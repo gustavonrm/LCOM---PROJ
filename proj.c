@@ -2,6 +2,7 @@
 #include <lcom/lcf.h>
 // Any header files included below this line should have been created by you
 
+#include "bitmap.h"
 #include "video_card.h"
 
 int main(int argc, char *argv[]) {
@@ -30,7 +31,16 @@ int main(int argc, char *argv[]) {
 
 int (proj_main_loop)() {
   vg_init(0x118);
-
+  printf("GOT HERE");
+  Bitmap* background;
+  if((background = loadBitmap("Background.bmp")) == NULL){
+    vg_exit();
+    return 1;
+  }
+  printf("GOT HERE2");
+  drawBitmap(background,0,0);
+  UpdateVideo();
+  printf("GOT HERE3");
   sleep(3);
 
   vg_exit(); 

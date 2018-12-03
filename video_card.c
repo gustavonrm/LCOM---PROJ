@@ -7,6 +7,8 @@ static uint16_t X_Res;
 static uint16_t Y_Res;
 static uint8_t B_per_pixel;
 static void *video_mem;
+static void *video_buffer;
+static uint32_t video_size;
 static uint8_t mem_model;
 static uint8_t red_mask_size;
 static uint8_t green_mask_size;
@@ -128,6 +130,9 @@ void* (vg_init)(uint16_t mode){
     return NULL;
   }
 
+  video_size = vram_size;
+  video_buffer = (char *) malloc(vram_size);
+
   return video_mem; 
 }
 
@@ -141,7 +146,9 @@ int draw_rectangle(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint
 }
 
 int draw_pixel(uint16_t x, uint16_t y, uint32_t color){
-  char *ptr = (char*)video_mem +(y * X_Res * B_per_pixel) +(x *B_per_pixel);
+  if(color == PINK) return 0;
+  char *ptr = (char*)video_buffer +(y * X_Res * B_per_pixel) +(x *B_per_pixel);
+  //printf("\nPIXEL COLOR: %x",color);
   memcpy(ptr,&color,B_per_pixel); 
   return 0;
 }
@@ -151,6 +158,10 @@ int vg_draw_line( uint16_t x, uint16_t y,uint16_t len,uint32_t color ){
     if(draw_pixel(x+i,y,color) != 0) return 1;
   }
   return 0; 
+}
+
+void UpdateVideo(){
+  memcpy(video_mem,video_buffer,video_size); 
 }
 
 int draw_xpm(xpm_image_t *image, uint8_t* map, uint16_t x, uint16_t y){

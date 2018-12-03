@@ -1,10 +1,17 @@
-#pragma once
+#ifndef _BITMAP_H_
+#define _BITMAP_H_
 
 /** @defgroup Bitmap Bitmap
- * @{
- * Functions for manipulating bitmaps
- */
+* @{
+*/
 
+#include <stdio.h>
+
+#define H_RES				1024
+#define V_RES				768
+#define PINK				0xfffffff8
+
+static char res_path[] = "home/lcom/labs/proj/res/"; ///< bitmap path
 typedef enum {
     ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT
 } Alignment;
@@ -33,7 +40,7 @@ typedef struct {
 /// Represents a Bitmap
 typedef struct {
     BitmapInfoHeader bitmapInfoHeader;
-    unsigned char* bitmapData;
+    unsigned int* bitmapData;
 } Bitmap;
 
 /**
@@ -42,7 +49,7 @@ typedef struct {
  * @param filename Path of the image to load
  * @return Non NULL pointer to the image buffer
  */
-Bitmap* loadBitmap(const char* filename);
+Bitmap* loadBitmap(char* filename);
 
 /**
  * @brief Draws an unscaled, unrotated bitmap at the given position
@@ -52,7 +59,7 @@ Bitmap* loadBitmap(const char* filename);
  * @param y destiny y coord
  * @param alignment image alignment
  */
-void drawBitmap(Bitmap* bitmap, int x, int y, Alignment alignment);
+void drawBitmap(Bitmap* bitmap, int x, int y);
 
 /**
  * @brief Destroys the given bitmap, freeing all resources used by it.
@@ -61,4 +68,4 @@ void drawBitmap(Bitmap* bitmap, int x, int y, Alignment alignment);
  */
 void deleteBitmap(Bitmap* bmp);
 
-/**@}*/
+#endif

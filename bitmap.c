@@ -1,16 +1,28 @@
 #include "bitmap.h"
 
 #include "stdio.h"
+#include "video_card.h"
 
-Bitmap* loadBitmap(const char* filename) {
+Bitmap* loadBitmap(char* filename) {
     // allocating necessary size
     Bitmap* bmp = (Bitmap*) malloc(sizeof(Bitmap));
 
+    char * file;
+    if((file = malloc(strlen(res_path)+strlen(filename)+1)) != NULL){
+        file[0] = '\0';   // ensures the memory is an empty string
+        strcat(file,res_path);
+        strcat(file,filename);
+    } else {
+        printf("malloc failed!\n");
+        return NULL;
+    }
     // open filename in read binary mode
     FILE *filePtr;
-    filePtr = fopen(filename, "rb");
-    if (filePtr == NULL)
+    filePtr = fopen(file, "rb");
+    if (filePtr == NULL){
+        printf("File not found: %s", file);
         return NULL;
+    }
 
     // read the bitmap file header
     BitmapFileHeader bitmapFileHeader;
@@ -32,7 +44,7 @@ Bitmap* loadBitmap(const char* filename) {
             break;
     } while (0);
 
-    if (rd = !1) {
+    if (rd != 1) {
         fprintf(stderr, "Error reading file\n");
         exit(-1);
     }
@@ -45,8 +57,7 @@ Bitmap* loadBitmap(const char* filename) {
     fseek(filePtr, bitmapFileHeader.offset, SEEK_SET);
 
     // allocate enough memory for the bitmap image data
-    unsigned char* bitmapImage = (unsigned char*) malloc(
-            bitmapInfoHeader.imageSize);
+    unsigned int* bitmapImage = (unsigned int*) malloc(bitmapInfoHeader.imageSize);
 
     // verify memory allocation
     if (!bitmapImage) {
@@ -73,21 +84,33 @@ Bitmap* loadBitmap(const char* filename) {
     return bmp;
 }
 
-void drawBitmap(Bitmap* bmp, int x, int y, Alignment alignment) {
+void drawBitmap(Bitmap* bmp, int x, int y) {
     if (bmp == NULL)
         return;
 
     int width = bmp->bitmapInfoHeader.width;
-    int drawWidth = width;
+    //int drawWidth = width;
     int height = bmp->bitmapInfoHeader.height;
 
-    if (alignment == ALIGN_CENTER)
+    for( int i=0; i<height; i++ ){
+        for(int j=0; j<width; j++){
+            uint32_t color = bmp->bitmapData[i * width + j];
+            draw_pixel(x+j,y+i,color); 
+        }
+    }
+
+
+
+
+
+
+    /*if (alignment == ALIGN_CENTER)
         x -= width / 2;
     else if (alignment == ALIGN_RIGHT)
         x -= width;
 
-    if (x + width < 0 || x > getHorResolution() || y + height < 0
-            || y > getVerResolution())
+    if (x + width < 0 || x > H_RES || y + height < 0
+            || y > Y_Res)
         return;
 
     int xCorrection = 0;
@@ -96,10 +119,10 @@ void drawBitmap(Bitmap* bmp, int x, int y, Alignment alignment) {
         drawWidth -= xCorrection;
         x = 0;
 
-        if (drawWidth > getHorResolution())
-            drawWidth = getHorResolution();
-    } else if (x + drawWidth >= getHorResolution()) {
-        drawWidth = getHorResolution() - x;
+        if (drawWidth > H_RES)
+            drawWidth = H_RES;
+    } else if (x + drawWidth >= H_RES) {
+        drawWidth = H_RES - x;
     }
 
     char* bufferStartPos;
@@ -109,16 +132,16 @@ void drawBitmap(Bitmap* bmp, int x, int y, Alignment alignment) {
     for (i = 0; i < height; i++) {
         int pos = y + height - 1 - i;
 
-        if (pos < 0 || pos >= getVerResolution())
+        if (pos < 0 || pos >= Y_Res)
             continue;
 
         bufferStartPos = getGraphicsBuffer();
-        bufferStartPos += x * 2 + pos * getHorResolution() * 2;
+        bufferStartPos += x * 2 + pos * H_RES * 2;
 
         imgStartPos = bmp->bitmapData + xCorrection * 2 + i * width * 2;
 
         memcpy(bufferStartPos, imgStartPos, drawWidth * 2);
-    }
+    }*/
 }
 
 void deleteBitmap(Bitmap* bmp) {
