@@ -1,6 +1,7 @@
 #include <lcom/lcf.h>
 #include "video_card.h"
 #include "macros.h"
+#include "bitmap.h"
 #include <math.h>
 
 static uint16_t X_Res;
@@ -55,24 +56,6 @@ uint8_t getGreenFieldPosition(){
 
 uint8_t getBlueFieldPosition(){
   return BlueFieldPosition;
-}
-
-uint32_t direct_color(uint16_t row, uint16_t col, uint32_t first, uint8_t step){
-  uint32_t Rmask = ((1 << getRedMaskSize()) - 1) << getRedFieldPosition();
-  unsigned Rvalue = (Rmask & first) >> getRedFieldPosition();
-    uint32_t R = (Rvalue + col * step) % (1 << getRedMaskSize());
-    R = R << getRedFieldPosition();
-  uint32_t Gmask = ((1 << getGreenMaskSize()) - 1) << getGreenFieldPosition();
-  unsigned Gvalue = (Gmask & first) >> getGreenFieldPosition();
-	  uint32_t G = (Gvalue + row * step) % (1 << getGreenMaskSize());
-    G = G << getGreenFieldPosition();
-  uint32_t Bmask = ((1 << getBlueMaskSize()) - 1) << getBlueFieldPosition();
-  unsigned Bvalue = (Bmask & first) >> getBlueFieldPosition();
-	  uint32_t B = (Bvalue + (col + row) * step) % (1 << getBlueMaskSize());
-    B = B << getBlueFieldPosition();
-
-  uint32_t color = R | G | B;
-  return color;
 }
 
 void* (vg_init)(uint16_t mode){
@@ -148,7 +131,6 @@ int draw_rectangle(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint
 int draw_pixel(uint16_t x, uint16_t y, uint32_t color){
   if(color == PINK) return 0;
   char *ptr = (char*)video_buffer +(y * X_Res * B_per_pixel) +(x *B_per_pixel);
-  //printf("\nPIXEL COLOR: %x",color);
   memcpy(ptr,&color,B_per_pixel); 
   return 0;
 }
@@ -164,25 +146,20 @@ void UpdateVideo(){
   memcpy(video_mem,video_buffer,video_size); 
 }
 
-int draw_xpm(xpm_image_t *image, uint8_t* map, uint16_t x, uint16_t y){
+void drawBitmap(Bitmap* bmp, int x, int y) {
+    if (bmp == NULL)
+        return;
 
-  int width, height;
-  /*char *map;
-  // get the pix map from the XPM
-  map = read_xpm(xpm, &width, &height);*/
-  // copy it to graphics memory
+    int width = bmp->bitmapInfoHeader.width;
+    //int drawWidth = width;
+    int height = bmp->bitmapInfoHeader.height;
 
-  //uint8_t* map = &image->map;
-  height = image->height;
-  width = image->width;
-
-  for( int i=0; i<height; i++ ){
-    for(int j=0; j<width; j++){
-      uint32_t color = map[i * width + j];
-     if(draw_pixel(x+j,y+i,color) != 0) return 1; 
+    for( int i=0; i<height; i++ ){
+        for(int j=0; j<width; j++){
+            uint32_t color = bmp->bitmapData[i * width + j];
+            draw_pixel(x+j,y+i,color); 
+        }
     }
-  }
-  return 0; 
 }
 
 

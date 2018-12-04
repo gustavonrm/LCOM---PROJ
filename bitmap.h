@@ -9,12 +9,8 @@
 
 #define H_RES				1024
 #define V_RES				768
-#define PINK				0xfffffff8
 
 static char res_path[] = "home/lcom/labs/proj/res/"; ///< bitmap path
-typedef enum {
-    ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT
-} Alignment;
 
 typedef struct {
     unsigned short type; // specifies the file type
@@ -50,16 +46,6 @@ typedef struct {
  * @return Non NULL pointer to the image buffer
  */
 Bitmap* loadBitmap(char* filename);
-
-/**
- * @brief Draws an unscaled, unrotated bitmap at the given position
- *
- * @param bitmap bitmap to be drawn
- * @param x destiny x coord
- * @param y destiny y coord
- * @param alignment image alignment
- */
-void drawBitmap(Bitmap* bitmap, int x, int y);
 
 /**
  * @brief Destroys the given bitmap, freeing all resources used by it.

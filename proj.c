@@ -4,6 +4,9 @@
 
 #include "bitmap.h"
 #include "video_card.h"
+#include "keyboard.h"
+
+Bitmap* background;
 
 int main(int argc, char *argv[]) {
   // sets the language of LCF messages (can be either EN-US or PT-PT)
@@ -31,16 +34,14 @@ int main(int argc, char *argv[]) {
 
 int (proj_main_loop)() {
   vg_init(0x118);
-  printf("GOT HERE");
-  Bitmap* background;
+
   if((background = loadBitmap("Background.bmp")) == NULL){
     vg_exit();
     return 1;
   }
-  printf("GOT HERE2");
   drawBitmap(background,0,0);
   UpdateVideo();
-  printf("GOT HERE3");
+
   sleep(3);
 
   vg_exit(); 

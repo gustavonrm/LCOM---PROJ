@@ -1,7 +1,7 @@
+#include <lcom/lcf.h>
 #include "bitmap.h"
 
 #include "stdio.h"
-#include "video_card.h"
 
 Bitmap* loadBitmap(char* filename) {
     // allocating necessary size
@@ -82,66 +82,6 @@ Bitmap* loadBitmap(char* filename) {
     bmp->bitmapInfoHeader = bitmapInfoHeader;
 
     return bmp;
-}
-
-void drawBitmap(Bitmap* bmp, int x, int y) {
-    if (bmp == NULL)
-        return;
-
-    int width = bmp->bitmapInfoHeader.width;
-    //int drawWidth = width;
-    int height = bmp->bitmapInfoHeader.height;
-
-    for( int i=0; i<height; i++ ){
-        for(int j=0; j<width; j++){
-            uint32_t color = bmp->bitmapData[i * width + j];
-            draw_pixel(x+j,y+i,color); 
-        }
-    }
-
-
-
-
-
-
-    /*if (alignment == ALIGN_CENTER)
-        x -= width / 2;
-    else if (alignment == ALIGN_RIGHT)
-        x -= width;
-
-    if (x + width < 0 || x > H_RES || y + height < 0
-            || y > Y_Res)
-        return;
-
-    int xCorrection = 0;
-    if (x < 0) {
-        xCorrection = -x;
-        drawWidth -= xCorrection;
-        x = 0;
-
-        if (drawWidth > H_RES)
-            drawWidth = H_RES;
-    } else if (x + drawWidth >= H_RES) {
-        drawWidth = H_RES - x;
-    }
-
-    char* bufferStartPos;
-    char* imgStartPos;
-
-    int i;
-    for (i = 0; i < height; i++) {
-        int pos = y + height - 1 - i;
-
-        if (pos < 0 || pos >= Y_Res)
-            continue;
-
-        bufferStartPos = getGraphicsBuffer();
-        bufferStartPos += x * 2 + pos * H_RES * 2;
-
-        imgStartPos = bmp->bitmapData + xCorrection * 2 + i * width * 2;
-
-        memcpy(bufferStartPos, imgStartPos, drawWidth * 2);
-    }*/
 }
 
 void deleteBitmap(Bitmap* bmp) {

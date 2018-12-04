@@ -3,6 +3,7 @@
 
 #include <lcom/lcf.h>
 #include "macros.h"
+#include "bitmap.h"
 
 uint16_t getXRes();
 uint16_t getYRes();
@@ -15,7 +16,7 @@ uint8_t getBlueMaskSize();
 
 int draw_rectangle(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t color);
 int vg_draw_line( uint16_t x, uint16_t y,uint16_t len,uint32_t color );
-int draw_xpm(xpm_image_t *image, uint8_t* map, uint16_t x, uint16_t y);
+void drawBitmap(Bitmap* bitmap, int x, int y);
 int draw_pixel(uint16_t x, uint16_t y, uint32_t color);
 void UpdateVideo();
 
