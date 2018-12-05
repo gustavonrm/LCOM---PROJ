@@ -21,6 +21,8 @@ int (timer_unsubscribe_int)() {
   return 0;
 }
 
-void (timer_int_handler)() {
+int timer_ih() {
+  if(counter == 60) counter = 0;
   counter++;
+  return counter;
 }

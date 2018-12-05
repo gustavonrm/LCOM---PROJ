@@ -30,10 +30,10 @@ typedef struct {
       bool moving; //movement complete or not
       int width, height;  // dimensions
       int xspeed, yspeed; // current speed
-      char *map;          // the pixmap
+      unsigned int *map;          // the pixmap
 } Sprite;
 
-Sprite *create_sprite(const char *pic[], int x, int y, int xf, int yf, int xspeed, int yspeed);
+Sprite *create_sprite(Bitmap* bmp, int x, int y, int xf, int yf, int xspeed, int yspeed);
 void destroy_sprite(Sprite *sp);
 int draw_sprite(Sprite *sp);
 

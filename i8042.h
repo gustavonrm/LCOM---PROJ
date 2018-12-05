@@ -8,6 +8,7 @@
  */
 
 #define KDB_IRQ	        1   /**< @brief keybord 1 IRQ line */
+#define MOUSE_IRQ   12   /**< @brief mouse 12 IRQ line */
 #define BIT(n) (0x01<<(n))
 
 #define OUT_BUF 0x60      //output buffer 
@@ -28,6 +29,19 @@
 #define OBF         BIT(0)
 #define PAR_ERR     BIT(7)
 #define TO_ERR      BIT(6)
+
+#define ENABLE_STREAM_CMD 0xf4
+#define SET_STREAM 0xea
+#define DISABLE_STREAM_CMD 0xf5
+#define SET_REMOTE_MODE 0xF0 
+#define MOUSE_CMD 0xd4 //command to write commands to mouse
+#define DISABLE_DATA_REPORT 0xf5
+
+#define ACK 0xfa  //Command recieved successfully
+#define NACK 0xfe  //Invalid byte recieved
+#define ERROR 0xfc  //second invalid byte recieved
+
+#define READ_DATA 0xEB //mouse packets readings 
 
 #define MAX_RETRIES 5
 #define IN_BUF 0x60       //intput buffer 

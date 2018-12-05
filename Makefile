@@ -1,6 +1,6 @@
 PROG=proj
 
-SRCS = proj.c video_card.c bitmap.c
+SRCS = proj.c video_card.c bitmap.c timer.c keyboard.c mouse_ih.c
 
 CPPFLAGS += -pedantic #-D __LCOM_OPTIMIZED__
 

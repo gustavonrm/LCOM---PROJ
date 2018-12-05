@@ -15,6 +15,4 @@
 #define SEGMENT(n)((n) >> 16 & 0x0FFFF)
 #define OFFSET(n) ((n) & 0x0FFFF)
 
-#define PINK				0xfffffff8
-
 #endif

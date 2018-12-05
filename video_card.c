@@ -58,6 +58,8 @@ uint8_t getBlueFieldPosition(){
   return BlueFieldPosition;
 }
 
+///////////////////////////////////
+
 void* (vg_init)(uint16_t mode){
   struct reg86u reg;
 
@@ -119,6 +121,8 @@ void* (vg_init)(uint16_t mode){
   return video_mem; 
 }
 
+///////////////////////////////////
+
 ////////RECTANGLE///////
 int draw_rectangle(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t color){
   for(uint16_t i=0; i<height; i++){
@@ -128,12 +132,17 @@ int draw_rectangle(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint
   return 0;
 }
 
+///////////////////////////////////
+
 int draw_pixel(uint16_t x, uint16_t y, uint32_t color){
-  if(color == PINK) return 0;
+  if(!(color & 0xff000000)) return 0;
+  //if(color == PINK) return 0;
   char *ptr = (char*)video_buffer +(y * X_Res * B_per_pixel) +(x *B_per_pixel);
   memcpy(ptr,&color,B_per_pixel); 
   return 0;
 }
+
+///////////////////////////////////
 
 int vg_draw_line( uint16_t x, uint16_t y,uint16_t len,uint32_t color ){
   for( uint16_t i=0; i< len ;i++){
@@ -142,9 +151,13 @@ int vg_draw_line( uint16_t x, uint16_t y,uint16_t len,uint32_t color ){
   return 0; 
 }
 
+///////////////////////////////////
+
 void UpdateVideo(){
   memcpy(video_mem,video_buffer,video_size); 
 }
+
+///////////////////////////////////
 
 void drawBitmap(Bitmap* bmp, int x, int y) {
     if (bmp == NULL)
@@ -154,6 +167,7 @@ void drawBitmap(Bitmap* bmp, int x, int y) {
     //int drawWidth = width;
     int height = bmp->bitmapInfoHeader.height;
 
+    //printf("PINK COLOR: %04X",bmp->bitmapData[0]);
     for( int i=0; i<height; i++ ){
         for(int j=0; j<width; j++){
             uint32_t color = bmp->bitmapData[i * width + j];
@@ -162,19 +176,15 @@ void drawBitmap(Bitmap* bmp, int x, int y) {
     }
 }
 
+////////////////SPRITE///////////////////
 
-/** Creates a new sprite with pixmap "pic", with specified
-position (within the screen limits) and speed;
-* Does not draw the sprite on the screen
-* Returns NULL on invalid pixmap.
-*/
-Sprite *create_sprite(const char *pic[], int x, int y, int xf, int yf, int xspeed, int yspeed) {
+Sprite *create_sprite(Bitmap* bmp, int x, int y, int xf, int yf, int xspeed, int yspeed) {
   //allocate space for the "object"
   Sprite *sp = (Sprite *) malloc ( sizeof(Sprite));
   if( sp == NULL ) return NULL;
   
   // read the sprite pixmap
-  sp->map = read_xpm(pic, &(sp->width), &(sp->height));
+  sp->map = bmp->bitmapData;
   if( sp->map == NULL ) {
     free(sp);
     return NULL;
@@ -192,6 +202,8 @@ Sprite *create_sprite(const char *pic[], int x, int y, int xf, int yf, int xspee
   return sp; 
 }
 
+///////////////////////////////////
+
 void destroy_sprite(Sprite *sp) {
   if( sp == NULL ) return;
   if( sp ->map ) free(sp->map);
@@ -201,9 +213,11 @@ void destroy_sprite(Sprite *sp) {
   // should do this @ the caller
 }
 
+///////////////////////////////////
+
 int draw_sprite(Sprite *sp) {
   if(sp->moving){
-    draw_rectangle(sp->x, sp->y, sp->width, sp->height,0);
+    draw_rectangle(sp->x, sp->y, sp->width, sp->height,PINK);
     sp->x = sp->x + sp->xspeed;
     sp->y = sp->y + sp->yspeed;
     if(sp->x > sp->xf && sp->x_dir) sp->x = sp->xf;
@@ -220,6 +234,8 @@ int draw_sprite(Sprite *sp) {
   sp->moving = (sp->x != sp->xf || sp->y != sp->yf);
   return 0;
 }
+
+///////////////////////////////////
 
 int new_vbe_get_mode_info(uint16_t mode,vbe_mode_info_t * vmi_p ){
 
@@ -252,6 +268,7 @@ int new_vbe_get_mode_info(uint16_t mode,vbe_mode_info_t * vmi_p ){
   return 0; 
 }
 
+///////////////////////////////////
 
 int vbe_get_ctrl_info(){
   
