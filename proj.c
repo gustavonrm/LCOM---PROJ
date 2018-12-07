@@ -13,6 +13,10 @@ Cursor *cursor;
 Wizard *player;
 extern uint8_t pack;
 extern uint8_t packets[3];
+//keyboard
+extern char words;
+extern uint16_t key;
+extern bool openTextBox; 
 
 int main(int argc, char *argv[])
 {
@@ -105,6 +109,16 @@ int Arena()
         {
           key = kbd_ih();
           if(key == U) UpdateVideo();
+          if (key == T)
+          {
+            openTextBox=true; 
+            UpdateVideo(); 
+          }
+          if (key == ENTER)
+          {
+            openTextBox=false; 
+            UpdateVideo(); 
+          }
         }
 
         if (msg.m_notify.interrupts & irq_mouse)  //MOUSE

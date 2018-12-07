@@ -37,5 +37,5 @@ bool LoadAssets();
 Wizard* CreateWizard(enum Wizard_color color, int center_x, int center_y, unsigned int rot);
 Cursor* CreateCursor(int x, int y);  //Creates Cursor obj
 void DrawCursor(Cursor *cursor); //Tests for out of bounds and draws appropriate Bitmap on screen
-
+void DrawTextBox();
 #endif

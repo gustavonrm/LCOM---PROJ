@@ -27,6 +27,7 @@ void DrawBitmap(Bitmap* bitmap, int x, int y);
 void UpdateVideo();
 
 
+
 ////SPRITE////
 
 Sprite* CreateSprite(char img_name[]);

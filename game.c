@@ -5,8 +5,14 @@
 
 Bitmap *background;
 Bitmap *P_Cursor;
+//mouse manip
 Bitmap *R_Cursor;
 Sprite *GreenWizard;
+//keyboard manip
+Bitmap *Letter_A;
+//...//
+Bitmap *TextBox;
+
 //List of all Sprites
 
 bool LoadAssets()
@@ -20,6 +26,14 @@ bool LoadAssets()
         return false;
     if ((R_Cursor = loadBitmap("Cursor_Released.bmp")) == NULL)
         return false;
+    if ((Letter_A = loadBitmap("A.bmp")) == NULL)
+        return false;
+
+    //...//
+
+    if ((TextBox = loadBitmap("Text_Box.bmp")) == NULL)
+        return false;
+    return true;
 
     return true;
 }
@@ -48,9 +62,10 @@ Wizard *CreateWizard(enum Wizard_color color, int center_x, int center_y, unsign
     return wizard;
 }
 
-Cursor* CreateCursor(int x, int y){
+Cursor *CreateCursor(int x, int y)
+{
     Cursor *cursor = (Cursor *)malloc(sizeof(Cursor));
-    
+
     cursor->x = x;
     cursor->y = y;
 
@@ -63,12 +78,22 @@ Cursor* CreateCursor(int x, int y){
 
 void DrawCursor(Cursor *cursor)
 {
-    if(cursor->x < 0) cursor->x = 0;
-    else if(cursor->x > H_RES) cursor->x = H_RES;
+    if (cursor->x < 0)
+        cursor->x = 0;
+    else if (cursor->x > H_RES)
+        cursor->x = H_RES;
 
-    if(cursor->y < 0) cursor->y = 0;
-    else if(cursor->y > V_RES) cursor->y = V_RES;
+    if (cursor->y < 0)
+        cursor->y = 0;
+    else if (cursor->y > V_RES)
+        cursor->y = V_RES;
 
-    if(cursor->press) DrawBitmap(cursor->pressed, cursor->x, cursor->y); 
-    else DrawBitmap(cursor->released, cursor->x, cursor->y);
+    if (cursor->press)
+        DrawBitmap(cursor->pressed, cursor->x, cursor->y);
+    else
+        DrawBitmap(cursor->released, cursor->x, cursor->y);
+}
+
+void DrawTextBox(){
+    DrawBitmap(TextBox,20,600);
 }

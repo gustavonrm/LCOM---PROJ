@@ -158,11 +158,14 @@ int vg_draw_line( uint16_t x, uint16_t y,uint16_t len,uint32_t color ){
 }
 
 ///////////////////////////////////
+bool openTextBox= false; 
 
 void UpdateVideo(){
   DrawBackground();
   DrawSprite(player->img, player->center_x, player->center_y, player->rot, true);
   DrawCursor(cursor);
+    if (openTextBox == true)
+    DrawTextBox();
   memcpy(video_mem,video_buffer,video_size); 
 }
 

@@ -13,7 +13,6 @@
 
 #define OUT_BUF 0x60      //output buffer 
 #define ESC_BREAK 0x81    //esc break key
-#define U         0x16    //U make code
 #define STAT_REG 0x64 
 #define OBF BIT(0)
 #define WAIT_KBC 20000
@@ -46,6 +45,39 @@
 
 #define MAX_RETRIES 5
 #define IN_BUF 0x60       //intput buffer 
+
+//Keycodes definitions 
+#define A   0x1e     
+#define B   0x30     
+#define C   0x2E    
+#define D   0x20     
+#define E   0x12     
+#define F   0x21     
+#define G   0x22     
+#define H   0x23     
+#define I   0x17     
+#define J   0x24     
+#define K   0x25     
+#define L   0x26     
+#define M   0x32     
+#define N   0x31     
+#define O   0x18     
+#define P   0x19    
+#define Q   0x10     
+#define R   0x13     
+#define S   0x1F     
+#define T   0x14  
+#define U   0x16     
+#define V   0x2F     
+#define W   0x11  
+#define X   0x2D     
+#define Y   0x15     
+#define Z   0x2C     
+
+#define ENTER 0X1C
+#define BACKSPACE 0X0E
+#define SPACEBAR 39 
+
 
 #endif 
 /* _LCOM_I8042_H */
