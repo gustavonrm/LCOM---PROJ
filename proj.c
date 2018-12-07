@@ -3,12 +3,12 @@
 // Any header files included below this line should have been created by you
 
 #include "bitmap.h"
+#include "game.h"
 #include "video_card.h"
 #include "keyboard.h"
 #include "timer.h"
 
-Bitmap* background;
-Bitmap* wizard;
+extern Bitmap* background;
 
 int main(int argc, char *argv[]) {
   // sets the language of LCF messages (can be either EN-US or PT-PT)
@@ -36,13 +36,8 @@ int main(int argc, char *argv[]) {
 
 int Arena(){
 
-
-  wizard = loadBitmap("Green_Hat.bmp");
-  Sprite* players = create_sprite(wizard, 300, 300, 301, 301, 1, 1);
-
-  drawBitmap(background,0,0);
-  drawBitmap(wizard, 300, 300);
-  draw_sprite(players);
+  Wizard* player = CreateWizard(Green, 560, 400, 0);
+  DrawSprite(player->img, player->center_x, player->center_y, player->rot);
   UpdateVideo();
   
   int counter = 0;
@@ -102,12 +97,14 @@ int Arena(){
 
 
 int (proj_main_loop)() {
-  vg_init(0x118);
+  vg_init(0x144);
 
-  if((background = loadBitmap("Background.bmp")) == NULL){
+  if(!LoadAssets()){
     vg_exit();
     return 1;
   }
+
+  DrawBitmap(background,0,0);
 
   Arena();
 

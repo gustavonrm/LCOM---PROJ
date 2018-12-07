@@ -7,9 +7,6 @@
 
 #include <stdio.h>
 
-#define H_RES				1024
-#define V_RES				768
-
 static char res_path[] = "home/lcom/labs/proj/res/"; ///< bitmap path
 
 typedef struct {

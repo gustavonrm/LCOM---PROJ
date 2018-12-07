@@ -5,6 +5,9 @@
 #include "macros.h"
 #include "bitmap.h"
 
+#define H_RES				1024
+#define V_RES				768
+
 uint16_t getXRes();
 uint16_t getYRes();
 uint8_t getByts_per_pixel();
@@ -16,8 +19,9 @@ uint8_t getBlueMaskSize();
 
 int draw_rectangle(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t color);
 int vg_draw_line( uint16_t x, uint16_t y,uint16_t len,uint32_t color );
-void drawBitmap(Bitmap* bitmap, int x, int y);
 int draw_pixel(uint16_t x, uint16_t y, uint32_t color);
+
+void DrawBitmap(Bitmap* bitmap, int x, int y);
 void UpdateVideo();
 
 
@@ -31,11 +35,11 @@ typedef struct {
       int width, height;  // dimensions
       int xspeed, yspeed; // current speed
       unsigned int *map;          // the pixmap
-} Sprite;
+} Sprites;
 
-Sprite *create_sprite(Bitmap* bmp, int x, int y, int xf, int yf, int xspeed, int yspeed);
-void destroy_sprite(Sprite *sp);
-int draw_sprite(Sprite *sp);
+Sprites *create_sprite(Bitmap* bmp, int x, int y, int xf, int yf, int xspeed, int yspeed);
+void destroy_sprite(Sprites *sp);
+int draw_sprite(Sprites *sp);
 
 int new_vbe_get_mode_info(uint16_t mode,vbe_mode_info_t * vmi_p );	
 int vbe_get_ctrl_info(); 

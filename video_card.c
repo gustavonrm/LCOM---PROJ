@@ -159,28 +159,27 @@ void UpdateVideo(){
 
 ///////////////////////////////////
 
-void drawBitmap(Bitmap* bmp, int x, int y) {
-    if (bmp == NULL)
-        return;
+void DrawBitmap(Bitmap* bmp, int x, int y) {
+  if (bmp == NULL) return;
 
-    int width = bmp->bitmapInfoHeader.width;
-    //int drawWidth = width;
-    int height = bmp->bitmapInfoHeader.height;
+  int width = bmp->bitmapInfoHeader.width;
+  int height = bmp->bitmapInfoHeader.height;
 
-    //printf("PINK COLOR: %04X",bmp->bitmapData[0]);
-    for( int i=0; i<height; i++ ){
-        for(int j=0; j<width; j++){
-            uint32_t color = bmp->bitmapData[i * width + j];
-            draw_pixel(x+j,y+i,color); 
-        }
+  for( int i=0; i<height; i++ ){
+    for(int j=0; j<width; j++){
+      if(x+j < 0 || x+j > H_RES || y+i < 0 || y+i > V_RES) continue;
+      //Checking if it's out of bounds ^^
+      uint32_t color = bmp->bitmapData[i * width + j];
+      draw_pixel(x+j,y+i,color); 
     }
+  }
 }
 
 ////////////////SPRITE///////////////////
 
-Sprite *create_sprite(Bitmap* bmp, int x, int y, int xf, int yf, int xspeed, int yspeed) {
+Sprites *create_sprite(Bitmap* bmp, int x, int y, int xf, int yf, int xspeed, int yspeed) {
   //allocate space for the "object"
-  Sprite *sp = (Sprite *) malloc ( sizeof(Sprite));
+  Sprites *sp = (Sprites *) malloc ( sizeof(Sprites));
   if( sp == NULL ) return NULL;
   
   // read the sprite pixmap
@@ -204,7 +203,7 @@ Sprite *create_sprite(Bitmap* bmp, int x, int y, int xf, int yf, int xspeed, int
 
 ///////////////////////////////////
 
-void destroy_sprite(Sprite *sp) {
+void destroy_sprite(Sprites *sp) {
   if( sp == NULL ) return;
   if( sp ->map ) free(sp->map);
   free(sp);
@@ -215,9 +214,9 @@ void destroy_sprite(Sprite *sp) {
 
 ///////////////////////////////////
 
-int draw_sprite(Sprite *sp) {
+int draw_sprite(Sprites *sp) {
   if(sp->moving){
-    draw_rectangle(sp->x, sp->y, sp->width, sp->height,PINK);
+    draw_rectangle(sp->x, sp->y, sp->width, sp->height, 0xff000000);
     sp->x = sp->x + sp->xspeed;
     sp->y = sp->y + sp->yspeed;
     if(sp->x > sp->xf && sp->x_dir) sp->x = sp->xf;
