@@ -10,6 +10,7 @@
 
 extern Bitmap *background;
 Cursor *cursor;
+Wizard *player;
 extern uint8_t pack;
 extern uint8_t packets[3];
 
@@ -40,11 +41,9 @@ int main(int argc, char *argv[])
 
 int Arena()
 {
-  Cursor *cursor = CreateCursor(500, 500);
-  Wizard *player = CreateWizard(Green, 560, 400, 0);
+  cursor = CreateCursor(500, 500);
+  player = CreateWizard(Green, 560, 400, 0);
   
-  DrawSprite(player->img, player->center_x, player->center_y, player->rot);
-  DrawCursor(cursor);
   UpdateVideo();
 
   int counter = 0;
@@ -97,7 +96,7 @@ int Arena()
         if (msg.m_notify.interrupts & irq_timer0)  //TIMER
         {
           counter = timer_ih();
-          //UpdateVideo();
+          UpdateVideo();
         }
 
         if (msg.m_notify.interrupts & irq_kbd)  //KEYBOARD
@@ -110,9 +109,9 @@ int Arena()
         {
           mouse = mouse_int_h();
           if(mouse != NULL) { //if mouse recieved something useful
+            cursor->press = mouse->lb;
             cursor->x += mouse->delta_x;
             cursor->y -= mouse->delta_y;  //it's - becuase y coordinates are counted downawrds
-            DrawCursor(cursor);
           }
         }
 

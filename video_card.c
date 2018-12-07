@@ -2,6 +2,7 @@
 #include "video_card.h"
 #include "macros.h"
 #include "bitmap.h"
+#include "game.h"
 #include <math.h>
 
 static uint16_t X_Res;
@@ -19,6 +20,9 @@ static uint8_t GreenFieldPosition;
 static uint8_t BlueFieldPosition;
 
 extern Cursor *cursor;
+extern Bitmap *background;
+extern Wizard *player;
+
 
 uint16_t getXRes(){
   return X_Res;
@@ -156,6 +160,7 @@ int vg_draw_line( uint16_t x, uint16_t y,uint16_t len,uint32_t color ){
 
 void UpdateVideo(){
   DrawBitmap(background, 0, 0);
+  DrawSprite(player->img, player->center_x, player->center_y, player->rot);
   DrawCursor(cursor);
   memcpy(video_mem,video_buffer,video_size); 
 }

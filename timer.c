@@ -23,6 +23,6 @@ int (timer_unsubscribe_int)() {
 
 int timer_ih() {
   if (ticks == 60) ticks = 0;
- ticks++;
+  ticks++;
   return ticks;
 }
