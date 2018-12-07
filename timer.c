@@ -5,10 +5,10 @@
 
 #include "i8254.h"
 
-unsigned int counter=0; 
+unsigned int ticks=0; 
 int timer_hook_id = 0;  //used for timer
 
-extern unsigned int counter;
+extern unsigned int ticks;
 
 int (timer_subscribe_int)(uint8_t *bit_no) {
   *bit_no = timer_hook_id;
@@ -22,7 +22,7 @@ int (timer_unsubscribe_int)() {
 }
 
 int timer_ih() {
-  if(counter == 60) counter = 0;
-  counter++;
-  return counter;
+  if (ticks == 60) ticks = 0;
+ ticks++;
+  return ticks;
 }

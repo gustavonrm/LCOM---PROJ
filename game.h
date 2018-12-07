@@ -27,10 +27,18 @@ typedef struct {
     enum Element_Type type;  //element type
 } Element;
 
+typedef struct {
+    int x, y;  //Current pointing positon
+    bool press;
+    Bitmap* pressed;
+    Bitmap* released;
+} Cursor;
+
 bool LoadAssets();
 Sprite* CreateSprite(char img_name[]);
 void DrawSprite(Sprite* img, int center_x, int center_y, unsigned int rot);
 Wizard* CreateWizard(enum Wizard_color color, int center_x, int center_y, unsigned int rot);
-void Cursor(bool LB_Pressed); 
+Cursor* CreateCursor(int x, int y);  //Creates Cursor obj
+void DrawCursor(Cursor *cursor); //Tests for out of bounds and draws appropriate Bitmap on screen
 
 #endif

@@ -13,6 +13,7 @@
 
 #define OUT_BUF 0x60      //output buffer 
 #define ESC_BREAK 0x81    //esc break key
+#define U         0x16    //U make code
 #define STAT_REG 0x64 
 #define OBF BIT(0)
 #define WAIT_KBC 20000

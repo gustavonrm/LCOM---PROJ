@@ -9,6 +9,7 @@
 #include "timer.h"
 
 extern Bitmap *background;
+Cursor *cursor;
 extern uint8_t pack;
 extern uint8_t packets[3];
 
@@ -39,21 +40,22 @@ int main(int argc, char *argv[])
 
 int Arena()
 {
-
+  Cursor *cursor = CreateCursor(500, 500);
   Wizard *player = CreateWizard(Green, 560, 400, 0);
+  
   DrawSprite(player->img, player->center_x, player->center_y, player->rot);
+  DrawCursor(cursor);
   UpdateVideo();
 
   int counter = 0;
   uint16_t key = 0;
+  struct packet* mouse;
 
   int r;
   message msg;
   int ipc_status;
   //unsigned int freq = 1; //frequency of updates(bcs there are 60 ticks/sec)
   //int frame_n = 0;
-
-  bool LB;
 
   uint8_t bit_no, bit_no_t, bit_no_m;
 
@@ -91,54 +93,27 @@ int Arena()
     { /* received notification */
       switch (_ENDPOINT_P(msg.m_source))
       {
-      case HARDWARE: /* hardware interrupt notification */
-        
-        if (msg.m_notify.interrupts & irq_timer0)
-        { // subscribed interrupt
-
+      case HARDWARE:     
+        if (msg.m_notify.interrupts & irq_timer0)  //TIMER
+        {
           counter = timer_ih();
           //UpdateVideo();
         }
 
-        if (msg.m_notify.interrupts & irq_kbd)
+        if (msg.m_notify.interrupts & irq_kbd)  //KEYBOARD
         {
-
           key = kbd_ih();
+          if(key == U) UpdateVideo();
         }
 
-        if (msg.m_notify.interrupts & irq_mouse)
+        if (msg.m_notify.interrupts & irq_mouse)  //MOUSE
         {
-          counter = 0;
-          while (counter != 4)
-          {
-            mouse_ih();
-            if (counter == 0)
-            { //Expecting first packet
-              if (pack & BIT(3))
-              { //It's first packet
-                packets[0] = pack;
-                counter++;
-              }
-            }
-            else
-            { //If expecting 2º or 3º packets
-              packets[counter] = pack;
-              counter++;
-            }
-            if (counter == 3)
-            { //If I have all three bytes
-              counter++;
-              if ((packets[0] & BIT(0)) == 1)
-              {
-                LB = true;
-              }
-              if ((packets[0] & BIT(0)) == 0)
-              {
-                LB = false;
-              }
-            }
+          mouse = mouse_int_h();
+          if(mouse != NULL) { //if mouse recieved something useful
+            cursor->x += mouse->delta_x;
+            cursor->y -= mouse->delta_y;  //it's - becuase y coordinates are counted downawrds
+            DrawCursor(cursor);
           }
-          Cursor(LB);
         }
 
         break;

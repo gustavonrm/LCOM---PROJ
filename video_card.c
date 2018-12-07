@@ -18,6 +18,8 @@ static uint8_t RedFieldPosition;
 static uint8_t GreenFieldPosition;
 static uint8_t BlueFieldPosition;
 
+extern Cursor *cursor;
+
 uint16_t getXRes(){
   return X_Res;
 }
@@ -135,8 +137,7 @@ int draw_rectangle(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint
 ///////////////////////////////////
 
 int draw_pixel(uint16_t x, uint16_t y, uint32_t color){
-  if(!(color & 0xff000000)) return 0;
-  //if(color == PINK) return 0;
+  if(!(color & 0xff000000)) return 0;  //Only draws fully opaque pixels
   char *ptr = (char*)video_buffer +(y * X_Res * B_per_pixel) +(x *B_per_pixel);
   memcpy(ptr,&color,B_per_pixel); 
   return 0;
@@ -154,6 +155,8 @@ int vg_draw_line( uint16_t x, uint16_t y,uint16_t len,uint32_t color ){
 ///////////////////////////////////
 
 void UpdateVideo(){
+  DrawBitmap(background, 0, 0);
+  DrawCursor(cursor);
   memcpy(video_mem,video_buffer,video_size); 
 }
 

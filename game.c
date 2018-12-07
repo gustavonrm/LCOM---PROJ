@@ -70,15 +70,27 @@ Wizard *CreateWizard(enum Wizard_color color, int center_x, int center_y, unsign
     return wizard;
 }
 
-void Cursor( bool LB_Pressed)
+Cursor* CreateCursor(int x, int y){
+    Cursor *cursor = (Cursor *)malloc(sizeof(Cursor));
+    
+    cursor->x = x;
+    cursor->y = y;
+
+    cursor->press = false;
+    cursor->pressed = P_Cursor;
+    cursor->released = R_Cursor;
+
+    return cursor;
+}
+
+void DrawCursor(Cursor *cursor)
 {
+    if(cursor->x < 0) cursor->x = 0;
+    else if(cursor->x > H_RES) cursor->x = H_RES;
 
-    if(LB_Pressed == false){
-      DrawBitmap(R_Cursor, 50, 50);  
-    }
-    if(LB_Pressed == true){
-        DrawBitmap(P_Cursor, 50, 50); 
-    }
+    if(cursor->y < 0) cursor->y = 0;
+    else if(cursor->y > V_RES) cursor->y = V_RES;
 
-
+    if(cursor->press) DrawBitmap(cursor->pressed, cursor->x, cursor->y); 
+    else DrawBitmap(cursor->released, cursor->x, cursor->y);
 }

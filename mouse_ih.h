@@ -8,7 +8,7 @@ int subscribe_mouse(uint8_t *bit_no);
 int unsubscribe_mouse();
 int enable_stream();
 int disable_stream();
-void (mouse_ih)();
+struct packet* mouse_int_h();
 void parse_packet(struct packet *pp, uint8_t packets[3]);
 
 int (disable_mouse_IH)();

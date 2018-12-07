@@ -4,8 +4,6 @@
 #include "i8042.h"
 
 int mouse_hook_id = 2;
-uint8_t bit_no = 0;
-uint8_t pack;
 uint8_t packets[3];
 
 unsigned int count = 0;
@@ -113,6 +111,7 @@ int disable_stream()
 
 void read_data()
 {
+  uint8_t pack;
   uint32_t stat, data;
   if (sys_inb(STAT_REG, &stat) != OK)
     return; //Read status
@@ -125,16 +124,45 @@ void read_data()
   else{}
 }
 
-void(mouse_ih)()
+////////////////////////////
+
+int counter = 0;
+struct packet pp;
+
+struct packet* mouse_int_h()
 {
+  uint8_t pack;
   uint32_t stat, data;
-  if (sys_inb(STAT_REG, &stat) != OK)return;
-  if (stat & OBF)
-  { //Check if there's anything in OUTPUT BUFFER
-    if (sys_inb(OUT_BUF, &data) != OK)return;
+  if (sys_inb(STAT_REG, &stat) != OK)return NULL;
+  if (stat & OBF && stat & AUX)
+  { //Check if there's anything in OUTPUT BUFFER from mouse
+    if (sys_inb(OUT_BUF, &data) != OK)return NULL;
       pack = (uint8_t)data;
   }
+
+  if (counter == 0)
+  { //Expecting first packet
+    if (pack & BIT(3))
+    { //It's first packet
+      packets[0] = pack;
+      counter++;
+    }
+  }
+  else
+  { //If expecting 2º or 3º packets
+    packets[counter] = pack;
+    counter++;
+  }
+  if (counter == 3)
+  { //If I have all three bytes
+    counter = 0;
+    parse_packet(&pp, packets);
+    return &pp;
+  }
+  return NULL;
 }
+
+////////////////////////////
 
 void parse_packet(struct packet *pp, uint8_t packets[3])
 {
@@ -158,6 +186,8 @@ void parse_packet(struct packet *pp, uint8_t packets[3])
   else
     pp->delta_y = (uint16_t)packets[2];
 }
+
+////////////////////////////
 
 int(mouse_write)(uint32_t CMD)
 {
@@ -194,6 +224,8 @@ int(mouse_write)(uint32_t CMD)
   //}
   return 0; //if success
 }
+
+uint8_t pack;
 
 int read_pcktB()
 { //function similir to all oothers implemented and those on lab3, it reads the byte basically
@@ -284,75 +316,3 @@ struct mouse_ev *update_event_type(struct packet *pp)
 //////////////////////////
 //////////////////////////
 //Project
-
-int mouse_cursor(/*int *x, int *y,*/ bool *LB)
-{
-
-  message msg;
-  int ipc_status, r;
-  int counter = 0;
-  uint8_t packets[3];
-  int cnt = 1;
-  while (cnt != 0)
-  {
-    if ((r = driver_receive(ANY, &msg, &ipc_status)) != 0)
-    {
-      printf("driver_receive failed with: %d", r);
-      continue;
-    }
-    if (is_ipc_notify(ipc_status))
-    { /* received notification */
-      switch (_ENDPOINT_P(msg.m_source))
-      {
-      case HARDWARE: /* hardware interrupt notification */
-        if (msg.m_notify.interrupts & BIT(bit_no))
-        { /* subscribed interrupt */
-          mouse_ih();
-          if (counter == 0)
-          { //Expecting first packet
-            if (pack & BIT(3))
-            { //It's first packet
-              packets[0] = pack;
-              counter++;
-            }
-          }
-          else
-          { //If expecting 2º or 3º packets
-            packets[counter] = pack;
-            counter++;
-          }
-          if (counter == 3)
-          { //If I have all three bytes
-            counter = 0;
-            cnt--;
-            if ((packets[0] & BIT(0)) == 1)
-            {
-              *LB = true;
-            }
-            if ((packets[0] & BIT(0)) == 0)
-            {
-              *LB = false;
-            }
-            /*if (packets[0] & BIT(4))
-            {
-              x = ((int)(0xFF00 | (uint16_t)packets[1]));
-            }
-            else
-              x = (int)packets[1];
-
-            if (packets[0] & BIT(5))
-            {
-              y= ((int)(0xFF00 | (uint16_t)packets[2]));
-            }
-            else
-              y= (int)packets[2];*/
-          }
-        }
-        break;
-      default:
-        break; /* no other notifications expected: do nothing */
-      }
-    }
-  }
-  return 0;
-}
