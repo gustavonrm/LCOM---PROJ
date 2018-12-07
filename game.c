@@ -1,6 +1,7 @@
 #include <lcom/lcf.h>
 
 #include "game.h"
+#include "video_card.h"
 
 Bitmap *background;
 Bitmap *P_Cursor;
@@ -21,29 +22,6 @@ bool LoadAssets()
         return false;
 
     return true;
-}
-
-Sprite *CreateSprite(char img_name[])
-{
-    Bitmap *bmp;
-    if ((bmp = loadBitmap(img_name)) == NULL)
-        return NULL;
-    Sprite *sprite = (Sprite *)malloc(sizeof(Sprite));
-
-    /*For cicle calling function to rotate the bitmap in 360 directions*/
-
-    sprite->bitmap[0] = bmp; //for now
-
-    return sprite;
-}
-
-void DrawSprite(Sprite *img, int center_x, int center_y, unsigned int rot)
-{
-    int x, y; //drawing position
-    x = center_x - img->bitmap[rot]->bitmapInfoHeader.width;
-    y = center_y - img->bitmap[rot]->bitmapInfoHeader.height;
-
-    DrawBitmap(img->bitmap[rot], x, y);
 }
 
 Wizard *CreateWizard(enum Wizard_color color, int center_x, int center_y, unsigned int rot)

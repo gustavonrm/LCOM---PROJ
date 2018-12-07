@@ -8,7 +8,7 @@
  */
 
 #define KDB_IRQ	        1   /**< @brief keybord 1 IRQ line */
-#define MOUSE_IRQ   12   /**< @brief mouse 12 IRQ line */
+#define MOUSE_IRQ       12   /**< @brief mouse 12 IRQ line */
 #define BIT(n) (0x01<<(n))
 
 #define OUT_BUF 0x60      //output buffer 

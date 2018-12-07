@@ -1,4 +1,5 @@
 #include <lcom/lcf.h>
+
 #include "video_card.h"
 #include "macros.h"
 #include "bitmap.h"
@@ -159,13 +160,17 @@ int vg_draw_line( uint16_t x, uint16_t y,uint16_t len,uint32_t color ){
 ///////////////////////////////////
 
 void UpdateVideo(){
-  DrawBitmap(background, 0, 0);
-  DrawSprite(player->img, player->center_x, player->center_y, player->rot);
+  DrawBackground();
+  DrawSprite(player->img, player->center_x, player->center_y, player->rot, true);
   DrawCursor(cursor);
   memcpy(video_mem,video_buffer,video_size); 
 }
 
 ///////////////////////////////////
+
+void DrawBackground(){
+  memcpy(video_buffer,background->bitmapData,background->bitmapInfoHeader.imageSize);
+}
 
 void DrawBitmap(Bitmap* bmp, int x, int y) {
   if (bmp == NULL) return;
@@ -185,35 +190,24 @@ void DrawBitmap(Bitmap* bmp, int x, int y) {
 
 ////////////////SPRITE///////////////////
 
-Sprites *create_sprite(Bitmap* bmp, int x, int y, int xf, int yf, int xspeed, int yspeed) {
-  //allocate space for the "object"
-  Sprites *sp = (Sprites *) malloc ( sizeof(Sprites));
-  if( sp == NULL ) return NULL;
-  
-  // read the sprite pixmap
-  sp->map = bmp->bitmapData;
-  if( sp->map == NULL ) {
-    free(sp);
-    return NULL;
-  }
+Sprite *CreateSprite(char img_name[])
+{
+  Bitmap *bmp;
+  if ((bmp = loadBitmap(img_name)) == NULL)
+        return NULL;
+  Sprite *sprite = (Sprite *)malloc(sizeof(Sprite));
 
-  if(xf-x > 0) sp->x_dir = true;
-  else sp->x_dir = false;
-  if(yf-y > 0) sp->y_dir = true;
-  else sp->y_dir = false;
-  sp->xspeed = xspeed;
-  sp->yspeed = yspeed;
-  sp->moving = ((x != xf || y != yf) && (xspeed != 0 || yspeed != 0));
-  sp->x = x; sp->y = y;
-  sp->xf = xf; sp->yf = yf;
-  return sp; 
+    /*For cicle calling function to rotate the bitmap in 360 directions*/
+
+  sprite->bitmap[0] = bmp; //for now
+
+    return sprite;
 }
 
 ///////////////////////////////////
 
-void destroy_sprite(Sprites *sp) {
+void destroy_sprite(Sprite *sp) {
   if( sp == NULL ) return;
-  if( sp ->map ) free(sp->map);
   free(sp);
   sp = NULL;    
   // XXX: pointer is passed by value
@@ -222,24 +216,30 @@ void destroy_sprite(Sprites *sp) {
 
 ///////////////////////////////////
 
-int draw_sprite(Sprites *sp) {
-  if(sp->moving){
-    draw_rectangle(sp->x, sp->y, sp->width, sp->height, 0xff000000);
-    sp->x = sp->x + sp->xspeed;
-    sp->y = sp->y + sp->yspeed;
-    if(sp->x > sp->xf && sp->x_dir) sp->x = sp->xf;
-    else if(sp->x < sp->xf && !sp->x_dir) sp->x = sp->xf;
-    if(sp->y > sp-> yf && sp->y_dir) sp->y = sp->yf;
-    else if(sp->y < sp->yf && !sp->y_dir) sp->y = sp->yf;
+void DrawSprite(Sprite *img, int center_x, int center_y, unsigned int rot, bool centered)
+{
+  int x, y; //drawing position
+  int width, height;
+
+  width = img->bitmap[rot]->bitmapInfoHeader.width;
+  height = img->bitmap[rot]->bitmapInfoHeader.height;
+
+  if(centered){
+    x = center_x - img->bitmap[rot]->bitmapInfoHeader.width;
+    y = center_y - img->bitmap[rot]->bitmapInfoHeader.height;
   }
-  for( int i=0; i<sp->height; i++ ){
-    for(int j=0; j<sp->width; j++){
-      uint32_t color = sp->map[i * sp->width + j];
-     if(draw_pixel(sp->x+j,sp->y+i,color) != 0) return 1; 
+  else{
+    x = center_x;
+    y = center_y;
+  }
+
+  for( int i=0; i<height; i++ ){
+    for(int j=0; j<width; j++){
+      if(x+j < 0 || x+j > H_RES || y+i < 0 || y+i > V_RES) continue; //Checking if it's out of bounds
+      uint32_t color = img->bitmap[rot]->bitmapData[i * width + j];
+      draw_pixel(x+j,y+i,color); 
     }
   }
-  sp->moving = (sp->x != sp->xf || sp->y != sp->yf);
-  return 0;
 }
 
 ///////////////////////////////////

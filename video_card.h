@@ -3,7 +3,7 @@
 
 #include <lcom/lcf.h>
 #include "macros.h"
-#include "bitmap.h"
+#include "game.h"
 
 #define H_RES				1024
 #define V_RES				768
@@ -21,25 +21,17 @@ int draw_rectangle(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint
 int vg_draw_line( uint16_t x, uint16_t y,uint16_t len,uint32_t color );
 int draw_pixel(uint16_t x, uint16_t y, uint32_t color);
 
+
+void DrawBackground();
 void DrawBitmap(Bitmap* bitmap, int x, int y);
 void UpdateVideo();
 
 
 ////SPRITE////
 
-typedef struct {
-      int x, y; // current position
-      int xf, yf; //final position
-      bool x_dir, y_dir; //true if positive direction;
-      bool moving; //movement complete or not
-      int width, height;  // dimensions
-      int xspeed, yspeed; // current speed
-      unsigned int *map;          // the pixmap
-} Sprites;
-
-Sprites *create_sprite(Bitmap* bmp, int x, int y, int xf, int yf, int xspeed, int yspeed);
-void destroy_sprite(Sprites *sp);
-int draw_sprite(Sprites *sp);
+Sprite* CreateSprite(char img_name[]);
+void destroy_sprite(Sprite *sp);
+void DrawSprite(Sprite *sp, int center_x, int center_y, unsigned int rot, bool centered);
 
 int new_vbe_get_mode_info(uint16_t mode,vbe_mode_info_t * vmi_p );	
 int vbe_get_ctrl_info(); 

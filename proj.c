@@ -41,6 +41,7 @@ int main(int argc, char *argv[])
 
 int Arena()
 {
+
   cursor = CreateCursor(500, 500);
   player = CreateWizard(Green, 560, 400, 0);
   
@@ -96,6 +97,7 @@ int Arena()
         if (msg.m_notify.interrupts & irq_timer0)  //TIMER
         {
           counter = timer_ih();
+          //if(counter == 2)
           UpdateVideo();
         }
 
@@ -153,8 +155,6 @@ int(proj_main_loop)()
     vg_exit();
     return 1;
   }
-
-  DrawBitmap(background, 0, 0);
 
   Arena();
 
