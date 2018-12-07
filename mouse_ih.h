@@ -60,5 +60,6 @@ typedef struct mouse_ev {
 
 void state_machine(struct mouse_ev *evt, uint8_t x_len ,uint8_t tolerance);
 struct mouse_ev* update_event_type(struct packet *pp);
+int mouse_cursor(/*int* x,int* y,*/ bool* LB); 
 
 #endif

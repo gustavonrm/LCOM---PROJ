@@ -8,9 +8,12 @@
 #include "keyboard.h"
 #include "timer.h"
 
-extern Bitmap* background;
+extern Bitmap *background;
+extern uint8_t pack;
+extern uint8_t packets[3];
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
   // sets the language of LCF messages (can be either EN-US or PT-PT)
   lcf_set_language("EN-US");
 
@@ -34,12 +37,13 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
-int Arena(){
+int Arena()
+{
 
-  Wizard* player = CreateWizard(Green, 560, 400, 0);
+  Wizard *player = CreateWizard(Green, 560, 400, 0);
   DrawSprite(player->img, player->center_x, player->center_y, player->rot);
   UpdateVideo();
-  
+
   int counter = 0;
   uint16_t key = 0;
 
@@ -49,69 +53,140 @@ int Arena(){
   //unsigned int freq = 1; //frequency of updates(bcs there are 60 ticks/sec)
   //int frame_n = 0;
 
-  uint8_t bit_no, bit_no_t;
+  bool LB;
 
-  if (subscribe_kbd(&bit_no) != 0) {
+  uint8_t bit_no, bit_no_t, bit_no_m;
+
+  if (enable_stream() == 1)
+  {
+    if (enable_stream() == -1)
+      return 1;
+  }
+
+  if (subscribe_kbd(&bit_no) != 0)
+  {
     return 1;
   }
 
-  if (timer_subscribe_int(&bit_no_t) != 0) {
+  if (timer_subscribe_int(&bit_no_t) != 0)
+  {
     return 1;
   }
 
-  uint32_t irq_kbd= BIT(bit_no), irq_timer0 = BIT(bit_no_t);
-      
-  while((key != ESC_BREAK)){
-    if ((r = driver_receive(ANY, &msg, &ipc_status)) != 0) { 
+  if (subscribe_mouse(&bit_no_m) != 0)
+  {
+    return 1;
+  }
+
+  uint32_t irq_kbd = BIT(bit_no), irq_timer0 = BIT(bit_no_t), irq_mouse = BIT(bit_no_m);
+
+  while ((key != ESC_BREAK))
+  {
+    if ((r = driver_receive(ANY, &msg, &ipc_status)) != 0)
+    {
       printf("driver_receive failed with: %d", r);
       continue;
-    }    
-    if (is_ipc_notify(ipc_status)) { /* received notification */
-      switch (_ENDPOINT_P(msg.m_source)) {
-        case HARDWARE: /* hardware interrupt notification */
-          if (msg.m_notify.interrupts & irq_timer0) { // subscribed interrupt
-            
-            counter = timer_ih();
-            //UpdateVideo();
-            
-          }
+    }
+    if (is_ipc_notify(ipc_status))
+    { /* received notification */
+      switch (_ENDPOINT_P(msg.m_source))
+      {
+      case HARDWARE: /* hardware interrupt notification */
+        
+        if (msg.m_notify.interrupts & irq_timer0)
+        { // subscribed interrupt
 
-          if (msg.m_notify.interrupts & irq_kbd){
-            
-            key = kbd_ih();
-          
+          counter = timer_ih();
+          //UpdateVideo();
+        }
+
+        if (msg.m_notify.interrupts & irq_kbd)
+        {
+
+          key = kbd_ih();
+        }
+
+        if (msg.m_notify.interrupts & irq_mouse)
+        {
+          counter = 0;
+          while (counter != 4)
+          {
+            mouse_ih();
+            if (counter == 0)
+            { //Expecting first packet
+              if (pack & BIT(3))
+              { //It's first packet
+                packets[0] = pack;
+                counter++;
+              }
+            }
+            else
+            { //If expecting 2º or 3º packets
+              packets[counter] = pack;
+              counter++;
+            }
+            if (counter == 3)
+            { //If I have all three bytes
+              counter++;
+              if ((packets[0] & BIT(0)) == 1)
+              {
+                LB = true;
+              }
+              if ((packets[0] & BIT(0)) == 0)
+              {
+                LB = false;
+              }
+            }
           }
+          Cursor(LB);
+        }
+
         break;
-        default:
-        break; 
+      default:
+        break;
       }
     }
   }
 
-  if(timer_unsubscribe_int()!=OK) {
+  if (unsubscribe_mouse() != 0)
+  {
     return 1;
   }
-  if(unsubscribe_keyboard() !=OK) return 1; 
+
+  if (timer_unsubscribe_int() != OK)
+  {
+    return 1;
+  }
+  if (unsubscribe_keyboard() != OK)
+  {
+    return 1;
+  }
+
+  if (disable_stream() == 1)
+  { //if it returns 1 then we should try again
+    if (disable_stream() == -1)
+      return 1; //if it returns -1 then there was a fatal error
+  }
   return 0;
 }
 
-
-int (proj_main_loop)() {
+int(proj_main_loop)()
+{
   vg_init(0x144);
 
-  if(!LoadAssets()){
+  if (!LoadAssets())
+  {
     vg_exit();
     return 1;
   }
 
-  DrawBitmap(background,0,0);
+  DrawBitmap(background, 0, 0);
 
   Arena();
 
-  vg_exit(); 
+  vg_exit();
   return 0;
 }
 
-
 //argc numero de argumentos entre ""
-//argv array cujos elementos sao os argumentos transatos 
+//argv array cujos elementos sao os argumentos transatos

@@ -3,6 +3,7 @@
 
 #include "bitmap.h"
 #include "video_card.h"
+#include "mouse_ih.h"
 
 enum Element_Type { Air, Earth, Water, Fire };
 enum Wizard_color { Red, Green, Blue, Yellow };
@@ -30,6 +31,6 @@ bool LoadAssets();
 Sprite* CreateSprite(char img_name[]);
 void DrawSprite(Sprite* img, int center_x, int center_y, unsigned int rot);
 Wizard* CreateWizard(enum Wizard_color color, int center_x, int center_y, unsigned int rot);
-
+void Cursor(bool LB_Pressed); 
 
 #endif
