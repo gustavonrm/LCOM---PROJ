@@ -190,12 +190,10 @@ void UpdateVideo()
   DrawCursor(cursor);
   if (openTextBox == true)
   {
-
     //para desenhar as letras, com a string q guarda a palavra, vai comparar
     // cada letra uma a uma e por cada letra vai dando displau no ecra a letra respetiva uma a uma
     DrawTextBox();
     Draw_string(); 
-
   }
   memcpy(video_mem, video_buffer, video_size);
 }

@@ -1,11 +1,42 @@
 #include <lcom/lcf.h>
 #include <keyboard.h>
 #include "video_card.h"
+#include "game.h"
+
+extern bool openTextBox;
+
+extern Bitmap *P_Cursor;
 
 int kbd_hook_id = 1;
-char words[] = "";
+char words[50] = "";
+int text_index;
 //alphabet
 extern Bitmap *Letter_A;
+extern Bitmap *Letter_B;
+extern Bitmap *Letter_C;
+extern Bitmap *Letter_D;
+extern Bitmap *Letter_E;
+extern Bitmap *Letter_F;
+extern Bitmap *Letter_G;
+extern Bitmap *Letter_H;
+extern Bitmap *Letter_I;
+extern Bitmap *Letter_J;
+extern Bitmap *Letter_K;
+extern Bitmap *Letter_L;
+extern Bitmap *Letter_M;
+extern Bitmap *Letter_N;
+extern Bitmap *Letter_O;
+extern Bitmap *Letter_P;
+extern Bitmap *Letter_Q;
+extern Bitmap *Letter_R;
+extern Bitmap *Letter_S;
+extern Bitmap *Letter_T;
+extern Bitmap *Letter_U;
+extern Bitmap *Letter_V;
+extern Bitmap *Letter_W;
+extern Bitmap *Letter_X;
+extern Bitmap *Letter_Y;
+extern Bitmap *Letter_Z;
 
 int subscribe_kbd(uint8_t *kbd_bit_no)
 {
@@ -66,164 +97,226 @@ uint16_t kbd_ih()
   return 1;
 }
 
-void write_key(uint16_t key)
+void write_key(uint16_t key, int text_index)
 {
-  //words = "";
-  char src[1];
   switch (key)
   {
-  //letters
   case A:
-    src[0] = 'A';
-    strcat(words, src);
+    words[text_index] = 'A';
+    break;
   case B:
-    src[0] = 'B';
-    strcat(words, src);
+    words[text_index] = 'B';
+    break;
   case C:
-    src[0] = 'C';
-    strcat(words, src);
+    words[text_index] = 'C';
+    break;
   case D:
-    src[0] = 'D';
-    strcat(words, src);
+    words[text_index] = 'D';
+    break;
   case E:
-    src[0] = 'E';
-    strcat(words, src);
+    words[text_index] = 'E';
+    break;
   case F:
-    src[0] = 'F';
-    strcat(words, src);
+    words[text_index] = 'F';
+    break;
   case G:
-    src[0] = 'G';
-    strcat(words, src);
+    words[text_index] = 'G';
+    break;
   case H:
-    src[0] = 'H';
-    strcat(words, src);
+    words[text_index] = 'H';
+    break;
   case I:
-    src[0] = 'I';
-    strcat(words, src);
+    words[text_index] = 'I';
+    break;
   case J:
-    src[0] = 'J';
-    strcat(words, src);
+    words[text_index] = 'J';
+    break;
   case K:
-    src[0] = 'K';
-    strcat(words, src);
+    words[text_index] = 'K';
+    break;
   case L:
-    src[0] = 'L';
-    strcat(words, src);
+    words[text_index] = 'L';
+    break;
   case M:
-    src[0] = 'M';
-    strcat(words, src);
+    words[text_index] = 'M';
+    break;
   case N:
-    src[0] = 'N';
-    strcat(words, src);
+    words[text_index] = 'N';
+    break;
   case O:
-    src[0] = 'O';
-    strcat(words, src);
+    words[text_index] = 'O';
+    break;
   case P:
-    src[0] = 'P';
-    strcat(words, src);
+    words[text_index] = 'P';
+    break;
   case Q:
-    src[0] = 'Q';
-    strcat(words, src);
+    words[text_index] = 'Q';
+    break;
   case R:
-    src[0] = 'R';
-    strcat(words, src);
+    words[text_index] = 'R';
+    break;
   case S:
-    src[0] = 'S';
-    strcat(words, src);
+    words[text_index] = 'S';
+    break;
   case T:
-    src[0] = 'T';
-    strcat(words, src);
+    words[text_index] = 'T';
+    break;
   case U:
-    src[0] = 'U';
-    strcat(words, src);
+    words[text_index] = 'U';
+    break;
   case V:
-    src[0] = 'V';
-    strcat(words, src);
+    words[text_index] = 'V';
+    break;
   case W:
-    src[0] = 'W';
-    strcat(words, src);
+    words[text_index] = 'W';
+    break;
   case X:
-    src[0] = 'X';
-    strcat(words, src);
+    words[text_index] = 'X';
+    break;
   case Y:
-    src[0] = 'Y';
-    strcat(words, src);
+    words[text_index] = 'Y';
+    break;
   case Z:
-    src[0] = 'Z';
-    strcat(words, src);
-  //operations
-  case ENTER:
+    words[text_index] = 'Z';
+    break;
+  case SPACEBAR:
+    words[text_index] = ' ';
     break;
   case BACKSPACE:
-
-  case SPACEBAR:
-    strcat(words, src);
+    words[text_index] = '\0';
+    text_index--;
+    break;
+  case ENTER:
+    text_index = 0;
+    break;
   }
+  text_index++;
 }
-
-char palavra[] = "ABRAKADABRA";
+char palavraTeste[] = "ABRAKADABRA";
 
 void Draw_string()
 {
 
-  int x = 5, y = 650;
-  for (size_t i = 0; i < strlen(palavra); i++)
+  int x = 20, y = 605;
+  for (size_t i = 0; i < strlen(words); i++)
   {
-    x += 10;
-    switch (palavra[i])
+    x += 12;
+    switch (words[i])
     {
     case 'A':
       DrawBitmap(Letter_A, x, y);
+      break;
     case 'B':
-      DrawBitmap(Letter_A, x, y);
+      DrawBitmap(Letter_B, x, y);
+      break;
     case 'C':
-      DrawBitmap(Letter_A, x, y);
+      DrawBitmap(Letter_C, x, y);
+      break;
     case 'D':
-      DrawBitmap(Letter_A, x, y);
+      DrawBitmap(Letter_D, x, y);
+      break;
     case 'E':
-      DrawBitmap(Letter_A, x, y);
+      DrawBitmap(Letter_E, x, y);
+      break;
     case 'F':
-      DrawBitmap(Letter_A, x, y);
+      DrawBitmap(Letter_F, x, y);
+      break;
     case 'G':
-      DrawBitmap(Letter_A, x, y);
+      DrawBitmap(Letter_G, x, y);
+      break;
     case 'H':
-      DrawBitmap(Letter_A, x, y);
+      DrawBitmap(Letter_H, x, y);
+      break;
     case 'I':
-      DrawBitmap(Letter_A, x, y);
+      DrawBitmap(Letter_I, x, y);
+      break;
     case 'J':
-      DrawBitmap(Letter_A, x, y);
+      DrawBitmap(Letter_J, x, y);
+      break;
     case 'K':
-      DrawBitmap(Letter_A, x, y);
+      DrawBitmap(Letter_K, x, y);
+      break;
     case 'L':
-      DrawBitmap(Letter_A, x, y);
+      DrawBitmap(Letter_L, x, y);
+      break;
     case 'M':
-      DrawBitmap(Letter_A, x, y);
+      DrawBitmap(Letter_M, x, y);
+      break;
     case 'N':
-      DrawBitmap(Letter_A, x, y);
+      DrawBitmap(Letter_N, x, y);
+      break;
     case 'O':
-      DrawBitmap(Letter_A, x, y);
+      DrawBitmap(Letter_O, x, y);
+      break;
     case 'P':
-      DrawBitmap(Letter_A, x, y);
+      DrawBitmap(Letter_P, x, y);
+      break;
     case 'Q':
-      DrawBitmap(Letter_A, x, y);
+      DrawBitmap(Letter_Q, x, y);
+      break;
     case 'R':
-      DrawBitmap(Letter_A, x, y);
+      DrawBitmap(Letter_R, x, y);
+      break;
     case 'S':
-      DrawBitmap(Letter_A, x, y);
+      DrawBitmap(Letter_S, x, y);
+      break;
     case 'T':
-      DrawBitmap(Letter_A, x, y);
+      DrawBitmap(Letter_T, x, y);
+      break;
     case 'U':
-      DrawBitmap(Letter_A, x, y);
+      DrawBitmap(Letter_U, x, y);
+      break;
     case 'V':
-      DrawBitmap(Letter_A, x, y);
+      DrawBitmap(Letter_V, x, y);
+      break;
     case 'W':
-      DrawBitmap(Letter_A, x, y);
+      DrawBitmap(Letter_W, x, y);
+      break;
     case 'X':
-      DrawBitmap(Letter_A, x, y);
+      DrawBitmap(Letter_X, x, y);
+      break;
     case 'Y':
-      DrawBitmap(Letter_A, x, y);
+      DrawBitmap(Letter_Y, x, y);
+      break;
     case 'Z':
-      DrawBitmap(Letter_A, x, y);
+      DrawBitmap(Letter_Z, x, y);
+      break;
     }
+  }
+}
+
+void keyboard_utilities(uint16_t key)
+{
+  if (key == U)
+    UpdateVideo();
+  if (openTextBox == true)
+  {
+    write_key(key, text_index); //erro esta aqui
+    UpdateVideo();
+    text_index++;
+  }
+  if (key == TAB)
+  {
+    text_index = 0;
+    printf("box %s\n", "blue");
+    openTextBox = true;
+    UpdateVideo();
+  }
+  if (key == ENTER)
+  {
+    write_key(key, text_index);
+
+    printf("close %s\n", "blue");
+    //reset
+    openTextBox = false;
+    text_index = 0;
+    strcpy(words, "");
+    UpdateVideo();
+  }
+  if (openTextBox == false)
+  {
+    printf("clean %s\n", "blue");
+    //strcpy(&words,"");
+    UpdateVideo();
   }
 }

@@ -10,8 +10,9 @@ int subscribe_kbd(uint8_t *bit_no);
 int unsubscribe_keyboard();
 uint16_t kbd_ih();
 
-void write_key(uint16_t key);
+void write_key(uint16_t key,int text_index);
 void Draw_string(); 
+void keyboard_utilities(uint16_t key);
 
 
 #endif

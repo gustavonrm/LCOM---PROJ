@@ -14,9 +14,8 @@ Wizard *player;
 extern uint8_t pack;
 extern uint8_t packets[3];
 //keyboard
-extern char words;
 extern uint16_t key;
-extern bool openTextBox; 
+
 
 int main(int argc, char *argv[])
 {
@@ -45,15 +44,14 @@ int main(int argc, char *argv[])
 
 int Arena()
 {
-
   cursor = CreateCursor(500, 500);
   player = CreateWizard(Green, 560, 400, 0);
-  
+
   UpdateVideo();
 
   int counter = 0;
   uint16_t key = 0;
-  struct packet* mouse;
+  struct packet *mouse;
 
   int r;
   message msg;
@@ -97,37 +95,28 @@ int Arena()
     { /* received notification */
       switch (_ENDPOINT_P(msg.m_source))
       {
-      case HARDWARE:     
-        if (msg.m_notify.interrupts & irq_timer0)  //TIMER
+      case HARDWARE:
+        if (msg.m_notify.interrupts & irq_timer0) //TIMER
         {
           counter = timer_ih();
           //if(counter == 2)
           UpdateVideo();
         }
 
-        if (msg.m_notify.interrupts & irq_kbd)  //KEYBOARD
+        if (msg.m_notify.interrupts & irq_kbd) //KEYBOARD
         {
           key = kbd_ih();
-          if(key == U) UpdateVideo();
-          if (key == T)
-          {
-            openTextBox=true; 
-            UpdateVideo(); 
-          }
-          if (key == ENTER)
-          {
-            openTextBox=false; 
-            UpdateVideo(); 
-          }
+          keyboard_utilities(key); 
         }
 
-        if (msg.m_notify.interrupts & irq_mouse)  //MOUSE
+        if (msg.m_notify.interrupts & irq_mouse) //MOUSE
         {
           mouse = mouse_int_h();
-          if(mouse != NULL) { //if mouse recieved something useful
+          if (mouse != NULL)
+          { //if mouse recieved something useful
             cursor->press = mouse->lb;
             cursor->x += mouse->delta_x;
-            cursor->y -= mouse->delta_y;  //it's - becuase y coordinates are counted downawrds
+            cursor->y -= mouse->delta_y; //it's - becuase y coordinates are counted downawrds
           }
         }
 
