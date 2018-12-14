@@ -76,7 +76,7 @@
 
 #define ENTER 0X1C
 #define BACKSPACE 0X0E
-#define SPACEBAR 39 
+#define SPACEBAR 0x39 
 #define TAB 0x0f
 
 
