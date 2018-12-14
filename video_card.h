@@ -31,7 +31,6 @@ void UpdateVideo();
 ////SPRITE////
 
 Sprite* CreateSprite(char img_name[]);
-Bitmap* RotateImage(Bitmap* image, float angle);
 void destroy_sprite(Sprite *sp);
 void DrawSprite(Sprite *sp, int center_x, int center_y, unsigned int rot, bool centered);
 

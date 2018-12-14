@@ -186,7 +186,7 @@ bool openTextBox = false;
 void UpdateVideo()
 {
   DrawBackground();
-  DrawSprite(player->img, player->center_x, player->center_y, 45, true);
+  DrawSprite(player->img, player->center_x, player->center_y, player->rot, true);
   DrawCursor(cursor);
   if (openTextBox == true)
   {
@@ -235,61 +235,11 @@ Sprite *CreateSprite(char img_name[])
     return NULL;
   Sprite *sprite = (Sprite *)malloc(sizeof(Sprite));
 
-  for(int i = 1; i < 360; i++){
-    Bitmap* rotated = RotateImage(bmp,i);
-    sprite->bitmap[i] = rotated;
-  }
+  /*For cicle calling function to rotate the bitmap in 360 directions*/
 
   sprite->bitmap[0] = bmp; //for now
 
   return sprite;
-}
-
-///////////////////////////////////////
-
-Bitmap* RotateImage(Bitmap* image, float angle){
-  angle = angle * M_PI / 180.0;
-  Bitmap *bmp = (Bitmap *)malloc(sizeof(Bitmap)); //New bitmap
-
-  double cosAngle = cos(angle);
-  double sinAngle = sin(angle);
-
-  int width = image->bitmapInfoHeader.width;
-  int height = image->bitmapInfoHeader.height;
-
-  int x0 = width/2;  //center x
-  int y0 = height/2;  //center yå
-  
-  unsigned int* bmp_map = (unsigned int*) malloc(image->bitmapInfoHeader.imageSize*2);
-  unsigned int* image_map = (unsigned int*) image->bitmapData;
-
-  for(int y = 0; y < height; y++){
-    for (int x = 0; x < width; x++) {
-      int x1 = (x-x0) * cosAngle + (y0-y) * sinAngle + x0;
-      int y1 = (x-x0) * sinAngle + (y-y0) * cosAngle + y0;
-      unsigned int color;
-
-      if (x1 >= 0 && x1 < width && y1 >= 0 && y1 < height) { //within bounds
-        //printf("\n X: %d  Y: %d \n",x,y);
-        //printf("\n X1: %d  Y1: %d \n",x1,y1);
-        color = *(unsigned int*)(image_map + y1 * width+ x1);
-        //printf("\nREAD");
-        //output[x][y] = input[x1][y1];
-      }
-      else color = 0x00FFFFFF;
-
-      memcpy(bmp_map + y*width + x, &color, sizeof(color));
-    } 
-  }
-
-  bmp->bitmapData = bmp_map;
-  bmp->bitmapInfoHeader.width = width;
-  bmp->bitmapInfoHeader.height = height;
-  bmp->bitmapInfoHeader.imageSize = image->bitmapInfoHeader.imageSize*2;
-
-  //printf("\nDONE");
-
-  return bmp;
 }
 
 ///////////////////////////////////

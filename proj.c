@@ -100,7 +100,7 @@ int Arena()
         {
           counter = timer_ih();
           //if(counter == 2)
-          //UpdateVideo();
+          UpdateVideo();
         }
 
         if (msg.m_notify.interrupts & irq_kbd) //KEYBOARD
@@ -151,13 +151,13 @@ int Arena()
 
 int(proj_main_loop)()
 {
+  vg_init(0x144);
+
   if (!LoadAssets())
   {
     vg_exit();
     return 1;
   }
-
-  vg_init(0x144);
 
   Arena();
 
