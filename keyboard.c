@@ -8,8 +8,9 @@ extern bool openTextBox;
 extern Bitmap *P_Cursor;
 
 int kbd_hook_id = 1;
-char words[50] = "";
-int text_index;
+//char words[10] = {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'};
+char words[50] = ""; 
+unsigned int text_index = 0;
 //alphabet
 extern Bitmap *Letter_A;
 extern Bitmap *Letter_B;
@@ -97,8 +98,11 @@ uint16_t kbd_ih()
   return 1;
 }
 
-void write_key(uint16_t key, int text_index)
+void write_key(uint16_t key)
 {
+  // words[0] = 'B';
+  //text_index = 1;
+  printf("index num = %d\n", text_index);
   switch (key)
   {
   case A:
@@ -183,14 +187,28 @@ void write_key(uint16_t key, int text_index)
     words[text_index] = ' ';
     break;
   case BACKSPACE:
+    if( words[0]== '\0'){
+         // text_index--;
+      return;
+    }
+    if( words[1]== '\0'){
+      text_index--;
+       words[text_index] = '\0';
+      return;
+    }
     words[text_index] = '\0';
     text_index--;
+    text_index--; 
     break;
   case ENTER:
     text_index = 0;
     break;
   }
-  text_index++;
+  if (words[text_index] != '\0')
+  {
+    text_index++;
+    words[text_index] = '\0';
+  }
 }
 char palavraTeste[] = "ABRAKADABRA";
 
@@ -198,7 +216,7 @@ void Draw_string()
 {
 
   int x = 20, y = 605;
-  for (size_t i = 0; i < strlen(words); i++)
+  for (size_t i = 0; i < text_index/*strlen(words)*/; i++)
   {
     x += 12;
     switch (words[i])
@@ -287,36 +305,65 @@ void Draw_string()
 
 void keyboard_utilities(uint16_t key)
 {
-  if (key == U)
-    UpdateVideo();
+
+  //if (key == U)
+  //UpdateVideo();
+
   if (openTextBox == true)
   {
-    write_key(key, text_index); //erro esta aqui
+    printf("string= %s\n ", words);
+    printf("index num = %d\n", text_index);
+    write_key(key); //erro esta aqui
     UpdateVideo();
-    text_index++;
   }
   if (key == TAB)
   {
     text_index = 0;
-    printf("box %s\n", "blue");
     openTextBox = true;
     UpdateVideo();
   }
   if (key == ENTER)
   {
-    write_key(key, text_index);
-
-    printf("close %s\n", "blue");
+    //getSpell(); 
+    //just in case 
+    write_key(key);
     //reset
     openTextBox = false;
     text_index = 0;
+    //words[0] = '\0';
     strcpy(words, "");
     UpdateVideo();
   }
   if (openTextBox == false)
   {
-    printf("clean %s\n", "blue");
     //strcpy(&words,"");
     UpdateVideo();
   }
 }
+
+/*
+char fire[50];
+char wind[50]; 
+char earth[50]; 
+char water[50]
+
+void getSpell(){
+   if(words== fire){
+     //condicao para fazer aparecer o bmp respetivos
+     printf( "Spell fogo\n "); 
+   }
+    if(words== wind){
+     //condicao para fazer aparecer o bmp respetivos
+     printf( "Wind Spell Casted!\n "); 
+   }
+    if(words== earth){
+     //condicao para fazer aparecer o bmp respetivos
+     printf( "Earth Spell cast\n "); 
+   }
+    if(words== water){
+     //condicao para fazer aparecer o bmp respetivos
+     printf( "Water Spell Casted\n "); 
+   }
+
+
+}*/
