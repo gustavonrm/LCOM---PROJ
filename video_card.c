@@ -186,7 +186,7 @@ bool openTextBox = false;
 void UpdateVideo()
 {
   DrawBackground();
-  DrawSprite(player->img, player->center_x, player->center_y, 45, true);
+  DrawSprite(player->img, player->center_x, player->center_y, player->rot, true);
   DrawCursor(cursor);
   if (openTextBox == true)
   {

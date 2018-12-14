@@ -67,7 +67,12 @@ Bitmap* loadBitmap(char* filename) {
     }
 
     // read in the bitmap image data
-    fread(bitmapImage, bitmapInfoHeader.imageSize, 1, filePtr);
+    int n_lines = bitmapInfoHeader.height;
+    int line_size = bitmapInfoHeader.width;
+    for(int i = (n_lines-1)*line_size; i >= 0; i -= line_size){  //ImageSize/height is number of lines
+        fread(bitmapImage+i, bitmapInfoHeader.bits/8, bitmapInfoHeader.width, filePtr); //writing width nº of block of size of each pixel each
+        //fseek(filePtr, bitmapInfoHeader.width, SEEK_CUR);
+    }
 
     // make sure bitmap image data was read
     if (bitmapImage == NULL) {
