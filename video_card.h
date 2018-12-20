@@ -6,7 +6,7 @@
 #include "game.h"
 
 #define H_RES				1024
-#define V_RES				768
+#define V_RES				767
 
 uint16_t getXRes();
 uint16_t getYRes();

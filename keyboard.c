@@ -44,6 +44,7 @@ int subscribe_kbd(uint8_t *kbd_bit_no)
   *kbd_bit_no = kbd_hook_id;
   if (sys_irqsetpolicy(KEYBOARD_IRQ, IRQ_REENABLE | IRQ_EXCLUSIVE, &kbd_hook_id) != OK)
     return 1; //sets exclusive interrupts to kbd_hook_id
+    //printf("\nSUBSCRIBED");
   return 0;
 }
 
@@ -306,21 +307,23 @@ void Draw_string()
 void keyboard_utilities(uint16_t key)
 {
 
-  //if (key == U)
-  //UpdateVideo();
+  if (key == U) {
+    Update_Game_State();
+    UpdateVideo();
+  }
 
   if (openTextBox == true)
   {
     printf("string= %s\n ", words);
     printf("index num = %d\n", text_index);
     write_key(key); //erro esta aqui
-    UpdateVideo();
+    Update_Game_State();
   }
   if (key == TAB)
   {
     text_index = 0;
     openTextBox = true;
-    UpdateVideo();
+    Update_Game_State();
   }
   if (key == ENTER)
   {
@@ -332,12 +335,12 @@ void keyboard_utilities(uint16_t key)
     text_index = 0;
     //words[0] = '\0';
     strcpy(words, "");
-    UpdateVideo();
+    Update_Game_State();
   }
   if (openTextBox == false)
   {
     //strcpy(&words,"");
-    UpdateVideo();
+    Update_Game_State();
   }
 }
 

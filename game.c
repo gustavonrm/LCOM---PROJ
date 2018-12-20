@@ -2,12 +2,15 @@
 
 #include "game.h"
 #include "video_card.h"
+#include "keyboard.h"
+#include <math.h>
 
 Bitmap *background;
 Bitmap *P_Cursor;
 //mouse manip
 Bitmap *R_Cursor;
 Sprite *GreenWizard;
+Sprite *FireBall;
 //keyboard manip
 Bitmap *Letter_A;
 Bitmap *Letter_B;
@@ -38,13 +41,15 @@ Bitmap *Letter_Z;
 
 Bitmap *TextBox;
 
-//List of all Sprites
+extern Cursor *cursor;
 
 bool LoadAssets()
 {
     if ((background = loadBitmap("Background.bmp")) == NULL)
         return false;
     if ((GreenWizard = CreateSprite("Green_Hat.bmp")) == NULL)
+        return false;
+    if((FireBall = CreateSprite("Fireball.bmp")) == NULL)
         return false;
     if ((P_Cursor = loadBitmap("Cursor_Pressed.bmp")) == NULL)
         return false;
@@ -109,6 +114,10 @@ bool LoadAssets()
     return true;
 }
 
+//////////OBJECT ARRAYS///////////
+Wizard* wizards[4];  //4 is max nuber of wizards
+Element* elements[30]; //there'll never be more than 30 active spells at the same time so this number is fine
+
 Wizard *CreateWizard(enum Wizard_color color, int center_x, int center_y, unsigned int rot)
 {
     Wizard *wizard = (Wizard *)malloc(sizeof(Wizard));
@@ -129,8 +138,48 @@ Wizard *CreateWizard(enum Wizard_color color, int center_x, int center_y, unsign
     wizard->center_x = center_x;
     wizard->center_y = center_y;
     wizard->rot = rot;
+    wizard->casting = false;
+    wizard->cast_type = Null;
+
+    for(unsigned int i = 0; i < WIZARDS_SIZE; i++){ //There can only be 4 wizards
+        if(wizards[i] == NULL){
+            wizards[i] = wizard;
+            break;
+        }
+    }    
 
     return wizard;
+}
+
+Element* CreateElement(enum Element_Type type, int center_x, int center_y, unsigned int rot){
+    Element *elem = (Element *) malloc(sizeof(Element));
+    elem->elem_type = type;
+    switch(type){
+        case Air:
+            break;
+        case Earth:
+            break;
+        case Water:
+            break;
+        case Fire:
+            elem->img = FireBall;
+        case Null:
+            break;
+    }
+
+    elem->center_x = center_x;
+    elem->center_y = center_y;
+    elem->rot = rot;
+    elem->active = true;
+
+    for(unsigned int i = 0; i < ELEMS_SIZE; i++){ //There can only be 30 spells
+        if(elements[i] == NULL || !elements[i]->active){
+            elements[i] = elem;
+            break;
+        }
+    }
+
+    return elem;
 }
 
 Cursor *CreateCursor(int x, int y)
@@ -168,4 +217,60 @@ void DrawCursor(Cursor *cursor)
 void DrawTextBox()
 {
     DrawBitmap(TextBox, 20, 595);
+}
+
+void DrawWizard(Wizard *wizard){
+    DrawSprite(wizard->img, wizard->center_x, wizard->center_y, wizard->rot, true);
+}
+
+void DrawElement(Element *element){
+    DrawSprite(element->img, element->center_x, element->center_y, element->rot, true);
+}
+
+void Move_Element(Element *element){
+    int rot = element->rot * M_PI / 180.0;
+    element->center_x -= FAST_SPEED*sin(rot);
+    element->center_y -= FAST_SPEED*cos(rot);
+}
+
+bool openTextBox = false;
+
+void Update_Game_State(){
+    ////CHECKING FOR ACTIONS////
+    for(unsigned int i = 0; i < WIZARDS_SIZE; i++){  //Cast spells if needed
+        if(wizards[i] != NULL && wizards[i]->casting){
+            int x = wizards[i]->center_x;
+            int y = wizards[i]->center_y;
+            int rot = wizards[i]->rot * M_PI / 180.0;;
+            x -= CAST_DISTANCE*sin(rot);
+            y -= CAST_DISTANCE*cos(rot); 
+            CreateElement(wizards[i]->cast_type, x, y, wizards[i]->rot);
+            printf("\nROT: %d", wizards[i]->rot);
+            wizards[i]->casting = false;
+        }
+    }
+
+    ////DRAWING TO BUFFER////
+    DrawBackground();
+    for(unsigned int i = 0; i < ELEMS_SIZE; i++){
+        if(elements[i] != NULL && elements[i]->active){
+            Move_Element(elements[i]);
+            DrawElement(elements[i]);
+        }
+    }
+
+    for(unsigned int i = 0; i < WIZARDS_SIZE; i++){  //Cast spells if needed
+        if(wizards[i] != NULL && wizards[i]->heatlh > 0){
+            DrawWizard(wizards[i]);
+        }
+    }
+
+    if (openTextBox == true)
+    {
+    //para desenhar as letras, com a string q guarda a palavra, vai comparar
+    // cada letra uma a uma e por cada letra vai dando display no ecra a letra respetiva uma a uma
+    DrawTextBox();
+    Draw_string(); 
+    }
+    DrawCursor(cursor);
 }

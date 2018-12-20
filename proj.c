@@ -12,6 +12,7 @@
 extern Bitmap *background;
 Cursor *cursor;
 Wizard *player;
+Wizard *bot;
 extern uint8_t pack;
 extern uint8_t packets[3];
 //keyboard
@@ -46,8 +47,10 @@ int main(int argc, char *argv[])
 int Arena()
 {
   cursor = CreateCursor(500, 500);
-  player = CreateWizard(Green, 560, 400, 0);
+  player = CreateWizard(Green, 560, 600, 0);
+  bot = CreateWizard(Green, 200, 300, 0);
 
+  Update_Game_State();
   UpdateVideo();
 
   int counter = 0;
@@ -100,8 +103,8 @@ int Arena()
         if (msg.m_notify.interrupts & irq_timer0) //TIMER
         {
           counter = timer_ih();
-          //if(counter == 2)
-          //UpdateVideo();
+          Update_Game_State();
+          UpdateVideo();
         }
 
         if (msg.m_notify.interrupts & irq_kbd) //KEYBOARD
@@ -118,9 +121,13 @@ int Arena()
             cursor->press = mouse->lb;
             cursor->x += mouse->delta_x;
             cursor->y -= mouse->delta_y; //it's - becuase y coordinates are counted downawrds
-            int angle = atan2(player->center_y - cursor->y, player->center_x - cursor->x)*180/M_PI - 90;
+            int angle = atan2(player->center_y - cursor->y, cursor->x - player->center_x)*180/M_PI - 90;
             if(angle < 0) angle = 360 + angle;
-            player->rot = angle;
+            if(!player->casting){
+              player->rot = angle;
+              player->casting = cursor->press; //THIS IS ONLY TEMPORARY(So user casts when LB is pressed)
+              if(player->casting) player->cast_type = Fire;  //TEMPORARY
+            }
           }
         }
 
