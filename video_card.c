@@ -21,9 +21,7 @@ static uint8_t RedFieldPosition;
 static uint8_t GreenFieldPosition;
 static uint8_t BlueFieldPosition;
 
-extern Cursor *cursor;
 extern Bitmap *background;
-extern Wizard *player;
 
 //TODO: remove this
 extern Bitmap *Fire_0;
@@ -167,7 +165,7 @@ int draw_rectangle(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint
 
 int draw_pixel(uint16_t x, uint16_t y, uint32_t color)
 {
-  if (!(color & 0xff000000))
+  if (!(color & 0xff000000) || x < 0 || y < 0 || x > X_Res || y > V_RES)
     return 0; //Only draws fully opaque pixels
   char *ptr = (char *)video_buffer + (y * X_Res * B_per_pixel) + (x * B_per_pixel);
   memcpy(ptr, &color, B_per_pixel);
@@ -187,10 +185,10 @@ int vg_draw_line(uint16_t x, uint16_t y, uint16_t len, uint32_t color)
 }
 
 ///////////////////////////////////
-bool openTextBox = false;
 
 void UpdateVideo()
 {
+<<<<<<< HEAD
 
   DrawBackground();
   //layout menus
@@ -208,6 +206,8 @@ void UpdateVideo()
     DrawTextPointer();
     Draw_string();
   }
+=======
+>>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
   memcpy(video_mem, video_buffer, video_size);
 }
 
@@ -230,8 +230,7 @@ void DrawBitmap(Bitmap *bmp, int x, int y)
   {
     for (int j = 0; j < width; j++)
     {
-      if (x + j < 0 || x + j > H_RES || y + i < 0 || y + i > V_RES)
-        continue;
+      if (x + j < 0 || x + j > H_RES || y + i < 0 || y + i > V_RES) continue;
       //Checking if it's out of bounds ^^
       uint32_t color = bmp->bitmapData[i * width + j];
       draw_pixel(x + j, y + i, color);
@@ -272,11 +271,19 @@ Bitmap *RotateImage(Bitmap *image, float angle)
   int width = image->bitmapInfoHeader.width;
   int height = image->bitmapInfoHeader.height;
 
+<<<<<<< HEAD
   int x0 = width / 2;  //center x
   int y0 = height / 2; //center yå
 
   unsigned int *bmp_map = (unsigned int *)malloc(image->bitmapInfoHeader.imageSize * 2);
   unsigned int *image_map = (unsigned int *)image->bitmapData;
+=======
+  int x0 = image->bitmapInfoHeader.width/2;  //center x
+  int y0 = image->bitmapInfoHeader.height/2;  //center y0
+  
+  unsigned int* bmp_map = (unsigned int*) malloc(width*height*4);
+  unsigned int* image_map = (unsigned int*) image->bitmapData;
+>>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
 
   for (int y = 0; y < height; y++)
   {
@@ -286,6 +293,7 @@ Bitmap *RotateImage(Bitmap *image, float angle)
       int y1 = (x - x0) * sinAngle + (y - y0) * cosAngle + y0;
       unsigned int color;
 
+<<<<<<< HEAD
       if (x1 >= 0 && x1 < width && y1 >= 0 && y1 < height)
       { //within bounds
         //printf("\n X: %d  Y: %d \n",x,y);
@@ -293,6 +301,10 @@ Bitmap *RotateImage(Bitmap *image, float angle)
         color = *(unsigned int *)(image_map + y1 * width + x1);
         //printf("\nREAD");
         //output[x][y] = input[x1][y1];
+=======
+      if (x1 > 0 && x1 < image->bitmapInfoHeader.width && y1 > 0 && y1 < image->bitmapInfoHeader.height) { //within bounds
+        color = *(unsigned int*)(image_map + y1 * width+ x1);
+>>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
       }
       else
         color = 0x00FFFFFF;
@@ -304,9 +316,13 @@ Bitmap *RotateImage(Bitmap *image, float angle)
   bmp->bitmapData = bmp_map;
   bmp->bitmapInfoHeader.width = width;
   bmp->bitmapInfoHeader.height = height;
+<<<<<<< HEAD
   bmp->bitmapInfoHeader.imageSize = image->bitmapInfoHeader.imageSize * 2;
 
   //printf("\nDONE");
+=======
+  bmp->bitmapInfoHeader.imageSize = image->bitmapInfoHeader.imageSize;
+>>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
 
   return bmp;
 }
@@ -335,8 +351,8 @@ void DrawSprite(Sprite *img, int center_x, int center_y, unsigned int rot, bool 
 
   if (centered)
   {
-    x = center_x - img->bitmap[rot]->bitmapInfoHeader.width;
-    y = center_y - img->bitmap[rot]->bitmapInfoHeader.height;
+    x = center_x - img->bitmap[rot]->bitmapInfoHeader.width/2;
+    y = center_y - img->bitmap[rot]->bitmapInfoHeader.height/2;
   }
   else
   {

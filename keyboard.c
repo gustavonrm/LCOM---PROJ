@@ -9,7 +9,11 @@ extern Bitmap *P_Cursor;
 
 int kbd_hook_id = 1;
 //char words[10] = {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'};
+<<<<<<< HEAD
 char words[50] = "";
+=======
+char words[50] = ""; 
+>>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
 unsigned int text_index = 0;
 //alphabet
 extern Bitmap *Letter_A;
@@ -44,6 +48,7 @@ int subscribe_kbd(uint8_t *kbd_bit_no)
   *kbd_bit_no = kbd_hook_id;
   if (sys_irqsetpolicy(KEYBOARD_IRQ, IRQ_REENABLE | IRQ_EXCLUSIVE, &kbd_hook_id) != OK)
     return 1; //sets exclusive interrupts to kbd_hook_id
+    //printf("\nSUBSCRIBED");
   return 0;
 }
 
@@ -100,6 +105,9 @@ uint16_t kbd_ih()
 
 void write_key(uint16_t key)
 {
+  // words[0] = 'B';
+  //text_index = 1;
+  printf("index num = %d\n", text_index);
   switch (key)
   {
   case A:
@@ -184,6 +192,7 @@ void write_key(uint16_t key)
     words[text_index] = ' ';
     break;
   case BACKSPACE:
+<<<<<<< HEAD
     if (words[0] == '\0')
     {
       return;
@@ -192,11 +201,24 @@ void write_key(uint16_t key)
     {
       text_index--;
       words[text_index] = '\0';
+=======
+    if( words[0]== '\0'){
+         // text_index--;
+      return;
+    }
+    if( words[1]== '\0'){
+      text_index--;
+       words[text_index] = '\0';
+>>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
       return;
     }
     words[text_index] = '\0';
     text_index--;
+<<<<<<< HEAD
     text_index--;
+=======
+    text_index--; 
+>>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
     break;
   case ENTER:
     break;
@@ -210,8 +232,13 @@ void write_key(uint16_t key)
 void Draw_string()
 {
 
+<<<<<<< HEAD
   int x = 35, y = 685;
   for (size_t i = 0; i < text_index; i++)
+=======
+  int x = 20, y = 605;
+  for (size_t i = 0; i < text_index/*strlen(words)*/; i++)
+>>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
   {
     x += 12;
     switch (words[i])
@@ -301,6 +328,7 @@ void Draw_string()
 void keyboard_utilities(uint16_t key)
 {
 
+<<<<<<< HEAD
   //if (key == U)
   //UpdateVideo();
 
@@ -312,25 +340,45 @@ void keyboard_utilities(uint16_t key)
     {
       openTextBox = false;
     }
+=======
+  if (key == U) {
+    Update_Game_State();
+    UpdateVideo();
+  }
+
+  if (openTextBox == true)
+  {
+    printf("string= %s\n ", words);
+    printf("index num = %d\n", text_index);
+    write_key(key); //erro esta aqui
+    Update_Game_State();
+>>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
   }
   if (key == TAB)
   {
     text_index = 0;
     openTextBox = true;
-    UpdateVideo();
+    Update_Game_State();
   }
   if (key == ENTER)
   {
+<<<<<<< HEAD
     //just in case
+=======
+    //getSpell(); 
+    //just in case 
+>>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
     write_key(key);
     //reset
     openTextBox = false;
     text_index = 0;
+    //words[0] = '\0';
     strcpy(words, "");
-    UpdateVideo();
+    Update_Game_State();
   }
   if (openTextBox == false)
   {
+<<<<<<< HEAD
     UpdateVideo();
   }
 }
@@ -409,3 +457,36 @@ bool getSpell()
 
   return false;
 }
+=======
+    //strcpy(&words,"");
+    Update_Game_State();
+  }
+}
+
+/*
+char fire[50];
+char wind[50]; 
+char earth[50]; 
+char water[50]
+
+void getSpell(){
+   if(words== fire){
+     //condicao para fazer aparecer o bmp respetivos
+     printf( "Spell fogo\n "); 
+   }
+    if(words== wind){
+     //condicao para fazer aparecer o bmp respetivos
+     printf( "Wind Spell Casted!\n "); 
+   }
+    if(words== earth){
+     //condicao para fazer aparecer o bmp respetivos
+     printf( "Earth Spell cast\n "); 
+   }
+    if(words== water){
+     //condicao para fazer aparecer o bmp respetivos
+     printf( "Water Spell Casted\n "); 
+   }
+
+
+}*/
+>>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
