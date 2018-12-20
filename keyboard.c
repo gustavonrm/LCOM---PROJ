@@ -9,7 +9,7 @@ extern Bitmap *P_Cursor;
 
 int kbd_hook_id = 1;
 //char words[10] = {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'};
-char words[50] = ""; 
+char words[50] = "";
 unsigned int text_index = 0;
 //alphabet
 extern Bitmap *Letter_A;
@@ -100,9 +100,6 @@ uint16_t kbd_ih()
 
 void write_key(uint16_t key)
 {
-  // words[0] = 'B';
-  //text_index = 1;
-  printf("index num = %d\n", text_index);
   switch (key)
   {
   case A:
@@ -187,21 +184,21 @@ void write_key(uint16_t key)
     words[text_index] = ' ';
     break;
   case BACKSPACE:
-    if( words[0]== '\0'){
-         // text_index--;
+    if (words[0] == '\0')
+    {
       return;
     }
-    if( words[1]== '\0'){
+    if (words[1] == '\0')
+    {
       text_index--;
-       words[text_index] = '\0';
+      words[text_index] = '\0';
       return;
     }
     words[text_index] = '\0';
     text_index--;
-    text_index--; 
+    text_index--;
     break;
   case ENTER:
-    text_index = 0;
     break;
   }
   if (words[text_index] != '\0')
@@ -210,13 +207,11 @@ void write_key(uint16_t key)
     words[text_index] = '\0';
   }
 }
-char palavraTeste[] = "ABRAKADABRA";
-
 void Draw_string()
 {
 
-  int x = 20, y = 605;
-  for (size_t i = 0; i < text_index/*strlen(words)*/; i++)
+  int x = 35, y = 685;
+  for (size_t i = 0; i < text_index; i++)
   {
     x += 12;
     switch (words[i])
@@ -311,10 +306,12 @@ void keyboard_utilities(uint16_t key)
 
   if (openTextBox == true)
   {
-    printf("string= %s\n ", words);
-    printf("index num = %d\n", text_index);
-    write_key(key); //erro esta aqui
+    write_key(key);
     UpdateVideo();
+    if (getSpell() == true)
+    {
+      openTextBox = false;
+    }
   }
   if (key == TAB)
   {
@@ -324,46 +321,91 @@ void keyboard_utilities(uint16_t key)
   }
   if (key == ENTER)
   {
-    //getSpell(); 
-    //just in case 
+    //just in case
     write_key(key);
     //reset
     openTextBox = false;
     text_index = 0;
-    //words[0] = '\0';
     strcpy(words, "");
     UpdateVideo();
   }
   if (openTextBox == false)
   {
-    //strcpy(&words,"");
     UpdateVideo();
   }
 }
 
-/*
-char fire[50];
-char wind[50]; 
-char earth[50]; 
-char water[50]
+char fire[50] = "INCENDIO";
+char wind[50] = "VENTUS";
+char earth[50] = "ORBIS";
+char water[50] = "AGUAMENTI";
 
-void getSpell(){
-   if(words== fire){
-     //condicao para fazer aparecer o bmp respetivos
-     printf( "Spell fogo\n "); 
-   }
-    if(words== wind){
-     //condicao para fazer aparecer o bmp respetivos
-     printf( "Wind Spell Casted!\n "); 
-   }
-    if(words== earth){
-     //condicao para fazer aparecer o bmp respetivos
-     printf( "Earth Spell cast\n "); 
-   }
-    if(words== water){
-     //condicao para fazer aparecer o bmp respetivos
-     printf( "Water Spell Casted\n "); 
-   }
+extern unsigned fire_timer;
+extern unsigned water_timer;
+extern unsigned earth_timer;
+extern unsigned wind_timer;
 
+bool getSpell()
+{
+  //get the spell string and reset the respective timer
+  if (fire_timer == 5)
+  {
+    if (strcmp(words, fire) == 0)
+    {
+      //condicao para fazer aparecer o bmp respetivos
+      printf("Fire Spell Casted!\n ");
+      strcpy(words, "");
+      fire_timer = 0;
+      return true;
+    }
+  }
+  else
+    (printf("Cant cast fire spell!\n"));
 
-}*/
+  if (wind_timer == 5)
+  {
+
+    if (strcmp(words, wind) == 0)
+    {
+      //condicao para fazer aparecer o bmp respetivos
+      printf("Wind Spell Casted!\n ");
+      strcpy(words, "");
+      water_timer = 0;
+      return true;
+    }
+  }
+  else
+    (printf("Cant cast wind spell!\n"));
+
+  if (earth_timer == 5)
+  {
+
+    if (strcmp(words, earth) == 0)
+    {
+      //condicao para fazer aparecer o bmp respetivos
+      printf("Earth Spell cast\n ");
+      strcpy(words, "");
+      earth_timer = 0;
+      return true;
+    }
+  }
+  else
+    (printf("Cant cast earth spell!\n"));
+
+  if (water_timer == 5)
+  {
+
+    if (strcmp(words, water) == 0)
+    {
+      //condicao para fazer aparecer o bmp respetivos
+      printf("Water Spell Casted\n ");
+      strcpy(words, "");
+      wind_timer = 0;
+      return true;
+    }
+  }
+  else
+    (printf("Cant cast earth spell!\n"));
+
+  return false;
+}

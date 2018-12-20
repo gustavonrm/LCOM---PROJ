@@ -7,6 +7,7 @@
 #include "video_card.h"
 #include "keyboard.h"
 #include "timer.h"
+#include <math.h>
 
 extern Bitmap *background;
 Cursor *cursor;
@@ -99,7 +100,10 @@ int Arena()
         if (msg.m_notify.interrupts & irq_timer0) //TIMER
         {
           counter = timer_ih();
-          //if(counter == 2)
+          if( counter == 60 ){
+          //fire_ih(); 
+          spell_utilities(); 
+          }
           UpdateVideo();
         }
 
@@ -117,6 +121,9 @@ int Arena()
             cursor->press = mouse->lb;
             cursor->x += mouse->delta_x;
             cursor->y -= mouse->delta_y; //it's - becuase y coordinates are counted downawrds
+            int angle = atan2(player->center_y - cursor->y,cursor->x -player->center_x )*180/M_PI - 90;
+            if(angle < 0) angle = 360 + angle;
+            player->rot = angle;
           }
         }
 
@@ -151,13 +158,15 @@ int Arena()
 
 int(proj_main_loop)()
 {
-  vg_init(0x144);
-
   if (!LoadAssets())
   {
     vg_exit();
     return 1;
   }
+
+  //sleep(10);
+
+  vg_init(0x144);
 
   Arena();
 
