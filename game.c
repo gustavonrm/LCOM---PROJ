@@ -228,7 +228,7 @@ void DrawElement(Element *element){
 }
 
 void Move_Element(Element *element){
-    int rot = element->rot * M_PI / 180.0;
+    double rot = element->rot * M_PI / 180.0;
     element->center_x -= FAST_SPEED*sin(rot);
     element->center_y -= FAST_SPEED*cos(rot);
 }
@@ -241,7 +241,7 @@ void Update_Game_State(){
         if(wizards[i] != NULL && wizards[i]->casting){
             int x = wizards[i]->center_x;
             int y = wizards[i]->center_y;
-            int rot = wizards[i]->rot * M_PI / 180.0;;
+            double rot = wizards[i]->rot * M_PI / 180.0;
             x -= CAST_DISTANCE*sin(rot);
             y -= CAST_DISTANCE*cos(rot); 
             CreateElement(wizards[i]->cast_type, x, y, wizards[i]->rot);
