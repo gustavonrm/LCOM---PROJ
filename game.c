@@ -86,8 +86,8 @@ bool LoadAssets()
 {
     if ((background = loadBitmap("Background.bmp")) == NULL)
         return false;
-   /* if ((Tool_Box = loadBitmap("Tool_Box.bmp")) == NULL)
-        return false;*/
+    if ((Tool_Box = loadBitmap("Tool_Box.bmp")) == NULL)
+        return false;
     if ((GreenWizard = CreateSprite("Green_Hat.bmp")) == NULL)
         return false;
 
@@ -447,7 +447,7 @@ void Update_Game_State()
         }
     }
 
-    //DrawToolBox();
+    DrawToolBox();
     DrawTextBox();
     DrawTimers();
 

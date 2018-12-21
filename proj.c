@@ -18,6 +18,10 @@ extern uint8_t packets[3];
 //keyboard
 extern uint16_t key;
 
+//globat temporary vars
+extern bool Fire_Cast; 
+
+
 int main(int argc, char *argv[])
 {
   // sets the language of LCF messages (can be either EN-US or PT-PT)
@@ -106,8 +110,8 @@ int Arena()
           {
             spell_utilities();
           }
-          //Update_Game_State();
-          //UpdateVideo();
+          Update_Game_State();
+          UpdateVideo();
         }
 
         if (msg.m_notify.interrupts & irq_kbd) //KEYBOARD
@@ -127,12 +131,19 @@ int Arena()
             int angle = atan2(player->center_y - cursor->y, cursor->x - player->center_x) * 180 / M_PI - 90;
             if (angle < 0)
               angle = 360 + angle;
-            if (!player->casting)
+
+//check line 136 in the future if problems 
+               player->rot = angle;
+
+
+            if (!player->casting && Fire_Cast == true)
             {
               player->rot = angle;
               player->casting = cursor->press; //THIS IS ONLY TEMPORARY(So user casts when LB is pressed)
-              if (player->casting)
-                player->cast_type = Fire; //TEMPORARY
+              if (player->casting )
+              Fire_Cast = false; 
+              player->cast_type = Fire; //TEMPORARY
+              
             }
           }
         }

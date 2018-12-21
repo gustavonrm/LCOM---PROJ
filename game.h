@@ -45,6 +45,10 @@ typedef struct {
     Bitmap* released;
 } Cursor;
 
+typedef struct{
+
+}
+
 //main layout
 bool LoadAssets();
 void DrawToolBox();

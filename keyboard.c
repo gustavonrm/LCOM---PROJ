@@ -298,6 +298,7 @@ void Draw_string()
   }
 }
 
+
 void keyboard_utilities(uint16_t key)
 {
 
@@ -332,15 +333,17 @@ void keyboard_utilities(uint16_t key)
   }
 }
 
-char fire[50] = "INCENDIO";
-char wind[50] = "VENTUS";
-char earth[50] = "ORBIS";
-char water[50] = "AGUAMENTI";
+char fire[50] = "FIRE";
+char wind[50] = "WIND";
+char earth[50] = "EARTH";
+char water[50] = "WATER";
 
 extern unsigned fire_timer;
 extern unsigned water_timer;
 extern unsigned earth_timer;
 extern unsigned wind_timer;
+
+bool Fire_Cast=false; 
 
 bool getSpell()
 {
@@ -352,6 +355,7 @@ bool getSpell()
       //condicao para fazer aparecer o bmp respetivos
       printf("Fire Spell Casted!\n ");
       strcpy(words, "");
+      Fire_Cast = true; 
       fire_timer = 0;
       return true;
     }
