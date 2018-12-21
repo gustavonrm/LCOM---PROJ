@@ -86,8 +86,8 @@ bool LoadAssets()
 {
     if ((background = loadBitmap("Background.bmp")) == NULL)
         return false;
-    if ((Tool_Box = loadBitmap("Tool_Box.bmp")) == NULL)
-        return false;
+   /* if ((Tool_Box = loadBitmap("Tool_Box.bmp")) == NULL)
+        return false;*/
     if ((GreenWizard = CreateSprite("Green_Hat.bmp")) == NULL)
         return false;
 
@@ -240,6 +240,7 @@ Wizard *CreateWizard(enum Wizard_color color, int center_x, int center_y, unsign
     wizard->rot = rot;
     wizard->casting = false;
     wizard->cast_type = Null;
+    wizard->health = 3;
 
     for (unsigned int i = 0; i < WIZARDS_SIZE; i++)
     { //There can only be 4 wizards
@@ -251,6 +252,13 @@ Wizard *CreateWizard(enum Wizard_color color, int center_x, int center_y, unsign
     }
 
     return wizard;
+}
+
+void Wizard_Colision(Wizard *wizard, Element *element){
+    if(element->elem_type != Null){
+        element->active = false;
+        wizard->health--;
+    }
 }
 
 Element *CreateElement(enum Element_Type type, int center_x, int center_y, unsigned int rot)
@@ -350,6 +358,27 @@ void Move_Element(Element *element)
     element->center_x -= FAST_SPEED * sin(rot);
     element->center_y -= FAST_SPEED * cos(rot);
 }
+
+void Element_Colision(Element *element1, Element *element2){
+    int e1 = (int) element1->elem_type;
+    int e2 = (int) element2->elem_type;
+    if( e1 == e2) return; //Do nothing for elements of same type
+    else if( e1*e2 > 0){ //Destroy both for elements of opposing types
+        element1->active = false;
+        element2->active = false;
+    }
+    else{ //If they're consecutive elements decie which to destroy
+        int res = e1 + e2;
+        if(res == -3){ //If colision happens between earth and air (Special case)
+            if(element1->elem_type == Air) element1->active = false;
+            else element2->active = false;
+            return;
+        }
+        if(abs(e1) > abs(e2)) element1->active = false; //Highest element gets destroyed
+        else element2->active = false;
+    }
+}
+
 ///////////////////////////////////////////////
 bool openTextBox = false;
 
@@ -370,28 +399,57 @@ void Update_Game_State()
         }
     }
 
+    ////MOVE ELEMENTS AND CHECK FOR COLISIONS////
+    for (unsigned int i = 0; i < ELEMS_SIZE; i++)
+    {
+        if (elements[i] != NULL && elements[i]->active)
+        {
+            Move_Element(elements[i]);
+            for (unsigned int x = 0; x < ELEMS_SIZE; x++){ //Colisions between elements
+                if (x != i && elements[x] != NULL && elements[x]->active){
+                    int x_dis = abs(elements[i]->center_x - elements[x]->center_x);
+                    int y_dis = abs(elements[i]->center_y - elements[x]->center_y);
+                    int distance = sqrt(pow(x_dis,2) + pow(y_dis,2));
+                    if(distance <= BALL_HITBOX_RADIUS*2){ //if there has been a colision
+                        Element_Colision(elements[i],elements[x]);
+                    }
+                }
+            }
+
+            for(unsigned int x = 0; x < WIZARDS_SIZE; x++){ //Colisions between elements and wizards
+                if(wizards[x] != NULL && wizards[x]->health > 0){
+                    int x_dis = abs(elements[i]->center_x - wizards[x]->center_x);
+                    int y_dis = abs(elements[i]->center_y - wizards[x]->center_y);
+                    int distance = sqrt(pow(x_dis,2) + pow(y_dis,2));
+                    if(distance <= BALL_HITBOX_RADIUS + WIZARD_HITBOX_RADIUS){ //if there has been a colision
+                        Wizard_Colision(wizards[x],elements[i]);
+                    }
+                }
+            }
+        }
+    }
+
     ////DRAWING TO BUFFER////
     DrawBackground();
     for (unsigned int i = 0; i < ELEMS_SIZE; i++)
     {
         if (elements[i] != NULL && elements[i]->active)
         {
-            Move_Element(elements[i]);
             DrawElement(elements[i]);
         }
     }
 
-    DrawToolBox();
-    DrawTextBox();
-    DrawTimers();
-
     for (unsigned int i = 0; i < WIZARDS_SIZE; i++)
     { //Cast spells if needed
-        if (wizards[i] != NULL && wizards[i]->heatlh > 0)
+        if (wizards[i] != NULL && wizards[i]->health > 0)
         {
             DrawWizard(wizards[i]);
         }
     }
+
+    //DrawToolBox();
+    DrawTextBox();
+    DrawTimers();
 
     if (openTextBox == true)
     {

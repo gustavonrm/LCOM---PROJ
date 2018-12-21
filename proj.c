@@ -106,8 +106,8 @@ int Arena()
           {
             spell_utilities();
           }
-          Update_Game_State();
-          UpdateVideo();
+          //Update_Game_State();
+          //UpdateVideo();
         }
 
         if (msg.m_notify.interrupts & irq_kbd) //KEYBOARD
