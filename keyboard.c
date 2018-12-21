@@ -4,6 +4,7 @@
 #include "game.h"
 
 extern bool openTextBox;
+extern SpellCast SpellsRdy; 
 
 extern Bitmap *P_Cursor;
 
@@ -337,33 +338,36 @@ char fire[50] = "FIRE";
 char wind[50] = "WIND";
 char earth[50] = "EARTH";
 char water[50] = "WATER";
-
+/*
 extern unsigned fire_timer;
 extern unsigned water_timer;
 extern unsigned earth_timer;
-extern unsigned wind_timer;
+extern unsigned air_timer;
 
 bool Fire_Cast=false; 
-
+bool Water_Cast=false; 
+bool Earth_Cast=false; 
+bool Air_Cast=false; 
+*/
 bool getSpell()
 {
   //get the spell string and reset the respective timer
-  if (fire_timer == 5)
+  if (SpellsRdy.fire_timer == 5)
   {
     if (strcmp(words, fire) == 0)
     {
       //condicao para fazer aparecer o bmp respetivos
       printf("Fire Spell Casted!\n ");
       strcpy(words, "");
-      Fire_Cast = true; 
-      fire_timer = 0;
+      SpellsRdy.Fire_Cast = true; 
+      SpellsRdy.fire_timer =0; 
       return true;
     }
   }
   else
     (printf("Cant cast fire spell!\n"));
 
-  if (wind_timer == 5)
+  if (SpellsRdy.air_timer == 5)
   {
 
     if (strcmp(words, wind) == 0)
@@ -371,14 +375,15 @@ bool getSpell()
       //condicao para fazer aparecer o bmp respetivos
       printf("Wind Spell Casted!\n ");
       strcpy(words, "");
-      water_timer = 0;
+       SpellsRdy.Air_Cast = true; 
+      SpellsRdy.air_timer = 0;
       return true;
     }
   }
   else
     (printf("Cant cast wind spell!\n"));
 
-  if (earth_timer == 5)
+  if (SpellsRdy.earth_timer == 5)
   {
 
     if (strcmp(words, earth) == 0)
@@ -386,14 +391,15 @@ bool getSpell()
       //condicao para fazer aparecer o bmp respetivos
       printf("Earth Spell cast\n ");
       strcpy(words, "");
-      earth_timer = 0;
+      SpellsRdy.Earth_Cast = true; 
+      SpellsRdy.earth_timer = 0;
       return true;
     }
   }
   else
     (printf("Cant cast earth spell!\n"));
 
-  if (water_timer == 5)
+  if (SpellsRdy.water_timer == 5)
   {
 
     if (strcmp(words, water) == 0)
@@ -401,7 +407,8 @@ bool getSpell()
       //condicao para fazer aparecer o bmp respetivos
       printf("Water Spell Casted\n ");
       strcpy(words, "");
-      wind_timer = 0;
+      SpellsRdy.Water_Cast = true; 
+      SpellsRdy.water_timer = 0;
       return true;
     }
   }
