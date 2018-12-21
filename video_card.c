@@ -21,13 +21,9 @@ static uint8_t RedFieldPosition;
 static uint8_t GreenFieldPosition;
 static uint8_t BlueFieldPosition;
 
+extern Cursor *cursor;
 extern Bitmap *background;
-
-//TODO: remove this
-extern Bitmap *Fire_0;
-extern Bitmap *Earth_0;
-extern Bitmap *Water_0;
-extern Bitmap *Wind_0;
+extern Wizard *player;
 
 uint16_t getXRes()
 {
@@ -165,7 +161,7 @@ int draw_rectangle(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint
 
 int draw_pixel(uint16_t x, uint16_t y, uint32_t color)
 {
-  if (!(color & 0xff000000) || x < 0 || y < 0 || x > X_Res || y > V_RES)
+  if (!(color & 0xff000000))
     return 0; //Only draws fully opaque pixels
   char *ptr = (char *)video_buffer + (y * X_Res * B_per_pixel) + (x * B_per_pixel);
   memcpy(ptr, &color, B_per_pixel);
@@ -191,6 +187,7 @@ void UpdateVideo()
   memcpy(video_mem, video_buffer, video_size);
 }
 
+
 ///////////////////////////////////
 
 void DrawBackground()
@@ -210,7 +207,8 @@ void DrawBitmap(Bitmap *bmp, int x, int y)
   {
     for (int j = 0; j < width; j++)
     {
-      if (x + j < 0 || x + j > H_RES || y + i < 0 || y + i > V_RES) continue;
+      if (x + j < 0 || x + j > H_RES || y + i < 0 || y + i > V_RES)
+        continue;
       //Checking if it's out of bounds ^^
       uint32_t color = bmp->bitmapData[i * width + j];
       draw_pixel(x + j, y + i, color);
@@ -240,8 +238,7 @@ Sprite *CreateSprite(char img_name[])
 
 ///////////////////////////////////////
 
-Bitmap *RotateImage(Bitmap *image, float angle)
-{
+Bitmap* RotateImage(Bitmap* image, float angle){
   angle = angle * M_PI / 180.0;
   Bitmap *bmp = (Bitmap *)malloc(sizeof(Bitmap)); //New bitmap
 
@@ -257,22 +254,19 @@ Bitmap *RotateImage(Bitmap *image, float angle)
   unsigned int* bmp_map = (unsigned int*) malloc(width*height*4);
   unsigned int* image_map = (unsigned int*) image->bitmapData;
 
-  for (int y = 0; y < height; y++)
-  {
-    for (int x = 0; x < width; x++)
-    {
-      int x1 = (x - x0) * cosAngle + (y0 - y) * sinAngle + x0;
-      int y1 = (x - x0) * sinAngle + (y - y0) * cosAngle + y0;
+  for(int y = 0; y < height; y++){
+    for (int x = 0; x < width; x++) {
+      int x1 = (x-x0) * cosAngle + (y0-y) * sinAngle + x0;
+      int y1 = (x-x0) * sinAngle + (y-y0) * cosAngle + y0;
       unsigned int color;
 
       if (x1 > 0 && x1 < image->bitmapInfoHeader.width && y1 > 0 && y1 < image->bitmapInfoHeader.height) { //within bounds
         color = *(unsigned int*)(image_map + y1 * width+ x1);
       }
-      else
-        color = 0x00FFFFFF;
+      else color = 0x00FFFFFF;
 
-      memcpy(bmp_map + y * width + x, &color, sizeof(color));
-    }
+      memcpy(bmp_map + y*width + x, &color, sizeof(color));
+    } 
   }
 
   bmp->bitmapData = bmp_map;
@@ -307,8 +301,8 @@ void DrawSprite(Sprite *img, int center_x, int center_y, unsigned int rot, bool 
 
   if (centered)
   {
-    x = center_x - img->bitmap[rot]->bitmapInfoHeader.width/2;
-    y = center_y - img->bitmap[rot]->bitmapInfoHeader.height/2;
+    x = center_x - img->bitmap[rot]->bitmapInfoHeader.width;
+    y = center_y - img->bitmap[rot]->bitmapInfoHeader.height;
   }
   else
   {

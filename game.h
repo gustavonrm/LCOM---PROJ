@@ -42,17 +42,23 @@ typedef struct {
     Bitmap* released;
 } Cursor;
 
+//main layout
 bool LoadAssets();
+void DrawToolBox();
 
+//players
 Wizard* CreateWizard(enum Wizard_color color, int center_x, int center_y, unsigned int rot);
 void DrawWizard(Wizard *wizard);
 
+//elements
 Element* CreateElement(enum Element_Type type, int center_x, int center_y, unsigned int rot);
 void DrawElement(Element *element);
 void Move_Element(Element *element);
 
+//cursors
 Cursor* CreateCursor(int x, int y);  //Creates Cursor obj
 void DrawCursor(Cursor *cursor); //Tests for out of bounds and draws appropriate Bitmap on screen
+
 //keayboard layout
 void DrawTextBox();
 void DrawTextPointer();
@@ -65,7 +71,7 @@ void DrawEarthTimer();
 void DrawWindTimer(); 
 void DrawTimers(); 
 
-void DrawTextBox();
-
+//video
 void Update_Game_State();
+
 #endif

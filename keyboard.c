@@ -9,7 +9,7 @@ extern Bitmap *P_Cursor;
 
 int kbd_hook_id = 1;
 //char words[10] = {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'};
-char words[50] = ""; 
+char words[50] = "";
 unsigned int text_index = 0;
 //alphabet
 extern Bitmap *Letter_A;
@@ -44,7 +44,6 @@ int subscribe_kbd(uint8_t *kbd_bit_no)
   *kbd_bit_no = kbd_hook_id;
   if (sys_irqsetpolicy(KEYBOARD_IRQ, IRQ_REENABLE | IRQ_EXCLUSIVE, &kbd_hook_id) != OK)
     return 1; //sets exclusive interrupts to kbd_hook_id
-    //printf("\nSUBSCRIBED");
   return 0;
 }
 
@@ -101,9 +100,6 @@ uint16_t kbd_ih()
 
 void write_key(uint16_t key)
 {
-  // words[0] = 'B';
-  //text_index = 1;
-  printf("index num = %d\n", text_index);
   switch (key)
   {
   case A:
@@ -188,16 +184,18 @@ void write_key(uint16_t key)
     words[text_index] = ' ';
     break;
   case BACKSPACE:
-    if( words[0]== '\0'){
-         // text_index--;
+    if (words[0] == '\0')
+    {
       return;
     }
-    if( words[1]== '\0'){
+    if (words[1] == '\0')
+    {
       text_index--;
-       words[text_index] = '\0';
+      words[text_index] = '\0';
       return;
     }
     words[text_index] = '\0';
+    text_index--;
     text_index--;
     break;
   case ENTER:
@@ -212,8 +210,8 @@ void write_key(uint16_t key)
 void Draw_string()
 {
 
-  int x = 20, y = 605;
-  for (size_t i = 0; i < text_index/*strlen(words)*/; i++)
+  int x = 45, y = 680;
+  for (size_t i = 0; i < text_index; i++)
   {
     x += 12;
     switch (words[i])
@@ -303,9 +301,6 @@ void Draw_string()
 void keyboard_utilities(uint16_t key)
 {
 
-  //if (key == U)
-  //UpdateVideo();
-
   if (openTextBox == true)
   {
     write_key(key);
@@ -315,18 +310,6 @@ void keyboard_utilities(uint16_t key)
       openTextBox = false;
     }
   }
-  if (key == U) {
-    Update_Game_State();
-    UpdateVideo();
-  }
-
-  /*if (openTextBox == true)
-  {
-    printf("string= %s\n ", words);
-    printf("index num = %d\n", text_index);
-    write_key(key); //erro esta aqui
-    Update_Game_State();
-  }*/
   if (key == TAB)
   {
     text_index = 0;
@@ -335,19 +318,17 @@ void keyboard_utilities(uint16_t key)
   }
   if (key == ENTER)
   {
-    //getSpell(); 
-    //just in case 
+    //just in case
     write_key(key);
     //reset
     openTextBox = false;
     text_index = 0;
-    //words[0] = '\0';
     strcpy(words, "");
     Update_Game_State();
   }
   if (openTextBox == false)
   {
-    UpdateVideo();
+    Update_Game_State();
   }
 }
 
@@ -425,30 +406,3 @@ bool getSpell()
 
   return false;
 }
-
-/*
-char fire[50];
-char wind[50]; 
-char earth[50]; 
-char water[50]
-
-void getSpell(){
-   if(words== fire){
-     //condicao para fazer aparecer o bmp respetivos
-     printf( "Spell fogo\n "); 
-   }
-    if(words== wind){
-     //condicao para fazer aparecer o bmp respetivos
-     printf( "Wind Spell Casted!\n "); 
-   }
-    if(words== earth){
-     //condicao para fazer aparecer o bmp respetivos
-     printf( "Earth Spell cast\n "); 
-   }
-    if(words== water){
-     //condicao para fazer aparecer o bmp respetivos
-     printf( "Water Spell Casted\n "); 
-   }
-
-
-}*/

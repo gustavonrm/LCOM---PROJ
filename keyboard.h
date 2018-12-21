@@ -15,7 +15,6 @@ void Draw_string();
 void keyboard_utilities(uint16_t key);
 
 bool getSpell();
-//void getSpell();
 
 
 #endif

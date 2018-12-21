@@ -6,12 +6,14 @@
 #include "keyboard.h"
 #include <math.h>
 
+//layout
 Bitmap *background;
-Bitmap *P_Cursor;
+Bitmap *Tool_Box;
+
 //mouse manip
+Bitmap *P_Cursor;
 Bitmap *R_Cursor;
 Sprite *GreenWizard;
-Sprite *FireBall;
 //keyboard manip
 Bitmap *Letter_A;
 Bitmap *Letter_B;
@@ -73,16 +75,23 @@ Bitmap *Earth_3;
 Bitmap *Earth_4;
 Bitmap *Earth_5;
 
+//elements
+Sprite *FireBall;
+
 extern Cursor *cursor;
+
+//List of all Sprites
 
 bool LoadAssets()
 {
     if ((background = loadBitmap("Background.bmp")) == NULL)
         return false;
+    if ((Tool_Box = loadBitmap("Tool_Box.bmp")) == NULL)
+        return false;
     if ((GreenWizard = CreateSprite("Green_Hat.bmp")) == NULL)
         return false;
-    if((FireBall = CreateSprite("Fireball.bmp")) == NULL)
-        return false;
+
+    //mouse
     if ((P_Cursor = loadBitmap("Cursor_Pressed.bmp")) == NULL)
         return false;
     if ((R_Cursor = loadBitmap("Cursor_Released.bmp")) == NULL)
@@ -198,13 +207,16 @@ bool LoadAssets()
         return false;
     if ((Earth_5 = loadBitmap("Earth_5.bmp")) == NULL)
         return false;
+    //spell sprites
+    if ((FireBall = CreateSprite("Fireball.bmp")) == NULL)
+        return false;
 
     return true;
 }
 
 //////////OBJECT ARRAYS///////////
-Wizard* wizards[4];  //4 is max nuber of wizards
-Element* elements[30]; //there'll never be more than 30 active spells at the same time so this number is fine
+Wizard *wizards[4];    //4 is max nuber of wizards
+Element *elements[30]; //there'll never be more than 30 active spells at the same time so this number is fine
 
 Wizard *CreateWizard(enum Wizard_color color, int center_x, int center_y, unsigned int rot)
 {
@@ -229,30 +241,34 @@ Wizard *CreateWizard(enum Wizard_color color, int center_x, int center_y, unsign
     wizard->casting = false;
     wizard->cast_type = Null;
 
-    for(unsigned int i = 0; i < WIZARDS_SIZE; i++){ //There can only be 4 wizards
-        if(wizards[i] == NULL){
+    for (unsigned int i = 0; i < WIZARDS_SIZE; i++)
+    { //There can only be 4 wizards
+        if (wizards[i] == NULL)
+        {
             wizards[i] = wizard;
             break;
         }
-    }    
+    }
 
     return wizard;
 }
 
-Element* CreateElement(enum Element_Type type, int center_x, int center_y, unsigned int rot){
-    Element *elem = (Element *) malloc(sizeof(Element));
+Element *CreateElement(enum Element_Type type, int center_x, int center_y, unsigned int rot)
+{
+    Element *elem = (Element *)malloc(sizeof(Element));
     elem->elem_type = type;
-    switch(type){
-        case Air:
-            break;
-        case Earth:
-            break;
-        case Water:
-            break;
-        case Fire:
-            elem->img = FireBall;
-        case Null:
-            break;
+    switch (type)
+    {
+    case Air:
+        break;
+    case Earth:
+        break;
+    case Water:
+        break;
+    case Fire:
+        elem->img = FireBall;
+    case Null:
+        break;
     }
 
     elem->center_x = center_x;
@@ -260,8 +276,10 @@ Element* CreateElement(enum Element_Type type, int center_x, int center_y, unsig
     elem->rot = rot;
     elem->active = true;
 
-    for(unsigned int i = 0; i < ELEMS_SIZE; i++){ //There can only be 30 spells
-        if(elements[i] == NULL || !elements[i]->active){
+    for (unsigned int i = 0; i < ELEMS_SIZE; i++)
+    { //There can only be 30 spells
+        if (elements[i] == NULL || !elements[i]->active)
+        {
             elements[i] = elem;
             break;
         }
@@ -284,6 +302,11 @@ Cursor *CreateCursor(int x, int y)
     return cursor;
 }
 
+void DrawToolBox()
+{
+    DrawBitmap(Tool_Box, 0, 618);
+}
+
 void DrawCursor(Cursor *cursor)
 {
     if (cursor->x < 0)
@@ -304,11 +327,80 @@ void DrawCursor(Cursor *cursor)
 
 void DrawTextBox()
 {
-    DrawBitmap(TextBox, 20, 650);
+    DrawBitmap(TextBox, 25, 640);
 }
 void DrawTextPointer()
 {
-    DrawBitmap(TextPointer, 35, 685);
+    DrawBitmap(TextPointer, 40, 680);
+}
+
+void DrawWizard(Wizard *wizard)
+{
+    DrawSprite(wizard->img, wizard->center_x, wizard->center_y, wizard->rot, true);
+}
+
+void DrawElement(Element *element)
+{
+    DrawSprite(element->img, element->center_x, element->center_y, element->rot, true);
+}
+
+void Move_Element(Element *element)
+{
+    double rot = element->rot * M_PI / 180.0;
+    element->center_x -= FAST_SPEED * sin(rot);
+    element->center_y -= FAST_SPEED * cos(rot);
+}
+///////////////////////////////////////////////
+bool openTextBox = false;
+
+void Update_Game_State()
+{
+    ////CHECKING FOR ACTIONS////
+    for (unsigned int i = 0; i < WIZARDS_SIZE; i++)
+    { //Cast spells if needed
+        if (wizards[i] != NULL && wizards[i]->casting)
+        {
+            int x = wizards[i]->center_x;
+            int y = wizards[i]->center_y;
+            double rot = wizards[i]->rot * M_PI / 180.0;
+            x -= CAST_DISTANCE * sin(rot);
+            y -= CAST_DISTANCE * cos(rot);
+            CreateElement(wizards[i]->cast_type, x, y, wizards[i]->rot);
+            wizards[i]->casting = false;
+        }
+    }
+
+    ////DRAWING TO BUFFER////
+    DrawBackground();
+    for (unsigned int i = 0; i < ELEMS_SIZE; i++)
+    {
+        if (elements[i] != NULL && elements[i]->active)
+        {
+            Move_Element(elements[i]);
+            DrawElement(elements[i]);
+        }
+    }
+
+    DrawToolBox();
+    DrawTextBox();
+    DrawTimers();
+
+    for (unsigned int i = 0; i < WIZARDS_SIZE; i++)
+    { //Cast spells if needed
+        if (wizards[i] != NULL && wizards[i]->heatlh > 0)
+        {
+            DrawWizard(wizards[i]);
+        }
+    }
+
+    if (openTextBox == true)
+    {
+        //para desenhar as letras, com a string q guarda a palavra, vai comparar
+        // cada letra uma a uma e por cada letra vai dando display no ecra a letra respetiva uma a uma
+        DrawTextPointer();
+        Draw_string();
+    }
+    DrawCursor(cursor);
 }
 
 //timers
@@ -321,127 +413,71 @@ extern unsigned wind_timer;
 void DrawFireTimer()
 {
     if (fire_timer == 0)
-        DrawBitmap(Fire_0, 400, 660);
+        DrawBitmap(Fire_0, 400, 655);
     if (fire_timer == 1)
-        DrawBitmap(Fire_1, 400, 660);
+        DrawBitmap(Fire_1, 400, 655);
     if (fire_timer == 2)
-        DrawBitmap(Fire_2, 400, 660);
+        DrawBitmap(Fire_2, 400, 655);
     if (fire_timer == 3)
-        DrawBitmap(Fire_3, 400, 660);
+        DrawBitmap(Fire_3, 400, 655);
     if (fire_timer == 4)
-        DrawBitmap(Fire_4, 400, 660);
+        DrawBitmap(Fire_4, 400, 655);
     if (fire_timer == 5)
-        DrawBitmap(Fire_5, 400, 660);
+        DrawBitmap(Fire_5, 400, 655);
 }
 
 void DrawWaterTimer()
 {
     if (water_timer == 0)
-        DrawBitmap(Water_0, 550, 660);
+        DrawBitmap(Water_0, 550, 655);
     if (water_timer == 1)
-        DrawBitmap(Water_1, 550, 660);
+        DrawBitmap(Water_1, 550, 655);
     if (water_timer == 2)
-        DrawBitmap(Water_2, 550, 660);
+        DrawBitmap(Water_2, 550, 655);
     if (water_timer == 3)
-        DrawBitmap(Water_3, 550, 660);
+        DrawBitmap(Water_3, 550, 655);
     if (water_timer == 4)
-        DrawBitmap(Water_4, 550, 660);
+        DrawBitmap(Water_4, 550, 655);
     if (water_timer == 5)
-        DrawBitmap(Water_5, 550, 660);
+        DrawBitmap(Water_5, 550, 655);
 }
 
 void DrawEarthTimer()
 {
     if (earth_timer == 0)
-        DrawBitmap(Earth_0, 550, 700);
+        DrawBitmap(Earth_0, 550, 695);
     if (earth_timer == 1)
-        DrawBitmap(Earth_1, 550, 700);
+        DrawBitmap(Earth_1, 550, 695);
     if (earth_timer == 2)
-        DrawBitmap(Earth_2, 550, 700);
+        DrawBitmap(Earth_2, 550, 695);
     if (earth_timer == 3)
-        DrawBitmap(Earth_3, 550, 700);
+        DrawBitmap(Earth_3, 550, 695);
     if (earth_timer == 4)
-        DrawBitmap(Earth_4, 550, 700);
+        DrawBitmap(Earth_4, 550, 695);
     if (earth_timer == 5)
-        DrawBitmap(Earth_5, 550, 700);
+        DrawBitmap(Earth_5, 550, 695);
 }
 
 void DrawWindTimer()
 {
     if (wind_timer == 0)
-        DrawBitmap(Wind_0, 400, 700);
+        DrawBitmap(Wind_0, 400, 695);
     if (wind_timer == 1)
-        DrawBitmap(Wind_1, 400, 700);
+        DrawBitmap(Wind_1, 400, 695);
     if (wind_timer == 2)
-        DrawBitmap(Wind_2, 400, 700);
+        DrawBitmap(Wind_2, 400, 695);
     if (wind_timer == 3)
-        DrawBitmap(Wind_3, 400, 700);
+        DrawBitmap(Wind_3, 400, 695);
     if (wind_timer == 4)
-        DrawBitmap(Wind_4, 400, 700);
+        DrawBitmap(Wind_4, 400, 695);
     if (wind_timer == 5)
-        DrawBitmap(Wind_5, 400, 700);
+        DrawBitmap(Wind_5, 400, 695);
 }
 
 void DrawTimers()
 {
-     DrawFireTimer();
+    DrawFireTimer();
     DrawWaterTimer();
-     DrawEarthTimer();
-     DrawWindTimer();
-}
-
-void DrawWizard(Wizard *wizard){
-    DrawSprite(wizard->img, wizard->center_x, wizard->center_y, wizard->rot, true);
-}
-
-void DrawElement(Element *element){
-    DrawSprite(element->img, element->center_x, element->center_y, element->rot, true);
-}
-
-void Move_Element(Element *element){
-    double rot = element->rot * M_PI / 180.0;
-    element->center_x -= FAST_SPEED*sin(rot);
-    element->center_y -= FAST_SPEED*cos(rot);
-}
-
-bool openTextBox = false;
-
-void Update_Game_State(){
-    ////CHECKING FOR ACTIONS////
-    for(unsigned int i = 0; i < WIZARDS_SIZE; i++){  //Cast spells if needed
-        if(wizards[i] != NULL && wizards[i]->casting){
-            int x = wizards[i]->center_x;
-            int y = wizards[i]->center_y;
-            double rot = wizards[i]->rot * M_PI / 180.0;
-            x -= CAST_DISTANCE*sin(rot);
-            y -= CAST_DISTANCE*cos(rot); 
-            CreateElement(wizards[i]->cast_type, x, y, wizards[i]->rot);
-            printf("\nROT: %d", wizards[i]->rot);
-            wizards[i]->casting = false;
-        }
-    }
-
-    ////DRAWING TO BUFFER////
-    DrawBackground();
-    for(unsigned int i = 0; i < ELEMS_SIZE; i++){
-        if(elements[i] != NULL && elements[i]->active){
-            Move_Element(elements[i]);
-            DrawElement(elements[i]);
-        }
-    }
-
-    for(unsigned int i = 0; i < WIZARDS_SIZE; i++){  //Cast spells if needed
-        if(wizards[i] != NULL && wizards[i]->heatlh > 0){
-            DrawWizard(wizards[i]);
-        }
-    }
-
-    if (openTextBox == true)
-    {
-    //para desenhar as letras, com a string q guarda a palavra, vai comparar
-    // cada letra uma a uma e por cada letra vai dando display no ecra a letra respetiva uma a uma
-    DrawTextBox();
-    Draw_string(); 
-    }
-    DrawCursor(cursor);
+    DrawEarthTimer();
+    DrawWindTimer();
 }
