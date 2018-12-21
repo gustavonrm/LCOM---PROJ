@@ -2,12 +2,9 @@
 
 #include "game.h"
 #include "video_card.h"
-<<<<<<< HEAD
 #include "timer.h"
-=======
 #include "keyboard.h"
 #include <math.h>
->>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
 
 Bitmap *background;
 Bitmap *P_Cursor;

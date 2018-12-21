@@ -103,14 +103,11 @@ int Arena()
         if (msg.m_notify.interrupts & irq_timer0) //TIMER
         {
           counter = timer_ih();
-<<<<<<< HEAD
           if( counter == 60 ){
           //fire_ih(); 
           spell_utilities(); 
           }
-=======
           Update_Game_State();
->>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
           UpdateVideo();
         }
 
@@ -128,11 +125,6 @@ int Arena()
             cursor->press = mouse->lb;
             cursor->x += mouse->delta_x;
             cursor->y -= mouse->delta_y; //it's - becuase y coordinates are counted downawrds
-<<<<<<< HEAD
-            int angle = atan2(player->center_y - cursor->y,cursor->x -player->center_x )*180/M_PI - 90;
-            if(angle < 0) angle = 360 + angle;
-            player->rot = angle;
-=======
             int angle = atan2(player->center_y - cursor->y, cursor->x - player->center_x)*180/M_PI - 90;
             if(angle < 0) angle = 360 + angle;
             if(!player->casting){
@@ -140,7 +132,6 @@ int Arena()
               player->casting = cursor->press; //THIS IS ONLY TEMPORARY(So user casts when LB is pressed)
               if(player->casting) player->cast_type = Fire;  //TEMPORARY
             }
->>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
           }
         }
 

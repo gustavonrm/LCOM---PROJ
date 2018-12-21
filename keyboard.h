@@ -14,11 +14,8 @@ void write_key(uint16_t key);
 void Draw_string(); 
 void keyboard_utilities(uint16_t key);
 
-<<<<<<< HEAD
 bool getSpell();
-=======
 //void getSpell();
->>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
 
 
 #endif

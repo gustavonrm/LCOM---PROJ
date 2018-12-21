@@ -188,26 +188,6 @@ int vg_draw_line(uint16_t x, uint16_t y, uint16_t len, uint32_t color)
 
 void UpdateVideo()
 {
-<<<<<<< HEAD
-
-  DrawBackground();
-  //layout menus
-  DrawTextBox();
-  DrawTimers();  
-
-  DrawSprite(player->img, player->center_x, player->center_y, player->rot, true);
-  DrawCursor(cursor);
-;
-
-  if (openTextBox == true)
-  {
-    //para desenhar as letras, com a string q guarda a palavra, vai comparar
-    // cada letra uma a uma e por cada letra vai dando displau no ecra a letra respetiva uma a uma
-    DrawTextPointer();
-    Draw_string();
-  }
-=======
->>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
   memcpy(video_mem, video_buffer, video_size);
 }
 
@@ -271,19 +251,11 @@ Bitmap *RotateImage(Bitmap *image, float angle)
   int width = image->bitmapInfoHeader.width;
   int height = image->bitmapInfoHeader.height;
 
-<<<<<<< HEAD
-  int x0 = width / 2;  //center x
-  int y0 = height / 2; //center yå
-
-  unsigned int *bmp_map = (unsigned int *)malloc(image->bitmapInfoHeader.imageSize * 2);
-  unsigned int *image_map = (unsigned int *)image->bitmapData;
-=======
   int x0 = image->bitmapInfoHeader.width/2;  //center x
   int y0 = image->bitmapInfoHeader.height/2;  //center y0
   
   unsigned int* bmp_map = (unsigned int*) malloc(width*height*4);
   unsigned int* image_map = (unsigned int*) image->bitmapData;
->>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
 
   for (int y = 0; y < height; y++)
   {
@@ -293,18 +265,8 @@ Bitmap *RotateImage(Bitmap *image, float angle)
       int y1 = (x - x0) * sinAngle + (y - y0) * cosAngle + y0;
       unsigned int color;
 
-<<<<<<< HEAD
-      if (x1 >= 0 && x1 < width && y1 >= 0 && y1 < height)
-      { //within bounds
-        //printf("\n X: %d  Y: %d \n",x,y);
-        //printf("\n X1: %d  Y1: %d \n",x1,y1);
-        color = *(unsigned int *)(image_map + y1 * width + x1);
-        //printf("\nREAD");
-        //output[x][y] = input[x1][y1];
-=======
       if (x1 > 0 && x1 < image->bitmapInfoHeader.width && y1 > 0 && y1 < image->bitmapInfoHeader.height) { //within bounds
         color = *(unsigned int*)(image_map + y1 * width+ x1);
->>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
       }
       else
         color = 0x00FFFFFF;
@@ -316,13 +278,7 @@ Bitmap *RotateImage(Bitmap *image, float angle)
   bmp->bitmapData = bmp_map;
   bmp->bitmapInfoHeader.width = width;
   bmp->bitmapInfoHeader.height = height;
-<<<<<<< HEAD
-  bmp->bitmapInfoHeader.imageSize = image->bitmapInfoHeader.imageSize * 2;
-
-  //printf("\nDONE");
-=======
   bmp->bitmapInfoHeader.imageSize = image->bitmapInfoHeader.imageSize;
->>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
 
   return bmp;
 }

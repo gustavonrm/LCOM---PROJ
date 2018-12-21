@@ -53,7 +53,6 @@ void Move_Element(Element *element);
 
 Cursor* CreateCursor(int x, int y);  //Creates Cursor obj
 void DrawCursor(Cursor *cursor); //Tests for out of bounds and draws appropriate Bitmap on screen
-<<<<<<< HEAD
 //keayboard layout
 void DrawTextBox();
 void DrawTextPointer();
@@ -65,10 +64,8 @@ void DrawWaterTimer();
 void DrawEarthTimer(); 
 void DrawWindTimer(); 
 void DrawTimers(); 
-=======
 
 void DrawTextBox();
 
 void Update_Game_State();
->>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
 #endif

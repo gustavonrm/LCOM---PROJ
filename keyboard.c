@@ -9,11 +9,7 @@ extern Bitmap *P_Cursor;
 
 int kbd_hook_id = 1;
 //char words[10] = {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'};
-<<<<<<< HEAD
-char words[50] = "";
-=======
 char words[50] = ""; 
->>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
 unsigned int text_index = 0;
 //alphabet
 extern Bitmap *Letter_A;
@@ -192,16 +188,6 @@ void write_key(uint16_t key)
     words[text_index] = ' ';
     break;
   case BACKSPACE:
-<<<<<<< HEAD
-    if (words[0] == '\0')
-    {
-      return;
-    }
-    if (words[1] == '\0')
-    {
-      text_index--;
-      words[text_index] = '\0';
-=======
     if( words[0]== '\0'){
          // text_index--;
       return;
@@ -209,16 +195,10 @@ void write_key(uint16_t key)
     if( words[1]== '\0'){
       text_index--;
        words[text_index] = '\0';
->>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
       return;
     }
     words[text_index] = '\0';
     text_index--;
-<<<<<<< HEAD
-    text_index--;
-=======
-    text_index--; 
->>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
     break;
   case ENTER:
     break;
@@ -232,13 +212,8 @@ void write_key(uint16_t key)
 void Draw_string()
 {
 
-<<<<<<< HEAD
-  int x = 35, y = 685;
-  for (size_t i = 0; i < text_index; i++)
-=======
   int x = 20, y = 605;
   for (size_t i = 0; i < text_index/*strlen(words)*/; i++)
->>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
   {
     x += 12;
     switch (words[i])
@@ -328,32 +303,30 @@ void Draw_string()
 void keyboard_utilities(uint16_t key)
 {
 
-<<<<<<< HEAD
   //if (key == U)
   //UpdateVideo();
 
   if (openTextBox == true)
   {
     write_key(key);
-    UpdateVideo();
+    Update_Game_State();
     if (getSpell() == true)
     {
       openTextBox = false;
     }
-=======
+  }
   if (key == U) {
     Update_Game_State();
     UpdateVideo();
   }
 
-  if (openTextBox == true)
+  /*if (openTextBox == true)
   {
     printf("string= %s\n ", words);
     printf("index num = %d\n", text_index);
     write_key(key); //erro esta aqui
     Update_Game_State();
->>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
-  }
+  }*/
   if (key == TAB)
   {
     text_index = 0;
@@ -362,12 +335,8 @@ void keyboard_utilities(uint16_t key)
   }
   if (key == ENTER)
   {
-<<<<<<< HEAD
-    //just in case
-=======
     //getSpell(); 
     //just in case 
->>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
     write_key(key);
     //reset
     openTextBox = false;
@@ -378,7 +347,6 @@ void keyboard_utilities(uint16_t key)
   }
   if (openTextBox == false)
   {
-<<<<<<< HEAD
     UpdateVideo();
   }
 }
@@ -457,11 +425,6 @@ bool getSpell()
 
   return false;
 }
-=======
-    //strcpy(&words,"");
-    Update_Game_State();
-  }
-}
 
 /*
 char fire[50];
@@ -489,4 +452,3 @@ void getSpell(){
 
 
 }*/
->>>>>>> 6496d7626e210a09f5b8132f90e24bbc6900ce19
