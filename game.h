@@ -9,9 +9,16 @@
 
 #define ELEMS_SIZE      30
 #define WIZARDS_SIZE    4
+#define BOTS_SIZE       3
 
 #define WIZARD_HITBOX_RADIUS    50
 #define BALL_HITBOX_RADIUS      28
+
+#define LOWER_ATTENTION         1*60
+#define HIGHER_ATTENTION        4*60
+#define LOWER_TTF               2*60
+#define HIGHER_TTF              3*60
+#define MAX_WOOBLE_VAR          180 //10 degrees of variation to either side
 
 typedef struct {
     Bitmap* bitmap[360];  //list of all 360 possible rotations
@@ -28,7 +35,19 @@ typedef struct {
     bool casting;  //True if wizard is casting a spell
     enum Element_Type cast_type;
     enum Wizard_color color;
+    char* name;
 } Wizard;
+
+typedef struct {
+    Wizard* wizard;
+    unsigned int attention_span;  //Ticks left until target is changed
+    unsigned int time_to_fire;  //Ticks left until bot fires a spell
+
+    int target; //This will be used to determine rotation
+    bool transitioning;  //True wheneven a bot is changing target acquisition
+    int init_diff;  //value of initial difference when starting the transition movement
+    unsigned int var_target; //target while wobbling when looking at another wizard
+} Bot;
 
 typedef struct {
     int center_x, center_y;  //Current center position
@@ -50,9 +69,17 @@ bool LoadAssets();
 void DrawToolBox();
 
 //players
-Wizard* CreateWizard(enum Wizard_color color, int center_x, int center_y, unsigned int rot);
+Wizard* CreateWizard(enum Wizard_color color, int center_x, int center_y, unsigned int rot, char* name) ;
 void DrawWizard(Wizard *wizard);
 void Wizard_Colision(Wizard *wizard, Element *element);
+
+//bots
+Bot* CreateBot(enum Wizard_color color, int center_x, int center_y, char* name);
+void Change_Target(Bot *bot);
+void Bot_Cast(Bot *bot);
+void Update_Bot_Rotation(Bot *bot);
+void Bot_Transition(Bot *bot);
+void Bot_Wobble(Bot *bot);
 
 //elements
 Element* CreateElement(enum Element_Type type, int center_x, int center_y, unsigned int rot);

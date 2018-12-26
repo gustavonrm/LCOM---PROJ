@@ -14,6 +14,9 @@ Bitmap *Tool_Box;
 Bitmap *P_Cursor;
 Bitmap *R_Cursor;
 Sprite *GreenWizard;
+Sprite *BlueWizard;
+Sprite *RedWizard;
+Sprite *YellowWizard;
 //keyboard manip
 Bitmap *Letter_A;
 Bitmap *Letter_B;
@@ -89,6 +92,12 @@ bool LoadAssets()
    /* if ((Tool_Box = loadBitmap("Tool_Box.bmp")) == NULL)
         return false;*/
     if ((GreenWizard = CreateSprite("Green_Hat.bmp")) == NULL)
+        return false;
+    if ((BlueWizard = CreateSprite("Blue_Hat.bmp")) == NULL)
+        return false;
+    if ((YellowWizard = CreateSprite("Yellow_Hat.bmp")) == NULL)
+        return false;
+    if ((RedWizard = CreateSprite("Red_Hat.bmp")) == NULL)
         return false;
 
     //mouse
@@ -215,23 +224,27 @@ bool LoadAssets()
 }
 
 //////////OBJECT ARRAYS///////////
-Wizard *wizards[4];    //4 is max nuber of wizards
-Element *elements[30]; //there'll never be more than 30 active spells at the same time so this number is fine
+Wizard *wizards[WIZARDS_SIZE];    //4 is max nuber of wizards
+Bot *bots[BOTS_SIZE];
+Element *elements[ELEMS_SIZE]; //there'll never be more than 30 active spells at the same time so this number is fine
 
-Wizard *CreateWizard(enum Wizard_color color, int center_x, int center_y, unsigned int rot)
+Wizard *CreateWizard(enum Wizard_color color, int center_x, int center_y, unsigned int rot, char* name)
 {
     Wizard *wizard = (Wizard *)malloc(sizeof(Wizard));
     wizard->color = color;
     switch (color)
     {
     case Red:
+        wizard->img = RedWizard;
         break;
     case Green:
         wizard->img = GreenWizard;
         break;
     case Blue:
+        wizard->img = BlueWizard;
         break;
     case Yellow:
+        wizard->img = YellowWizard;
         break;
     }
 
@@ -241,6 +254,7 @@ Wizard *CreateWizard(enum Wizard_color color, int center_x, int center_y, unsign
     wizard->casting = false;
     wizard->cast_type = Null;
     wizard->health = 3;
+    wizard->name = name;
 
     for (unsigned int i = 0; i < WIZARDS_SIZE; i++)
     { //There can only be 4 wizards
@@ -379,12 +393,212 @@ void Element_Colision(Element *element1, Element *element2){
     }
 }
 
+Bot* CreateBot(enum Wizard_color color, int center_x, int center_y, char* name){
+    Bot *bot = (Bot *)malloc(sizeof(Bot));
+
+    bot->attention_span = rand() % HIGHER_ATTENTION + LOWER_ATTENTION;
+    bot->time_to_fire = rand() % HIGHER_TTF + LOWER_TTF;
+
+    //First they'll be pointing to center
+    int x = 512;
+    int y = 384;
+    int angle = atan2(center_y - y, x - center_x) * 180 / M_PI - 90;
+    if (angle < 0) angle = 360 + angle;
+    bot->target = angle;
+    bot->transitioning = true;
+    bot->init_diff = 0;
+
+    bot->wizard = CreateWizard(color, center_x, center_y, angle, name);
+
+    for(int i = 0; i < BOTS_SIZE; i++){
+        if(bots[i] == NULL){
+            bots[i] = bot;
+            break;
+        }
+    }
+
+    return bot;
+}
+
+void Change_Target(Bot *bot){
+    int target_wizard;
+    Wizard* wiz;
+    unsigned int fail = 0;
+
+    do{ //Gets a valid wizard to look at
+        target_wizard = rand() % WIZARDS_SIZE;
+        wiz = wizards[target_wizard];
+        fail++;
+        if(fail == 20) return; //So there isn't and endless loop
+    } while(wiz == NULL || wiz->health <= 0 || wiz == bot->wizard);
+
+    int angle = atan2(bot->wizard->center_y - wiz->center_y, wiz->center_x - bot->wizard->center_x) * 180 / M_PI - 90;
+    if (angle < 0) angle = 360 + angle;
+    
+    if(angle != bot->target){
+        bot->target = angle;
+        bot->transitioning = true;
+    }
+    bot->attention_span = rand() % HIGHER_ATTENTION + LOWER_ATTENTION; //NOT FINAL
+
+    //printf("\n TARGET_WIZ: %d  RAND: %d", rand() % WIZARDS_SIZE, rand());
+    //printf("\n %s Targeting %s", bot->wizard->name, wiz->name);
+    //printf("\n TARGET: %d", bot->target);
+
+    //sleep(3);
+}
+
+int Transition_Function(int diff_percentage){  //This values give a very simple semi-human like mouse movement
+    if(diff_percentage <= 20) return (pow(diff_percentage,2)/100) + 5 + (rand() % 2);
+    else if(diff_percentage < 80) return -pow(40 - diff_percentage,2)/530 + 10 + (rand() % 5);
+    else return -pow(80 - diff_percentage,2)/80 + 8 + (rand() % 3);
+}
+
+void Bot_Transition(Bot *bot){
+    //Trasition movement algorithm
+
+    //Find which direction it's easiset to rotate (Increment or decrement rot)
+    int distance = abs(bot->wizard->rot - bot->target);
+    if (distance > 180)
+    {
+        distance = 360 - distance;
+    }
+
+    bool sign; //false if minus, true if plus
+    int direction = bot->wizard->rot + distance;
+    if (direction > 360)
+        direction = 360 - direction;
+
+    if (direction == bot->target)
+        sign = true;
+    else
+        sign = false;
+
+    if (distance < 3)
+    { //If transition in complete
+        bot->transitioning = false;
+        bot->wizard->rot = bot->target;
+        bot->var_target = bot->wizard->rot;
+        bot->init_diff = 0;
+        //printf("\nEND Transition");
+        //sleep(3);
+        return;
+    }
+
+    if (bot->init_diff == 0)
+        bot->init_diff = distance;
+
+    int diff_percentage = 100 - (distance / bot->init_diff) * 100;
+    int val = Transition_Function(diff_percentage); //Get value to increment/decrement
+
+    int final_rotation;
+    if (sign)
+        final_rotation = bot->wizard->rot + val;
+    else
+        final_rotation = bot->wizard->rot - val;
+
+    if (final_rotation > 360)
+        final_rotation -= 360;
+    else if (final_rotation < 0)
+        final_rotation += 360;
+
+    //printf("\nBOT: %s FINAL ROTATION: %d",bot->wizard->name, final_rotation);
+    //printf("\nDIFF: %d",distance);
+    //printf("\nDIRECTION: %d   ROT: %d   TARGET: %d",direction,bot->wizard->rot,bot->target);
+    //printf("\nVAL: %d   DIFF_PERCENT: %d",val, diff_percentage);
+    bot->wizard->rot = final_rotation;
+}
+
+void Bot_Wobble(Bot *bot){
+    //Wobble Algorithm
+
+    if (bot->var_target == bot->wizard->rot)
+    { //if we're there already let's get a new target
+        int var = rand() % MAX_WOOBLE_VAR - 90; //so it goes from -20 to 20 and every value below or above that is 0
+        if (var > 20 || var < -20)
+            var = 0; //So zero is more common
+        int new_target = bot->target + var;
+
+        if (new_target > 360)
+            new_target -= 360;
+        else if (new_target < 0)
+            new_target += 360;
+
+        bot->var_target = new_target;
+    }
+
+    int distance = abs(bot->wizard->rot - bot->var_target);
+    if (distance > 180)
+    {
+        distance = 360 - distance;
+    }
+    unsigned int direction = bot->wizard->rot + distance;
+    if (direction > 360)
+        direction = 360 - direction;
+    bool sign;
+    if (direction == bot->var_target)
+        sign = true;
+    else
+        sign = false;
+
+    int val = rand() % 2;
+    if (val > 2)
+        val = 0; //So 0 has more chance of appearing
+
+    int final_rotation;
+    if (sign)
+        final_rotation = bot->wizard->rot + val;
+    else
+        final_rotation = bot->wizard->rot - val;
+
+    if (final_rotation > 360)
+        final_rotation -= 360;
+    else if (final_rotation < 0)
+        final_rotation += 360;
+
+    if (abs(final_rotation - bot->var_target) < 2) bot->wizard->rot = bot->var_target;
+    else bot->wizard->rot = final_rotation;
+}
+
+void Update_Bot_Rotation(Bot *bot){
+    if(bot->transitioning){
+        Bot_Transition(bot);
+    }
+    else{
+        Bot_Wobble(bot);
+    }
+}
+
+void Bot_Cast(Bot *bot){
+    bot->time_to_fire = 3;
+    //printf("\nWIP");
+}
+
 ///////////////////////////////////////////////
 bool openTextBox = false;
 
 void Update_Game_State()
 {
     ////CHECKING FOR ACTIONS////
+    for(unsigned int i = 0; i < BOTS_SIZE; i++){ //Update Bot Behaviour
+        Bot* bot = bots[i];
+        if (bot != NULL && bot->wizard->health > 0)
+        { //If he exists and is alive
+            bot->attention_span--;
+            bot->time_to_fire--;
+
+            if(bot->attention_span == 0){
+                Change_Target(bot);
+            }
+
+            if(bot->time_to_fire == 0){
+                Bot_Cast(bot);
+            }
+
+            Update_Bot_Rotation(bot);
+        }
+    }
+
     for (unsigned int i = 0; i < WIZARDS_SIZE; i++)
     { //Cast spells if needed
         if (wizards[i] != NULL && wizards[i]->casting)

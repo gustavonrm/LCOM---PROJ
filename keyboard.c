@@ -301,6 +301,8 @@ void Draw_string()
 void keyboard_utilities(uint16_t key)
 {
 
+  if(key == U) UpdateVideo();
+
   if (openTextBox == true)
   {
     write_key(key);

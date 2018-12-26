@@ -301,8 +301,8 @@ void DrawSprite(Sprite *img, int center_x, int center_y, unsigned int rot, bool 
 
   if (centered)
   {
-    x = center_x - img->bitmap[rot]->bitmapInfoHeader.width;
-    y = center_y - img->bitmap[rot]->bitmapInfoHeader.height;
+    x = center_x - img->bitmap[rot]->bitmapInfoHeader.width/2;
+    y = center_y - img->bitmap[rot]->bitmapInfoHeader.height/2;
   }
   else
   {

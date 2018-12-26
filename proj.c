@@ -12,7 +12,9 @@
 extern Bitmap *background;
 Cursor *cursor;
 Wizard *player;
-Wizard *bot;
+Bot *bot1;
+Bot *bot2;
+Bot *bot3;
 extern uint8_t pack;
 extern uint8_t packets[3];
 //keyboard
@@ -45,9 +47,11 @@ int main(int argc, char *argv[])
 
 int Arena()
 {
-  cursor = CreateCursor(500, 500);
-  player = CreateWizard(Green, 560, 400, 0);
-  bot = CreateWizard(Green, 200, 300, 0);
+  cursor = CreateCursor(512, 500);
+  player = CreateWizard(Green, 512, 600, 0, "ALEX");
+  bot1 = CreateBot(Blue, 200, 384, "Blue Bobs");
+  bot2 = CreateBot(Red, 900, 384, "Commy");
+  bot3 = CreateBot(Yellow, 512, 100, "Bumbble Bee");
 
   Update_Game_State();
   UpdateVideo();
@@ -106,8 +110,8 @@ int Arena()
           {
             spell_utilities();
           }
-          //Update_Game_State();
-          //UpdateVideo();
+          Update_Game_State();
+          UpdateVideo();
         }
 
         if (msg.m_notify.interrupts & irq_kbd) //KEYBOARD
@@ -123,7 +127,7 @@ int Arena()
           { //if mouse recieved something useful
             cursor->press = mouse->lb;
             cursor->x += mouse->delta_x;
-            cursor->y -= mouse->delta_y; //it's - becuase y coordinates are counted downawrds
+            cursor->y -= mouse->delta_y; //it's - becuase y coordinates are counted downwards
             int angle = atan2(player->center_y - cursor->y, cursor->x - player->center_x) * 180 / M_PI - 90;
             if (angle < 0)
               angle = 360 + angle;
@@ -177,6 +181,9 @@ int(proj_main_loop)()
   //sleep(10);
 
   vg_init(0x144);
+
+  time_t t;
+  srand((unsigned) time(&t));
 
   Arena();
 
