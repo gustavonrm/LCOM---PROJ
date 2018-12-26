@@ -80,8 +80,12 @@ Bitmap *Earth_5;
 
 //elements
 Sprite *FireBall;
+Sprite *WaterBall;
+Sprite *EarthBall;
+Sprite *AirBall;
 
 extern Cursor *cursor;
+extern SpellCast SpellsRdy;
 
 //List of all Sprites
 
@@ -89,8 +93,8 @@ bool LoadAssets()
 {
     if ((background = loadBitmap("Background.bmp")) == NULL)
         return false;
-   /* if ((Tool_Box = loadBitmap("Tool_Box.bmp")) == NULL)
-        return false;*/
+    if ((Tool_Box = loadBitmap("Tool_Box.bmp")) == NULL)
+        return false;
     if ((GreenWizard = CreateSprite("Green_Hat.bmp")) == NULL)
         return false;
     if ((BlueWizard = CreateSprite("Blue_Hat.bmp")) == NULL)
@@ -216,8 +220,15 @@ bool LoadAssets()
         return false;
     if ((Earth_5 = loadBitmap("Earth_5.bmp")) == NULL)
         return false;
+
     //spell sprites
-    if ((FireBall = CreateSprite("Fireball.bmp")) == NULL)
+    if ((FireBall = CreateSprite("FireBall.bmp")) == NULL)
+        return false;
+    if ((WaterBall = CreateSprite("WaterBall.bmp")) == NULL)
+        return false;
+    if ((EarthBall = CreateSprite("EarthBall.bmp")) == NULL)
+        return false;
+    if ((AirBall = CreateSprite("AirBall.bmp")) == NULL)
         return false;
 
     return true;
@@ -268,8 +279,10 @@ Wizard *CreateWizard(enum Wizard_color color, int center_x, int center_y, unsign
     return wizard;
 }
 
-void Wizard_Colision(Wizard *wizard, Element *element){
-    if(element->elem_type != Null){
+void Wizard_Colision(Wizard *wizard, Element *element)
+{
+    if (element->elem_type != Null)
+    {
         element->active = false;
         wizard->health--;
     }
@@ -282,10 +295,13 @@ Element *CreateElement(enum Element_Type type, int center_x, int center_y, unsig
     switch (type)
     {
     case Air:
+        elem->img = AirBall;
         break;
     case Earth:
+        elem->img = EarthBall;
         break;
     case Water:
+        elem->img = WaterBall;
         break;
     case Fire:
         elem->img = FireBall;
@@ -373,23 +389,32 @@ void Move_Element(Element *element)
     element->center_y -= FAST_SPEED * cos(rot);
 }
 
-void Element_Colision(Element *element1, Element *element2){
-    int e1 = (int) element1->elem_type;
-    int e2 = (int) element2->elem_type;
-    if( e1 == e2) return; //Do nothing for elements of same type
-    else if( e1*e2 > 0){ //Destroy both for elements of opposing types
+void Element_Colision(Element *element1, Element *element2)
+{
+    int e1 = (int)element1->elem_type;
+    int e2 = (int)element2->elem_type;
+    if (e1 == e2)
+        return; //Do nothing for elements of same type
+    else if (e1 * e2 > 0)
+    { //Destroy both for elements of opposing types
         element1->active = false;
         element2->active = false;
     }
-    else{ //If they're consecutive elements decie which to destroy
+    else
+    { //If they're consecutive elements decie which to destroy
         int res = e1 + e2;
-        if(res == -3){ //If colision happens between earth and air (Special case)
-            if(element1->elem_type == Air) element1->active = false;
-            else element2->active = false;
+        if (res == -3)
+        { //If colision happens between earth and air (Special case)
+            if (element1->elem_type == Air)
+                element1->active = false;
+            else
+                element2->active = false;
             return;
         }
-        if(abs(e1) > abs(e2)) element1->active = false; //Highest element gets destroyed
-        else element2->active = false;
+        if (abs(e1) > abs(e2))
+            element1->active = false; //Highest element gets destroyed
+        else
+            element2->active = false;
     }
 }
 
@@ -619,24 +644,30 @@ void Update_Game_State()
         if (elements[i] != NULL && elements[i]->active)
         {
             Move_Element(elements[i]);
-            for (unsigned int x = 0; x < ELEMS_SIZE; x++){ //Colisions between elements
-                if (x != i && elements[x] != NULL && elements[x]->active){
+            for (unsigned int x = 0; x < ELEMS_SIZE; x++)
+            { //Colisions between elements
+                if (x != i && elements[x] != NULL && elements[x]->active)
+                {
                     int x_dis = abs(elements[i]->center_x - elements[x]->center_x);
                     int y_dis = abs(elements[i]->center_y - elements[x]->center_y);
-                    int distance = sqrt(pow(x_dis,2) + pow(y_dis,2));
-                    if(distance <= BALL_HITBOX_RADIUS*2){ //if there has been a colision
-                        Element_Colision(elements[i],elements[x]);
+                    int distance = sqrt(pow(x_dis, 2) + pow(y_dis, 2));
+                    if (distance <= BALL_HITBOX_RADIUS * 2)
+                    { //if there has been a colision
+                        Element_Colision(elements[i], elements[x]);
                     }
                 }
             }
 
-            for(unsigned int x = 0; x < WIZARDS_SIZE; x++){ //Colisions between elements and wizards
-                if(wizards[x] != NULL && wizards[x]->health > 0){
+            for (unsigned int x = 0; x < WIZARDS_SIZE; x++)
+            { //Colisions between elements and wizards
+                if (wizards[x] != NULL && wizards[x]->health > 0)
+                {
                     int x_dis = abs(elements[i]->center_x - wizards[x]->center_x);
                     int y_dis = abs(elements[i]->center_y - wizards[x]->center_y);
-                    int distance = sqrt(pow(x_dis,2) + pow(y_dis,2));
-                    if(distance <= BALL_HITBOX_RADIUS + WIZARD_HITBOX_RADIUS){ //if there has been a colision
-                        Wizard_Colision(wizards[x],elements[i]);
+                    int distance = sqrt(pow(x_dis, 2) + pow(y_dis, 2));
+                    if (distance <= BALL_HITBOX_RADIUS + WIZARD_HITBOX_RADIUS)
+                    { //if there has been a colision
+                        Wizard_Colision(wizards[x], elements[i]);
                     }
                 }
             }
@@ -661,7 +692,7 @@ void Update_Game_State()
         }
     }
 
-    //DrawToolBox();
+    DrawToolBox();
     DrawTextBox();
     DrawTimers();
 
@@ -677,72 +708,67 @@ void Update_Game_State()
 
 //timers
 
-extern unsigned fire_timer;
-extern unsigned water_timer;
-extern unsigned earth_timer;
-extern unsigned wind_timer;
-
 void DrawFireTimer()
 {
-    if (fire_timer == 0)
+    if (SpellsRdy.fire_timer == 0)
         DrawBitmap(Fire_0, 400, 655);
-    if (fire_timer == 1)
+    if (SpellsRdy.fire_timer == 1)
         DrawBitmap(Fire_1, 400, 655);
-    if (fire_timer == 2)
+    if (SpellsRdy.fire_timer == 2)
         DrawBitmap(Fire_2, 400, 655);
-    if (fire_timer == 3)
+    if (SpellsRdy.fire_timer == 3)
         DrawBitmap(Fire_3, 400, 655);
-    if (fire_timer == 4)
+    if (SpellsRdy.fire_timer == 4)
         DrawBitmap(Fire_4, 400, 655);
-    if (fire_timer == 5)
+    if (SpellsRdy.fire_timer == 5)
         DrawBitmap(Fire_5, 400, 655);
 }
 
 void DrawWaterTimer()
 {
-    if (water_timer == 0)
+    if (SpellsRdy.water_timer == 0)
         DrawBitmap(Water_0, 550, 655);
-    if (water_timer == 1)
+    if (SpellsRdy.water_timer == 1)
         DrawBitmap(Water_1, 550, 655);
-    if (water_timer == 2)
+    if (SpellsRdy.water_timer == 2)
         DrawBitmap(Water_2, 550, 655);
-    if (water_timer == 3)
+    if (SpellsRdy.water_timer == 3)
         DrawBitmap(Water_3, 550, 655);
-    if (water_timer == 4)
+    if (SpellsRdy.water_timer == 4)
         DrawBitmap(Water_4, 550, 655);
-    if (water_timer == 5)
+    if (SpellsRdy.water_timer == 5)
         DrawBitmap(Water_5, 550, 655);
 }
 
 void DrawEarthTimer()
 {
-    if (earth_timer == 0)
+    if (SpellsRdy.earth_timer == 0)
         DrawBitmap(Earth_0, 550, 695);
-    if (earth_timer == 1)
+    if (SpellsRdy.earth_timer == 1)
         DrawBitmap(Earth_1, 550, 695);
-    if (earth_timer == 2)
+    if (SpellsRdy.earth_timer == 2)
         DrawBitmap(Earth_2, 550, 695);
-    if (earth_timer == 3)
+    if (SpellsRdy.earth_timer == 3)
         DrawBitmap(Earth_3, 550, 695);
-    if (earth_timer == 4)
+    if (SpellsRdy.earth_timer == 4)
         DrawBitmap(Earth_4, 550, 695);
-    if (earth_timer == 5)
+    if (SpellsRdy.earth_timer == 5)
         DrawBitmap(Earth_5, 550, 695);
 }
 
 void DrawWindTimer()
 {
-    if (wind_timer == 0)
+    if (SpellsRdy.air_timer == 0)
         DrawBitmap(Wind_0, 400, 695);
-    if (wind_timer == 1)
+    if (SpellsRdy.air_timer == 1)
         DrawBitmap(Wind_1, 400, 695);
-    if (wind_timer == 2)
+    if (SpellsRdy.air_timer == 2)
         DrawBitmap(Wind_2, 400, 695);
-    if (wind_timer == 3)
+    if (SpellsRdy.air_timer == 3)
         DrawBitmap(Wind_3, 400, 695);
-    if (wind_timer == 4)
+    if (SpellsRdy.air_timer == 4)
         DrawBitmap(Wind_4, 400, 695);
-    if (wind_timer == 5)
+    if (SpellsRdy.air_timer == 5)
         DrawBitmap(Wind_5, 400, 695);
 }
 

@@ -15,10 +15,15 @@ Wizard *player;
 Bot *bot1;
 Bot *bot2;
 Bot *bot3;
+extern SpellCast SpellsRdy; 
 extern uint8_t pack;
 extern uint8_t packets[3];
 //keyboard
 extern uint16_t key;
+
+//globat temporary vars
+
+
 
 int main(int argc, char *argv[])
 {
@@ -131,12 +136,42 @@ int Arena()
             int angle = atan2(player->center_y - cursor->y, cursor->x - player->center_x) * 180 / M_PI - 90;
             if (angle < 0)
               angle = 360 + angle;
-            if (!player->casting)
+
+            //check line 136 in the future if problems
+            player->rot = angle;
+
+            if (!player->casting && SpellsRdy.Fire_Cast == true)
             {
               player->rot = angle;
               player->casting = cursor->press; //THIS IS ONLY TEMPORARY(So user casts when LB is pressed)
               if (player->casting)
-                player->cast_type = Fire; //TEMPORARY
+               SpellsRdy.Fire_Cast = false;
+              player->cast_type = Fire; //TEMPORARY
+            }
+
+            if (!player->casting &&  SpellsRdy. Water_Cast == true)
+            {
+              player->rot = angle;
+              player->casting = cursor->press; //THIS IS ONLY TEMPORARY(So user casts when LB is pressed)
+              if (player->casting)
+                 SpellsRdy.Water_Cast = false;
+                player->cast_type = Water; //TEMPORARY
+            }
+            if (!player->casting &&  SpellsRdy. Air_Cast == true)
+            {
+              player->rot = angle;
+              player->casting = cursor->press; //THIS IS ONLY TEMPORARY(So user casts when LB is pressed)
+              if (player->casting)
+                 SpellsRdy.Air_Cast = false;
+                player->cast_type = Air; //TEMPORARY
+            }
+            if (!player->casting &&  SpellsRdy. Earth_Cast == true)
+            {
+              player->rot = angle;
+              player->casting = cursor->press; //THIS IS ONLY TEMPORARY(So user casts when LB is pressed)
+              if (player->casting)
+                 SpellsRdy.Earth_Cast = false;
+                player->cast_type = Earth; //TEMPORARY
             }
           }
         }

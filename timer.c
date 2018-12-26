@@ -4,9 +4,12 @@
 #include <stdint.h>
 
 #include "i8254.h"
+#include "game.h"
 
 unsigned int ticks = 0;
 int timer_hook_id = 0; //used for timer
+
+SpellCast SpellsRdy = {0, 0, 0, 0, 0, 0, 0, 0}; 
 
 extern unsigned int ticks;
 
@@ -34,42 +37,36 @@ int timer_ih()
 }
 
 //spells - local Variables 
-unsigned fire_timer = 0;
-unsigned water_timer = 0;
-unsigned earth_timer = 0;
-unsigned wind_timer = 0;
-
-
 
 void fire_ih()
 {
-  if (fire_timer < 5)
+  if (SpellsRdy.fire_timer < 5)
   {
-    fire_timer++;
+    SpellsRdy.fire_timer++;
   }
 }
 
 void water_ih()
 {
-  if (water_timer < 5)
+  if (SpellsRdy.water_timer < 5)
   {
-    water_timer++;
+    SpellsRdy.water_timer++;
   }
 }
 
 void earth_ih()
 {
-  if (earth_timer < 5)
+  if (SpellsRdy.earth_timer < 5)
   {
-    earth_timer++;
+    SpellsRdy.earth_timer++;
   }
 }
 
 void wind_ih()
 {
-  if (wind_timer < 5)
+  if (SpellsRdy.air_timer < 5)
   {
-    wind_timer++;
+    SpellsRdy.air_timer++;
   }
 }
 
