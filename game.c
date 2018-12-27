@@ -5,6 +5,7 @@
 #include "timer.h"
 #include "keyboard.h"
 #include <math.h>
+#include <stdio.h>
 
 //layout
 Bitmap *background;
@@ -84,6 +85,9 @@ Sprite *WaterBall;
 Sprite *EarthBall;
 Sprite *AirBall;
 
+//animations
+Animation* Explosion;
+
 extern Cursor *cursor;
 extern SpellCast SpellsRdy;
 
@@ -102,6 +106,8 @@ bool LoadAssets()
     if ((YellowWizard = CreateSprite("Yellow_Hat.bmp")) == NULL)
         return false;
     if ((RedWizard = CreateSprite("Red_Hat.bmp")) == NULL)
+        return false;
+    if((Explosion = CreateAnimation("Explosion",9)) == NULL)
         return false;
 
     //mouse
@@ -234,8 +240,39 @@ bool LoadAssets()
     return true;
 }
 
+Animation* CreateAnimation(char animation_name[], int n_frames){
+    Animation *animation = (Animation *)malloc(sizeof(Animation));
+
+    char* name = "/";
+    strcat(name,animation_name);
+
+    char path[100] = "\0";
+    strcpy(path, animation_name);
+    strcat(path,name);
+
+    for(int i = 0; i < n_frames; i++){
+        char final[100] = "\0";
+        strcpy(final, path);
+
+        char number[2] = "\0";
+        sprintf(number, "%d", i);
+        strcat(final,number);
+
+        strcat(final,".bmp");
+        
+        Sprite* anim = CreateSprite(final);
+        if(anim != NULL) animation->sprites[i] = anim;
+        else {
+            printf("\nInvalid animation path: %s", final);
+            return NULL;
+        }
+    }
+
+    return animation;
+}
+
 //////////OBJECT ARRAYS///////////
-Wizard *wizards[WIZARDS_SIZE];    //4 is max nuber of wizards
+Wizard *wizards[WIZARDS_SIZE];    //4 is max nmuber of wizards
 Bot *bots[BOTS_SIZE];
 Element *elements[ELEMS_SIZE]; //there'll never be more than 30 active spells at the same time so this number is fine
 
@@ -539,9 +576,11 @@ void Bot_Wobble(Bot *bot){
 
     if (bot->var_target == bot->wizard->rot)
     { //if we're there already let's get a new target
-        int var = rand() % MAX_WOOBLE_VAR - 90; //so it goes from -20 to 20 and every value below or above that is 0
-        if (var > 20 || var < -20)
+        int var = rand() % MAX_WOOBLE_VAR - 135; //so it goes from -10 to 10 and every value below or above that is 0
+        if (var > 10 || var < -10)
             var = 0; //So zero is more common
+        
+        if(var == 0) return; //if it's zero then there's no need to do anything
         int new_target = bot->target + var;
 
         if (new_target > 360)
@@ -595,8 +634,33 @@ void Update_Bot_Rotation(Bot *bot){
 }
 
 void Bot_Cast(Bot *bot){
-    bot->time_to_fire = 3;
-    //printf("\nWIP");
+    enum Element_Type type;
+    do{
+        int type_n = rand() % 3;
+        switch(type_n){
+            case 0:
+            type = Air;
+            break;
+            
+            case 1:
+            type = Fire;
+            break;
+
+            case 2:
+            type = Earth;
+            break;
+
+            case 3:
+            type = Water;
+            break;
+        }
+    } while(type == bot->last_used);
+
+    bot->last_used = type;
+    bot->wizard->casting = true;
+    bot->wizard->cast_type = type;
+
+    bot->time_to_fire = rand() % HIGHER_TTF + LOWER_TTF;
 }
 
 ///////////////////////////////////////////////

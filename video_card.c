@@ -231,7 +231,7 @@ Sprite *CreateSprite(char img_name[])
     sprite->bitmap[i] = rotated;
   }
 
-  sprite->bitmap[0] = bmp; //for now
+  sprite->bitmap[0] = bmp;
 
   return sprite;
 }

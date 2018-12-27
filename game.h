@@ -18,11 +18,15 @@
 #define HIGHER_ATTENTION        4*60
 #define LOWER_TTF               2*60
 #define HIGHER_TTF              3*60
-#define MAX_WOOBLE_VAR          180 //10 degrees of variation to either side
+#define MAX_WOOBLE_VAR          270 //10 degrees of variation to either side
 
 typedef struct {
     Bitmap* bitmap[360];  //list of all 360 possible rotations
 } Sprite;
+
+typedef struct {
+    Sprite* sprites[30];  //Up to 30 frames for each animation
+} Animation;
 
 enum Element_Type
 {
@@ -61,6 +65,7 @@ typedef struct {
     bool transitioning;  //True wheneven a bot is changing target acquisition
     int init_diff;  //value of initial difference when starting the transition movement
     unsigned int var_target; //target while wobbling when looking at another wizard
+    enum Element_Type last_used; //This is the last casted spell by the bot
 } Bot;
 
 typedef struct {
@@ -89,13 +94,15 @@ typedef struct
     unsigned fire_timer;
     unsigned water_timer;
     unsigned earth_timer;
-     unsigned air_timer;
+    unsigned air_timer;
 }SpellCast;
 
 //main layout
 bool
 LoadAssets();
 void DrawToolBox();
+
+Animation* CreateAnimation(char animation_name[], int n_frames);
 
 //players
 Wizard* CreateWizard(enum Wizard_color color, int center_x, int center_y, unsigned int rot, char* name) ;
