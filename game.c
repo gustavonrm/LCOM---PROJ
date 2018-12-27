@@ -757,14 +757,14 @@ void Update_Game_State()
     }
 
     DrawToolBox();
-    DrawTextBox();
     DrawTimers();
 
     if (openTextBox == true)
     {
         //para desenhar as letras, com a string q guarda a palavra, vai comparar
         // cada letra uma a uma e por cada letra vai dando display no ecra a letra respetiva uma a uma
-        DrawTextPointer();
+        DrawTextBox();
+        //DrawTextPointer();
         Draw_string();
     }
     DrawCursor(cursor);
@@ -775,65 +775,65 @@ void Update_Game_State()
 void DrawFireTimer()
 {
     if (SpellsRdy.fire_timer == 0)
-        DrawBitmap(Fire_0, 400, 655);
+        DrawBitmap(Fire_0, 700, 655);
     if (SpellsRdy.fire_timer == 1)
-        DrawBitmap(Fire_1, 400, 655);
+        DrawBitmap(Fire_1, 700, 655);
     if (SpellsRdy.fire_timer == 2)
-        DrawBitmap(Fire_2, 400, 655);
+        DrawBitmap(Fire_2, 700, 655);
     if (SpellsRdy.fire_timer == 3)
-        DrawBitmap(Fire_3, 400, 655);
+        DrawBitmap(Fire_3, 700, 655);
     if (SpellsRdy.fire_timer == 4)
-        DrawBitmap(Fire_4, 400, 655);
+        DrawBitmap(Fire_4, 700, 655);
     if (SpellsRdy.fire_timer == 5)
-        DrawBitmap(Fire_5, 400, 655);
+        DrawBitmap(Fire_5, 700, 655);
 }
 
 void DrawWaterTimer()
 {
     if (SpellsRdy.water_timer == 0)
-        DrawBitmap(Water_0, 550, 655);
+        DrawBitmap(Water_0, 850, 655);
     if (SpellsRdy.water_timer == 1)
-        DrawBitmap(Water_1, 550, 655);
+        DrawBitmap(Water_1, 850, 655);
     if (SpellsRdy.water_timer == 2)
-        DrawBitmap(Water_2, 550, 655);
+        DrawBitmap(Water_2, 850, 655);
     if (SpellsRdy.water_timer == 3)
-        DrawBitmap(Water_3, 550, 655);
+        DrawBitmap(Water_3, 850, 655);
     if (SpellsRdy.water_timer == 4)
-        DrawBitmap(Water_4, 550, 655);
+        DrawBitmap(Water_4, 850, 655);
     if (SpellsRdy.water_timer == 5)
-        DrawBitmap(Water_5, 550, 655);
+        DrawBitmap(Water_5, 850, 655);
 }
 
 void DrawEarthTimer()
 {
     if (SpellsRdy.earth_timer == 0)
-        DrawBitmap(Earth_0, 550, 695);
+        DrawBitmap(Earth_0, 850, 695);
     if (SpellsRdy.earth_timer == 1)
-        DrawBitmap(Earth_1, 550, 695);
+        DrawBitmap(Earth_1, 850, 695);
     if (SpellsRdy.earth_timer == 2)
-        DrawBitmap(Earth_2, 550, 695);
+        DrawBitmap(Earth_2, 850, 695);
     if (SpellsRdy.earth_timer == 3)
-        DrawBitmap(Earth_3, 550, 695);
+        DrawBitmap(Earth_3, 850, 695);
     if (SpellsRdy.earth_timer == 4)
-        DrawBitmap(Earth_4, 550, 695);
+        DrawBitmap(Earth_4, 850, 695);
     if (SpellsRdy.earth_timer == 5)
-        DrawBitmap(Earth_5, 550, 695);
+        DrawBitmap(Earth_5, 850, 695);
 }
 
 void DrawWindTimer()
 {
     if (SpellsRdy.air_timer == 0)
-        DrawBitmap(Wind_0, 400, 695);
+        DrawBitmap(Wind_0, 700, 695);
     if (SpellsRdy.air_timer == 1)
-        DrawBitmap(Wind_1, 400, 695);
+        DrawBitmap(Wind_1, 700, 695);
     if (SpellsRdy.air_timer == 2)
-        DrawBitmap(Wind_2, 400, 695);
+        DrawBitmap(Wind_2, 700, 695);
     if (SpellsRdy.air_timer == 3)
-        DrawBitmap(Wind_3, 400, 695);
+        DrawBitmap(Wind_3, 700, 695);
     if (SpellsRdy.air_timer == 4)
-        DrawBitmap(Wind_4, 400, 695);
+        DrawBitmap(Wind_4, 700, 695);
     if (SpellsRdy.air_timer == 5)
-        DrawBitmap(Wind_5, 400, 695);
+        DrawBitmap(Wind_5, 700, 695);
 }
 
 void DrawTimers()
