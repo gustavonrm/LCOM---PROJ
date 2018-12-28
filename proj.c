@@ -7,6 +7,7 @@
 #include "video_card.h"
 #include "keyboard.h"
 #include "timer.h"
+#include "RTC.h"
 #include <math.h>
 
 extern Bitmap *background;
@@ -15,15 +16,13 @@ Wizard *player;
 Bot *bot1;
 Bot *bot2;
 Bot *bot3;
-extern SpellCast SpellsRdy; 
+extern SpellCast SpellsRdy;
 extern uint8_t pack;
 extern uint8_t packets[3];
 //keyboard
 extern uint16_t key;
 
 //globat temporary vars
-
-
 
 int main(int argc, char *argv[])
 {
@@ -71,7 +70,7 @@ int Arena()
   //unsigned int freq = 1; //frequency of updates(bcs there are 60 ticks/sec)
   //int frame_n = 0;
 
-  uint8_t bit_no, bit_no_t, bit_no_m;
+  uint8_t bit_no, bit_no_t, bit_no_m, bit_no_rtc;
 
   if (enable_stream() == 1)
   {
@@ -94,7 +93,15 @@ int Arena()
     return 1;
   }
 
-  uint32_t irq_kbd = BIT(bit_no), irq_timer0 = BIT(bit_no_t), irq_mouse = BIT(bit_no_m);
+  //subscribe RTC
+  if (subscribe_rtc(&bit_no_rtc) != 0)
+  {
+    return 1;
+  }
+
+  //....
+
+  uint32_t irq_kbd = BIT(bit_no), irq_timer0 = BIT(bit_no_t), irq_mouse = BIT(bit_no_m), irq_rtc = BIT(bit_no_rtc);
 
   while ((key != ESC_BREAK))
   {
@@ -108,6 +115,8 @@ int Arena()
       switch (_ENDPOINT_P(msg.m_source))
       {
       case HARDWARE:
+
+        //timer
         if (msg.m_notify.interrupts & irq_timer0) //TIMER
         {
           counter = timer_ih();
@@ -119,11 +128,14 @@ int Arena()
           UpdateVideo();
         }
 
+        //keyboard
         if (msg.m_notify.interrupts & irq_kbd) //KEYBOARD
         {
           key = kbd_ih();
           keyboard_utilities(key);
         }
+
+        //mouse
 
         if (msg.m_notify.interrupts & irq_mouse) //MOUSE
         {
@@ -145,36 +157,41 @@ int Arena()
               player->rot = angle;
               player->casting = cursor->press; //THIS IS ONLY TEMPORARY(So user casts when LB is pressed)
               if (player->casting)
-               SpellsRdy.Fire_Cast = false;
+                SpellsRdy.Fire_Cast = false;
               player->cast_type = Fire; //TEMPORARY
             }
 
-            if (!player->casting &&  SpellsRdy. Water_Cast == true)
+            if (!player->casting && SpellsRdy.Water_Cast == true)
             {
               player->rot = angle;
               player->casting = cursor->press; //THIS IS ONLY TEMPORARY(So user casts when LB is pressed)
               if (player->casting)
-                 SpellsRdy.Water_Cast = false;
-                player->cast_type = Water; //TEMPORARY
+                SpellsRdy.Water_Cast = false;
+              player->cast_type = Water; //TEMPORARY
             }
-            if (!player->casting &&  SpellsRdy. Air_Cast == true)
+            if (!player->casting && SpellsRdy.Air_Cast == true)
             {
               player->rot = angle;
               player->casting = cursor->press; //THIS IS ONLY TEMPORARY(So user casts when LB is pressed)
               if (player->casting)
-                 SpellsRdy.Air_Cast = false;
-                player->cast_type = Air; //TEMPORARY
+                SpellsRdy.Air_Cast = false;
+              player->cast_type = Air; //TEMPORARY
             }
-            if (!player->casting &&  SpellsRdy. Earth_Cast == true)
+            if (!player->casting && SpellsRdy.Earth_Cast == true)
             {
               player->rot = angle;
               player->casting = cursor->press; //THIS IS ONLY TEMPORARY(So user casts when LB is pressed)
               if (player->casting)
-                 SpellsRdy.Earth_Cast = false;
-                player->cast_type = Earth; //TEMPORARY
+                SpellsRdy.Earth_Cast = false;
+              player->cast_type = Earth; //TEMPORARY
             }
           }
         }
+        //RTC
+        if (msg.m_notify.interrupts & irq_rtc){
+            rtc_ih(); 
+        }
+        
 
         break;
       default:
@@ -195,6 +212,10 @@ int Arena()
   if (unsubscribe_keyboard() != OK)
   {
     return 1;
+  }
+  //RTC
+  if( unsubscribe_rtc() != OK){
+    return 1; 
   }
 
   if (disable_stream() == 1)
@@ -218,7 +239,7 @@ int(proj_main_loop)()
   vg_init(0x144);
 
   time_t t;
-  srand((unsigned) time(&t));
+  srand((unsigned)time(&t));
 
   Arena();
 
