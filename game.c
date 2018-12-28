@@ -6,6 +6,7 @@
 #include "keyboard.h"
 #include <math.h>
 #include <stdio.h>
+#include "RTC.h"
 
 //layout
 Bitmap *background;
@@ -57,6 +58,7 @@ Bitmap *Number_6;
 Bitmap *Number_7;
 Bitmap *Number_8;
 Bitmap *Number_9;
+Bitmap *Double_Dots;
 
 Bitmap *TextBox;
 Bitmap *TextPointer;
@@ -200,6 +202,8 @@ bool LoadAssets()
     if ((Number_8 = loadBitmap("8.bmp")) == NULL)
         return false;
     if ((Number_9 = loadBitmap("9.bmp")) == NULL)
+        return false;
+    if ((Double_Dots = loadBitmap("Double_Dots.bmp")) == NULL)
         return false;
 
     if ((TextBox = loadBitmap("Text_Box.bmp")) == NULL)
@@ -832,6 +836,7 @@ void Update_Game_State()
         Draw_string();
     }
     DrawCursor(cursor);
+    DrawClock();
 }
 
 //timers

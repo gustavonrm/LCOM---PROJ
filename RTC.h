@@ -31,6 +31,7 @@ void correct_hours();
 //functions for the game 
 void clock_display(); 
 void adjust_backgorund(); //this could be diferent 
+void DrawClock(); 
 
 
 #endif

@@ -2,10 +2,24 @@
 #include <stdlib.h>
 #include "RTC.h"
 #include "macros.h"
+#include "game.h"
+#include "video_card.h"
 
 //local variables
 int rtc_hook_id = 8;
 Time GameClock = {0, 0, 0};
+
+extern Bitmap *Number_0;
+extern Bitmap *Number_1;
+extern Bitmap *Number_2;
+extern Bitmap *Number_3;
+extern Bitmap *Number_4;
+extern Bitmap *Number_5;
+extern Bitmap *Number_6;
+extern Bitmap *Number_7;
+extern Bitmap *Number_8;
+extern Bitmap *Number_9;
+extern Bitmap *Double_Dots;
 
 //only interestd on update interupts tho we only want to get current hours
 
@@ -23,7 +37,7 @@ int subscribe_rtc(uint8_t *rtc_bit_no)
         printf("failed subscribing rtc interupts 3\n");
         return 1;
     }
-   printf("RTC subscribed!\n");
+    printf("RTC subscribed!\n");
     return 0;
 }
 
@@ -33,8 +47,9 @@ int unsubscribe_rtc()
     {
         return 1;
     }
-    
-    if(disable_update_interrupts()!= 0 ){
+
+    if (disable_update_interrupts() != 0)
+    {
         return 1;
     }
     return 0;
@@ -57,7 +72,7 @@ void rtc_ih()
             printf("error getting hours\n");
             return;
         }
-        clock_display();
+        clock_display(); //comment this to stop outputting 
     }
 }
 
@@ -102,23 +117,27 @@ int disable_update_interrupts()
 {
     uint32_t regB = 0;
 
-  if(sys_outb(RTC_ADDR_REG, RTC_REG_B) != OK) {
-		return 1;
-  }
+    if (sys_outb(RTC_ADDR_REG, RTC_REG_B) != OK)
+    {
+        return 1;
+    }
 
-  if (sys_inb(RTC_DATA_REG, &regB) != OK) {
-		return 1;
-	}
-//change all bits execept bit4 which is the one os the update 
-	regB &= ~BIT(4);
+    if (sys_inb(RTC_DATA_REG, &regB) != OK)
+    {
+        return 1;
+    }
+    //change all bits execept bit4 which is the one os the update
+    regB &= ~BIT(4);
 
-	if(sys_outb(RTC_ADDR_REG, RTC_REG_B) != OK) {
-		return 1;
-  }
+    if (sys_outb(RTC_ADDR_REG, RTC_REG_B) != OK)
+    {
+        return 1;
+    }
 
-	if(sys_outb(RTC_DATA_REG, regB) != OK) {
-		return 1;
-  }
+    if (sys_outb(RTC_DATA_REG, regB) != OK)
+    {
+        return 1;
+    }
 
     return 0;
 }
@@ -184,21 +203,20 @@ void clock_display()
 {
     correct_hours();
     // to test display with printf
-    int H, M, S;
-    H = GameClock.hours;
-    M = GameClock.minutes;
-    S = GameClock.seconds;
+    int Hour, Min, Sec;
+    Hour = GameClock.hours;
+    Min = GameClock.minutes;
+    Sec = GameClock.seconds;
 
-    printf("%d:", H);
-    printf("%d:", M);
-    printf("%d\n", S);
+    printf("%d:", Hour);
+    printf("%d:", Min);
+    printf("%d\n", Sec);
 
     //later with in game bmp
 }
 
 int bcd_to_binary(uint32_t *time)
 {
-    //uint32_t binary = 0;
     uint32_t regB = 0;
     if (sys_outb(RTC_ADDR_REG, RTC_REG_B) != OK)
     {
@@ -255,16 +273,598 @@ void correct_hours()
         GameClock.hours = 24;
 }
 
-/*
-void wait_valid_rtc()
+void DrawClock()
 {
-    unsigned long regA = 0;
-    do
+    //draw hour
+
+    if (GameClock.hours / 10 == 0)
     {
-        disable();
-        sys_outb(RTC_ADDR_REG, RTC_REG_A);
-        sys_inb(RTC_DATA_REG, &regA);
-        enable();
-    } while (regA & RTC_UIP);
+        DrawBitmap(Number_0, 10, 10);
+        switch (GameClock.hours % 10)
+        {
+        case 0:
+            DrawBitmap(Number_0, 20, 10);
+            break;
+
+        case 1:
+            DrawBitmap(Number_1, 20, 10);
+            break;
+
+        case 2:
+            DrawBitmap(Number_2, 20, 10);
+            break;
+
+        case 3:
+            DrawBitmap(Number_3, 20, 10);
+            break;
+
+        case 4:
+            DrawBitmap(Number_4, 20, 10);
+            break;
+
+        case 5:
+            DrawBitmap(Number_5, 20, 10);
+            break;
+
+        case 6:
+            DrawBitmap(Number_6, 20, 10);
+            break;
+
+        case 7:
+            DrawBitmap(Number_7, 20, 10);
+            break;
+
+        case 8:
+            DrawBitmap(Number_8, 20, 10);
+            break;
+
+        case 9:
+            DrawBitmap(Number_9, 20, 10);
+            break;
+        }
+    }
+
+    if (GameClock.hours / 10 == 1)
+    {
+        DrawBitmap(Number_1, 10, 10);
+        switch (GameClock.hours % 10)
+        {
+        case 0:
+            DrawBitmap(Number_0, 20, 10);
+            break;
+
+        case 1:
+            DrawBitmap(Number_1, 20, 10);
+            break;
+
+        case 2:
+            DrawBitmap(Number_2, 20, 10);
+            break;
+
+        case 3:
+            DrawBitmap(Number_3, 20, 10);
+            break;
+
+        case 4:
+            DrawBitmap(Number_4, 20, 10);
+            break;
+
+        case 5:
+            DrawBitmap(Number_5, 20, 10);
+            break;
+
+        case 6:
+            DrawBitmap(Number_6, 20, 10);
+            break;
+
+        case 7:
+            DrawBitmap(Number_7, 20, 10);
+            break;
+
+        case 8:
+            DrawBitmap(Number_8, 20, 10);
+            break;
+
+        case 9:
+            DrawBitmap(Number_9, 20, 10);
+            break;
+        }
+    }
+
+    if (GameClock.hours / 10 == 2)
+    {
+        DrawBitmap(Number_2, 10, 10);
+        switch (GameClock.hours % 10)
+        {
+        case 0:
+            DrawBitmap(Number_0, 20, 10);
+            break;
+
+        case 1:
+            DrawBitmap(Number_1, 20, 10);
+            break;
+
+        case 2:
+            DrawBitmap(Number_2, 20, 10);
+            break;
+
+        case 3:
+            DrawBitmap(Number_3, 20, 10);
+            break;
+
+        case 4:
+            DrawBitmap(Number_4, 20, 10);
+            break;
+
+        }
+    }
+
+    DrawBitmap(Double_Dots, 30, 12);
+
+    //draw min
+    if (GameClock.minutes / 10 == 0)
+    {
+        DrawBitmap(Number_0, 35, 10);
+        switch (GameClock.minutes % 10)
+        {
+        case 0:
+            DrawBitmap(Number_0, 45, 10);
+            break;
+        case 1:
+            DrawBitmap(Number_1, 45, 10);
+            break;
+        case 2:
+            DrawBitmap(Number_2, 45, 10);
+            break;
+        case 3:
+            DrawBitmap(Number_3, 45, 10);
+            break;
+        case 4:
+            DrawBitmap(Number_4, 45, 10);
+            break;
+        case 5:
+            DrawBitmap(Number_5, 45, 10);
+            break;
+        case 6:
+            DrawBitmap(Number_6, 45, 10);
+            break;
+        case 7:
+            DrawBitmap(Number_7, 45, 10);
+            break;
+        case 8:
+            DrawBitmap(Number_8, 45, 10);
+            break;
+        case 9:
+            DrawBitmap(Number_9, 45, 10);
+            break;
+        }
+    }
+
+    if (GameClock.minutes / 10 == 1)
+    {
+        DrawBitmap(Number_1, 35, 10);
+        switch (GameClock.minutes % 10)
+        {
+        case 0:
+            DrawBitmap(Number_0, 45, 10);
+            break;
+        case 1:
+            DrawBitmap(Number_1, 45, 10);
+            break;
+        case 2:
+            DrawBitmap(Number_2, 45, 10);
+            break;
+        case 3:
+            DrawBitmap(Number_3, 45, 10);
+            break;
+        case 4:
+            DrawBitmap(Number_4, 45, 10);
+            break;
+        case 5:
+            DrawBitmap(Number_5, 45, 10);
+            break;
+        case 6:
+            DrawBitmap(Number_6, 45, 10);
+            break;
+        case 7:
+            DrawBitmap(Number_7, 45, 10);
+            break;
+        case 8:
+            DrawBitmap(Number_8, 45, 10);
+            break;
+        case 9:
+            DrawBitmap(Number_9, 45, 10);
+            break;
+        }
+    }
+
+    if (GameClock.minutes / 10 == 2)
+    {
+        DrawBitmap(Number_2, 35, 10);
+        switch (GameClock.minutes % 10)
+        {
+        case 0:
+            DrawBitmap(Number_0, 45, 10);
+            break;
+        case 1:
+            DrawBitmap(Number_1, 45, 10);
+            break;
+        case 2:
+            DrawBitmap(Number_2, 45, 10);
+            break;
+        case 3:
+            DrawBitmap(Number_3, 45, 10);
+            break;
+        case 4:
+            DrawBitmap(Number_4, 45, 10);
+            break;
+        case 5:
+            DrawBitmap(Number_5, 45, 10);
+            break;
+        case 6:
+            DrawBitmap(Number_6, 45, 10);
+            break;
+        case 7:
+            DrawBitmap(Number_7, 45, 10);
+            break;
+        case 8:
+            DrawBitmap(Number_8, 45, 10);
+            break;
+        case 9:
+            DrawBitmap(Number_9, 45, 10);
+            break;
+        }
+    }
+
+    if (GameClock.minutes / 10 == 3)
+    {
+        DrawBitmap(Number_3, 35, 10);
+        switch (GameClock.minutes % 10)
+        {
+        case 0:
+            DrawBitmap(Number_0, 45, 10);
+            break;
+        case 1:
+            DrawBitmap(Number_1, 45, 10);
+            break;
+        case 2:
+            DrawBitmap(Number_2, 45, 10);
+            break;
+        case 3:
+            DrawBitmap(Number_3, 45, 10);
+            break;
+        case 4:
+            DrawBitmap(Number_4, 45, 10);
+            break;
+        case 5:
+            DrawBitmap(Number_5, 45, 10);
+            break;
+        case 6:
+            DrawBitmap(Number_6, 45, 10);
+            break;
+        case 7:
+            DrawBitmap(Number_7, 45, 10);
+            break;
+        case 8:
+            DrawBitmap(Number_8, 45, 10);
+            break;
+        case 9:
+            DrawBitmap(Number_9, 45, 10);
+            break;
+        }
+    }
+
+    if (GameClock.minutes / 10 == 4)
+    {
+        DrawBitmap(Number_4, 35, 10);
+        switch (GameClock.minutes % 10)
+        {
+        case 0:
+            DrawBitmap(Number_0, 45, 10);
+            break;
+        case 1:
+            DrawBitmap(Number_1, 45, 10);
+            break;
+        case 2:
+            DrawBitmap(Number_2, 45, 10);
+            break;
+        case 3:
+            DrawBitmap(Number_3, 45, 10);
+            break;
+        case 4:
+            DrawBitmap(Number_4, 45, 10);
+            break;
+        case 5:
+            DrawBitmap(Number_5, 45, 10);
+            break;
+        case 6:
+            DrawBitmap(Number_6, 45, 10);
+            break;
+        case 7:
+            DrawBitmap(Number_7, 45, 10);
+            break;
+        case 8:
+            DrawBitmap(Number_8, 45, 10);
+            break;
+        case 9:
+            DrawBitmap(Number_9, 45, 10);
+            break;
+        }
+    }
+
+    if (GameClock.minutes / 10 == 5)
+    {
+        DrawBitmap(Number_5, 35, 10);
+        switch (GameClock.minutes % 10)
+        {
+        case 0:
+            DrawBitmap(Number_0, 45, 10);
+            break;
+        case 1:
+            DrawBitmap(Number_1, 45, 10);
+            break;
+        case 2:
+            DrawBitmap(Number_2, 45, 10);
+            break;
+        case 3:
+            DrawBitmap(Number_3, 45, 10);
+            break;
+        case 4:
+            DrawBitmap(Number_4, 45, 10);
+            break;
+        case 5:
+            DrawBitmap(Number_5, 45, 10);
+            break;
+        case 6:
+            DrawBitmap(Number_6, 45, 10);
+            break;
+        case 7:
+            DrawBitmap(Number_7, 45, 10);
+            break;
+        case 8:
+            DrawBitmap(Number_8, 45, 10);
+            break;
+        case 9:
+            DrawBitmap(Number_9, 45, 10);
+            break;
+        }
+    }
+
+    if (GameClock.minutes == 60)
+    {
+        DrawBitmap(Number_6, 35, 10);
+        DrawBitmap(Number_0, 45, 10);
+    }
+
+    DrawBitmap(Double_Dots, 55, 12);
+
+    //draw sec
+
+    if ((GameClock.seconds / 10) == 0)
+    {
+        DrawBitmap(Number_0, 60, 10);
+        switch (GameClock.seconds % 10)
+        {
+        case 0:
+            DrawBitmap(Number_0, 70, 10);
+            break;
+        case 1:
+            DrawBitmap(Number_1, 70, 10);
+            break;
+        case 2:
+            DrawBitmap(Number_2, 70, 10);
+            break;
+        case 3:
+            DrawBitmap(Number_3, 70, 10);
+            break;
+        case 4:
+            DrawBitmap(Number_4, 70, 10);
+            break;
+        case 5:
+            DrawBitmap(Number_5, 70, 10);
+            break;
+        case 6:
+            DrawBitmap(Number_6, 70, 10);
+            break;
+        case 7:
+            DrawBitmap(Number_7, 70, 10);
+            break;
+        case 8:
+            DrawBitmap(Number_8, 70, 10);
+            break;
+        case 9:
+            DrawBitmap(Number_9, 70, 10);
+            break;
+        }
+    }
+    if ((GameClock.seconds / 10) == 1)
+    {
+        DrawBitmap(Number_1, 60, 10);
+        switch (GameClock.seconds % 10)
+        {
+        case 0:
+            DrawBitmap(Number_0, 70, 10);
+            break;
+        case 1:
+            DrawBitmap(Number_1, 70, 10);
+            break;
+        case 2:
+            DrawBitmap(Number_2, 70, 10);
+            break;
+        case 3:
+            DrawBitmap(Number_3, 70, 10);
+            break;
+        case 4:
+            DrawBitmap(Number_4, 70, 10);
+            break;
+        case 5:
+            DrawBitmap(Number_5, 70, 10);
+            break;
+        case 6:
+            DrawBitmap(Number_6, 70, 10);
+            break;
+        case 7:
+            DrawBitmap(Number_7, 70, 10);
+            break;
+        case 8:
+            DrawBitmap(Number_8, 70, 10);
+            break;
+        case 9:
+            DrawBitmap(Number_9, 70, 10);
+            break;
+        }
+    }
+    if ((GameClock.seconds / 10) == 2)
+    {
+        DrawBitmap(Number_2, 60, 10);
+        switch (GameClock.seconds % 10)
+        {
+        case 0:
+            DrawBitmap(Number_0, 70, 10);
+            break;
+        case 1:
+            DrawBitmap(Number_1, 70, 10);
+            break;
+        case 2:
+            DrawBitmap(Number_2, 70, 10);
+            break;
+        case 3:
+            DrawBitmap(Number_3, 70, 10);
+            break;
+        case 4:
+            DrawBitmap(Number_4, 70, 10);
+            break;
+        case 5:
+            DrawBitmap(Number_5, 70, 10);
+            break;
+        case 6:
+            DrawBitmap(Number_6, 70, 10);
+            break;
+        case 7:
+            DrawBitmap(Number_7, 70, 10);
+            break;
+        case 8:
+            DrawBitmap(Number_8, 70, 10);
+            break;
+        case 9:
+            DrawBitmap(Number_9, 70, 10);
+            break;
+        }
+    }
+    if ((GameClock.seconds / 10) == 3)
+    {
+        DrawBitmap(Number_3, 60, 10);
+        switch (GameClock.seconds % 10)
+        {
+        case 0:
+            DrawBitmap(Number_0, 70, 10);
+            break;
+        case 1:
+            DrawBitmap(Number_1, 70, 10);
+            break;
+        case 2:
+            DrawBitmap(Number_2, 70, 10);
+            break;
+        case 3:
+            DrawBitmap(Number_3, 70, 10);
+            break;
+        case 4:
+            DrawBitmap(Number_4, 70, 10);
+            break;
+        case 5:
+            DrawBitmap(Number_5, 70, 10);
+            break;
+        case 6:
+            DrawBitmap(Number_6, 70, 10);
+            break;
+        case 7:
+            DrawBitmap(Number_7, 70, 10);
+            break;
+        case 8:
+            DrawBitmap(Number_8, 70, 10);
+            break;
+        case 9:
+            DrawBitmap(Number_9, 70, 10);
+            break;
+        }
+    }
+    if ((GameClock.seconds / 10) == 4)
+    {
+        DrawBitmap(Number_4, 60, 10);
+        switch (GameClock.seconds % 10)
+        {
+        case 0:
+            DrawBitmap(Number_0, 70, 10);
+            break;
+        case 1:
+            DrawBitmap(Number_1, 70, 10);
+            break;
+        case 2:
+            DrawBitmap(Number_2, 70, 10);
+            break;
+        case 3:
+            DrawBitmap(Number_3, 70, 10);
+            break;
+        case 4:
+            DrawBitmap(Number_4, 70, 10);
+            break;
+        case 5:
+            DrawBitmap(Number_5, 70, 10);
+            break;
+        case 6:
+            DrawBitmap(Number_6, 70, 10);
+            break;
+        case 7:
+            DrawBitmap(Number_7, 70, 10);
+            break;
+        case 8:
+            DrawBitmap(Number_8, 70, 10);
+            break;
+        case 9:
+            DrawBitmap(Number_9, 70, 10);
+            break;
+        }
+    }
+    if ((GameClock.seconds / 10) == 5)
+    {
+        DrawBitmap(Number_5, 60, 10);
+        switch (GameClock.seconds % 10)
+        {
+        case 0:
+            DrawBitmap(Number_0, 70, 10);
+            break;
+        case 1:
+            DrawBitmap(Number_1, 70, 10);
+            break;
+        case 2:
+            DrawBitmap(Number_2, 70, 10);
+            break;
+        case 3:
+            DrawBitmap(Number_3, 70, 10);
+            break;
+        case 4:
+            DrawBitmap(Number_4, 70, 10);
+            break;
+        case 5:
+            DrawBitmap(Number_5, 70, 10);
+            break;
+        case 6:
+            DrawBitmap(Number_6, 70, 10);
+            break;
+        case 7:
+            DrawBitmap(Number_7, 70, 10);
+            break;
+        case 8:
+            DrawBitmap(Number_8, 70, 10);
+            break;
+        case 9:
+            DrawBitmap(Number_9, 70, 10);
+            break;
+        }
+        if (GameClock.seconds == 60)
+        {
+            DrawBitmap(Number_6, 60, 10);
+            DrawBitmap(Number_0, 70, 10);
+        }
+    }
 }
-*/
