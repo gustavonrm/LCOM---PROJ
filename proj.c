@@ -15,7 +15,7 @@ Wizard *player;
 Bot *bot1;
 Bot *bot2;
 Bot *bot3;
-extern SpellCast SpellsRdy; 
+ 
 extern uint8_t pack;
 extern uint8_t packets[3];
 //keyboard
@@ -108,8 +108,8 @@ int Arena()
       switch (_ENDPOINT_P(msg.m_source))
       {
       case HARDWARE:
-        if (msg.m_notify.interrupts & irq_timer0) //TIMER
-        {
+        if (msg.m_notify.interrupts & irq_timer0)
+        { //TIMER
           counter = timer_ih();
           if (counter == 60)
           {
@@ -119,60 +119,21 @@ int Arena()
           UpdateVideo();
         }
 
-        if (msg.m_notify.interrupts & irq_kbd) //KEYBOARD
-        {
+        if (msg.m_notify.interrupts & irq_kbd)
+        { //KEYBOARD
           key = kbd_ih();
           keyboard_utilities(key);
         }
 
-        if (msg.m_notify.interrupts & irq_mouse) //MOUSE
-        {
+        if (msg.m_notify.interrupts & irq_mouse)
+        { //MOUSE
           mouse = mouse_int_h();
           if (mouse != NULL)
           { //if mouse recieved something useful
-            cursor->press = mouse->lb;
+            cursor->lb = mouse->lb;
+            cursor->rb = mouse->rb;
             cursor->x += mouse->delta_x;
             cursor->y -= mouse->delta_y; //it's - becuase y coordinates are counted downwards
-            int angle = atan2(player->center_y - cursor->y, cursor->x - player->center_x) * 180 / M_PI - 90;
-            if (angle < 0)
-              angle = 360 + angle;
-
-            //check line 136 in the future if problems
-            player->rot = angle;
-
-            if (!player->casting && SpellsRdy.Fire_Cast == true)
-            {
-              player->rot = angle;
-              player->casting = cursor->press; //THIS IS ONLY TEMPORARY(So user casts when LB is pressed)
-              if (player->casting)
-               SpellsRdy.Fire_Cast = false;
-              player->cast_type = Fire; //TEMPORARY
-            }
-
-            if (!player->casting &&  SpellsRdy. Water_Cast == true)
-            {
-              player->rot = angle;
-              player->casting = cursor->press; //THIS IS ONLY TEMPORARY(So user casts when LB is pressed)
-              if (player->casting)
-                 SpellsRdy.Water_Cast = false;
-                player->cast_type = Water; //TEMPORARY
-            }
-            if (!player->casting &&  SpellsRdy. Air_Cast == true)
-            {
-              player->rot = angle;
-              player->casting = cursor->press; //THIS IS ONLY TEMPORARY(So user casts when LB is pressed)
-              if (player->casting)
-                 SpellsRdy.Air_Cast = false;
-                player->cast_type = Air; //TEMPORARY
-            }
-            if (!player->casting &&  SpellsRdy. Earth_Cast == true)
-            {
-              player->rot = angle;
-              player->casting = cursor->press; //THIS IS ONLY TEMPORARY(So user casts when LB is pressed)
-              if (player->casting)
-                 SpellsRdy.Earth_Cast = false;
-                player->cast_type = Earth; //TEMPORARY
-            }
           }
         }
 
