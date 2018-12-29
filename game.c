@@ -121,7 +121,7 @@ bool LoadAssets()
         return false;
     if ((RedWizard = CreateSprite("Red_Hat.bmp")) == NULL)
         return false;
-    if ((Explosion = CreateAnimation("Explosion", 9)) == NULL)
+    if ((Explosion = CreateAnimation("Explosion", 9, 2)) == NULL)
         return false;
 
     //mouse
@@ -277,7 +277,7 @@ bool LoadAssets()
     return true;
 }
 
-Animation *CreateAnimation(char animation_name[], int n_frames)
+Animation *CreateAnimation(char animation_name[], int n_frames, int ticks_per_frame)
 {
     Animation *animation = (Animation *)malloc(sizeof(Animation));
 
@@ -310,6 +310,7 @@ Animation *CreateAnimation(char animation_name[], int n_frames)
     }
 
     animation->n_frames = n_frames;
+    animation->ticks_between_frames = ticks_per_frame;
 
     return animation;
 }
@@ -475,9 +476,14 @@ void DrawElement(Element *element)
 
 void Move_Element(Element *element)
 {
-    double rot = element->rot * M_PI / 180.0;
-    element->center_x -= FAST_SPEED * sin(rot);
-    element->center_y -= FAST_SPEED * cos(rot);
+    double rot;
+    rot = (element->rot * M_PI / 180.0);
+
+    int x_des = round(FAST_SPEED * sin(rot));
+    int y_des = round(FAST_SPEED * cos(rot));
+
+    element->center_x -= x_des;
+    element->center_y -= y_des;
 }
 
 void Element_Colision(Element *element1, Element *element2)
@@ -785,23 +791,35 @@ bool Check_Cursor(Cursor* cursor, enum Spell_Type spell_type){
     return false;
 }
 
-void Draw_Animation(Animation* animation, int center_x, int center_y, int frame_n, unsigned int rot){
+void Draw_Animation(Animation* animation, int center_x, int center_y, int frame_n, int *try_n, unsigned int rot){
     if (frame_n >= animation->n_frames) return;
+    if (*try_n < animation->ticks_between_frames && frame_n != 0)
+    {
+        (*try_n)++;
+    }
+    else
+    {
+        (*try_n) = 0;
+    }
     DrawSprite(animation->sprites[frame_n],center_x,center_y, rot,true);
 }
 
 void Draw_Cast(Wizard* wizard){
-    if(wizard->cast_animation == NULL || wizard->frame_n >= wizard->cast_animation->n_frames) return;
+    if(wizard->cast_animation == NULL || wizard->frame_n > wizard->cast_animation->n_frames) return;
 
     int x = wizard->center_x;
     int y = wizard->center_y;
     double rot = wizard->rot * M_PI / 180.0;
     x -= CAST_DISTANCE * sin(rot);
     y -= CAST_DISTANCE * cos(rot);
+    if(wizard->frame_n == wizard->cast_animation->n_frames) { //So it stops on last frame
+        wizard->frame_n--;
+        wizard->try_n = wizard->cast_animation->ticks_between_frames;
+    }
 
-    Draw_Animation(wizard->cast_animation, x, y, wizard->frame_n, wizard->rot);
+    Draw_Animation(wizard->cast_animation, x, y, wizard->frame_n, &wizard->try_n, wizard->rot);
 
-    wizard->frame_n++;
+    if(wizard->try_n == 0) wizard->frame_n++;
 }
 
 void Get_Animation(Wizard* wizard){
@@ -832,7 +850,7 @@ void Player_Cast(Wizard* player, Cursor* cursor){
         if(player->frame_n >= player->cast_animation->n_frames){
             spell_timer--;
             if(!Check_Cursor(cursor,player->spell)){
-                CreateElement(player); //NEED TO CHANGE THIS FUNCTION
+                CreateElement(player);
                 spell_timer = 0;
             } 
             if(spell_timer == 0){
@@ -847,9 +865,6 @@ void Player_Cast(Wizard* player, Cursor* cursor){
             player->spell = None;
             player->cast_type = Null;
         }
-        //Constinue to draw animation (Can't be here but has to set a flag to draw, maybe casting is enough)
-        //When animation is complete wait for user to release LB and then call Create_Element
-        //If user doesn't release LB in 0.5 secs cancel everything (ONLY IF IT'S EASY TO CREATE MORE TIMERS) (it probably is bcs this is called 60 times per second)
         //While Spell is being casted Keyboard must also be disabled
     }
     else
@@ -947,8 +962,8 @@ void Draw_Destruction(Element* element){
         element->destroyed = true;
         return;
     }
-    Draw_Animation(Explosion, element->center_x, element->center_y, element->frame_n, element->rot);
-    element->frame_n++;
+    Draw_Animation(Explosion, element->center_x, element->center_y, element->frame_n, &element->try_n, element->rot);
+    if(element->try_n == 0) element->frame_n++;
 }
 
 bool Out_Of_Bounds(Element* element){

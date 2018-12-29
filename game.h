@@ -29,6 +29,7 @@ typedef struct {
 typedef struct {
     Sprite* sprites[30];  //Up to 30 frames for each animation
     int n_frames;
+    int ticks_between_frames;
 } Animation;
 
 enum Element_Type
@@ -68,6 +69,7 @@ typedef struct
     enum Spell_Type spell;
     Animation* cast_animation;
     int frame_n;
+    int try_n;
     
     enum Wizard_color color;
     char* name;
@@ -94,6 +96,7 @@ typedef struct {
     enum Spell_Type spell_type;  //Type of spell
     bool active; //True if object hasn't hit anything
     int frame_n;
+    int try_n;
 
     bool destroyed;
 
@@ -125,9 +128,9 @@ typedef struct
 bool LoadAssets(); //Loads all of the bitmaps and saves them in sprites, bmps or animations
 void DrawToolBox();
 
-Animation* CreateAnimation(char animation_name[], int n_frames); //Used to load animations
+Animation* CreateAnimation(char animation_name[], int n_frames, int ticks_per_frame); //Used to load animations
 void Get_Animation(Wizard* wizard); //Get correct casting animation for a wizard
-void Draw_Animation(Animation* animation, int center_x, int center_y, int frame_n, unsigned int rot);
+void Draw_Animation(Animation* animation, int center_x, int center_y, int frame_n, int *try_n, unsigned int rot);
 
 //players
 void Player_Cast(Wizard* player, Cursor* cursor); //Handles spell casting for players

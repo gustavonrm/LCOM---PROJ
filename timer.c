@@ -9,7 +9,7 @@
 unsigned int ticks = 0;
 int timer_hook_id = 0; //used for timer
 
-SpellCast SpellsRdy = {0, 0, 0, 0, 0, 0, 0, 0}; 
+SpellCast SpellsRdy = {0, 0, 0, 0, 5, 5, 5, 5}; 
 
 extern unsigned int ticks;
 
