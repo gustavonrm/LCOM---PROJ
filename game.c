@@ -6,6 +6,7 @@
 #include "keyboard.h"
 #include <math.h>
 #include <stdio.h>
+#include "RTC.h"
 
 //layout
 Bitmap *background;
@@ -18,7 +19,8 @@ Sprite *GreenWizard;
 Sprite *BlueWizard;
 Sprite *RedWizard;
 Sprite *YellowWizard;
-//keyboard manip
+
+//load font
 Bitmap *Letter_A;
 Bitmap *Letter_B;
 Bitmap *Letter_C;
@@ -45,6 +47,18 @@ Bitmap *Letter_W;
 Bitmap *Letter_X;
 Bitmap *Letter_Y;
 Bitmap *Letter_Z;
+
+Bitmap *Number_0;
+Bitmap *Number_1;
+Bitmap *Number_2;
+Bitmap *Number_3;
+Bitmap *Number_4;
+Bitmap *Number_5;
+Bitmap *Number_6;
+Bitmap *Number_7;
+Bitmap *Number_8;
+Bitmap *Number_9;
+Bitmap *Double_Dots;
 
 Bitmap *TextBox;
 Bitmap *TextPointer;
@@ -86,7 +100,7 @@ Sprite *EarthBall;
 Sprite *AirBall;
 
 //animations
-Animation* Explosion;
+Animation *Explosion;
 
 extern Cursor *cursor;
 extern SpellCast SpellsRdy;
@@ -107,7 +121,7 @@ bool LoadAssets()
         return false;
     if ((RedWizard = CreateSprite("Red_Hat.bmp")) == NULL)
         return false;
-    if((Explosion = CreateAnimation("Explosion",9)) == NULL)
+    if ((Explosion = CreateAnimation("Explosion", 9)) == NULL)
         return false;
 
     //mouse
@@ -116,7 +130,7 @@ bool LoadAssets()
     if ((R_Cursor = loadBitmap("Cursor_Released.bmp")) == NULL)
         return false;
 
-    //load letters
+    //load font
     if ((Letter_A = loadBitmap("A.bmp")) == NULL)
         return false;
     if ((Letter_B = loadBitmap("B.bmp")) == NULL)
@@ -169,6 +183,29 @@ bool LoadAssets()
         return false;
     if ((Letter_Z = loadBitmap("Z.bmp")) == NULL)
         return false;
+    if ((Number_0 = loadBitmap("0.bmp")) == NULL)
+        return false;
+    if ((Number_1 = loadBitmap("1.bmp")) == NULL)
+        return false;
+    if ((Number_2 = loadBitmap("2.bmp")) == NULL)
+        return false;
+    if ((Number_3 = loadBitmap("3.bmp")) == NULL)
+        return false;
+    if ((Number_4 = loadBitmap("4.bmp")) == NULL)
+        return false;
+    if ((Number_5 = loadBitmap("5.bmp")) == NULL)
+        return false;
+    if ((Number_6 = loadBitmap("6.bmp")) == NULL)
+        return false;
+    if ((Number_7 = loadBitmap("7.bmp")) == NULL)
+        return false;
+    if ((Number_8 = loadBitmap("8.bmp")) == NULL)
+        return false;
+    if ((Number_9 = loadBitmap("9.bmp")) == NULL)
+        return false;
+    if ((Double_Dots = loadBitmap("Double_Dots.bmp")) == NULL)
+        return false;
+
     if ((TextBox = loadBitmap("Text_Box.bmp")) == NULL)
         return false;
     if ((TextPointer = loadBitmap("Text_Pointer.bmp")) == NULL)
@@ -240,29 +277,33 @@ bool LoadAssets()
     return true;
 }
 
-Animation* CreateAnimation(char animation_name[], int n_frames){
+Animation *CreateAnimation(char animation_name[], int n_frames)
+{
     Animation *animation = (Animation *)malloc(sizeof(Animation));
 
-    char* name = "/";
-    strcat(name,animation_name);
+    char *name = "/";
+    strcat(name, animation_name);
 
     char path[100] = "\0";
     strcpy(path, animation_name);
-    strcat(path,name);
+    strcat(path, name);
 
-    for(int i = 0; i < n_frames; i++){
+    for (int i = 0; i < n_frames; i++)
+    {
         char final[100] = "\0";
         strcpy(final, path);
 
         char number[2] = "\0";
         sprintf(number, "%d", i);
-        strcat(final,number);
+        strcat(final, number);
 
-        strcat(final,".bmp");
-        
-        Sprite* anim = CreateSprite(final);
-        if(anim != NULL) animation->sprites[i] = anim;
-        else {
+        strcat(final, ".bmp");
+
+        Sprite *anim = CreateSprite(final);
+        if (anim != NULL)
+            animation->sprites[i] = anim;
+        else
+        {
             printf("\nInvalid animation path: %s", final);
             return NULL;
         }
@@ -274,11 +315,11 @@ Animation* CreateAnimation(char animation_name[], int n_frames){
 }
 
 //////////OBJECT ARRAYS///////////
-Wizard *wizards[WIZARDS_SIZE];    //4 is max nmuber of wizards
+Wizard *wizards[WIZARDS_SIZE]; //4 is max nmuber of wizards
 Bot *bots[BOTS_SIZE];
 Element *elements[ELEMS_SIZE]; //there'll never be more than 30 active spells at the same time so this number is fine
 
-Wizard *CreateWizard(enum Wizard_color color, int center_x, int center_y, unsigned int rot, char* name)
+Wizard *CreateWizard(enum Wizard_color color, int center_x, int center_y, unsigned int rot, char *name)
 {
     Wizard *wizard = (Wizard *)malloc(sizeof(Wizard));
     wizard->color = color;
@@ -468,7 +509,8 @@ void Element_Colision(Element *element1, Element *element2)
     }
 }
 
-Bot* CreateBot(enum Wizard_color color, int center_x, int center_y, char* name){
+Bot *CreateBot(enum Wizard_color color, int center_x, int center_y, char *name)
+{
     Bot *bot = (Bot *)malloc(sizeof(Bot));
 
     bot->attention_span = rand() % HIGHER_ATTENTION + LOWER_ATTENTION;
@@ -478,15 +520,18 @@ Bot* CreateBot(enum Wizard_color color, int center_x, int center_y, char* name){
     int x = 512;
     int y = 384;
     int angle = atan2(center_y - y, x - center_x) * 180 / M_PI - 90;
-    if (angle < 0) angle = 360 + angle;
+    if (angle < 0)
+        angle = 360 + angle;
     bot->target = angle;
     bot->transitioning = true;
     bot->init_diff = 0;
 
     bot->wizard = CreateWizard(color, center_x, center_y, angle, name);
 
-    for(int i = 0; i < BOTS_SIZE; i++){
-        if(bots[i] == NULL){
+    for (int i = 0; i < BOTS_SIZE; i++)
+    {
+        if (bots[i] == NULL)
+        {
             bots[i] = bot;
             break;
         }
@@ -495,12 +540,14 @@ Bot* CreateBot(enum Wizard_color color, int center_x, int center_y, char* name){
     return bot;
 }
 
-void Change_Target(Bot *bot){
+void Change_Target(Bot *bot)
+{
     int target_wizard;
-    Wizard* wiz;
+    Wizard *wiz;
     unsigned int fail = 0;
 
-    do{ //Gets a valid wizard to look at
+    do
+    { //Gets a valid wizard to look at
         target_wizard = rand() % WIZARDS_SIZE;
         wiz = wizards[target_wizard];
         fail++;
@@ -508,9 +555,11 @@ void Change_Target(Bot *bot){
     } while(wiz == NULL || wiz->health <= 0 || wiz == bot->wizard);
 
     int angle = atan2(bot->wizard->center_y - wiz->center_y, wiz->center_x - bot->wizard->center_x) * 180 / M_PI - 90;
-    if (angle < 0) angle = 360 + angle;
-    
-    if(angle != bot->target){
+    if (angle < 0)
+        angle = 360 + angle;
+
+    if (angle != bot->target)
+    {
         bot->target = angle;
         bot->transitioning = true;
     }
@@ -523,13 +572,18 @@ void Change_Target(Bot *bot){
     //sleep(3);
 }
 
-int Transition_Function(int diff_percentage){  //This values give a very simple semi-human like mouse movement
-    if(diff_percentage <= 20) return (pow(diff_percentage,2)/100) + 5 + (rand() % 2);
-    else if(diff_percentage < 80) return -pow(40 - diff_percentage,2)/530 + 10 + (rand() % 5);
-    else return -pow(80 - diff_percentage,2)/80 + 8 + (rand() % 3);
+int Transition_Function(int diff_percentage)
+{ //This values give a very simple semi-human like mouse movement
+    if (diff_percentage <= 20)
+        return (pow(diff_percentage, 2) / 100) + 5 + (rand() % 2);
+    else if (diff_percentage < 80)
+        return -pow(40 - diff_percentage, 2) / 530 + 10 + (rand() % 5);
+    else
+        return -pow(80 - diff_percentage, 2) / 80 + 8 + (rand() % 3);
 }
 
-void Bot_Transition(Bot *bot){
+void Bot_Transition(Bot *bot)
+{
     //Trasition movement algorithm
 
     //Find which direction it's easiset to rotate (Increment or decrement rot)
@@ -584,16 +638,18 @@ void Bot_Transition(Bot *bot){
     bot->wizard->rot = final_rotation;
 }
 
-void Bot_Wobble(Bot *bot){
+void Bot_Wobble(Bot *bot)
+{
     //Wobble Algorithm
 
     if (bot->var_target == bot->wizard->rot)
-    { //if we're there already let's get a new target
+    {                                            //if we're there already let's get a new target
         int var = rand() % MAX_WOOBLE_VAR - 135; //so it goes from -10 to 10 and every value below or above that is 0
         if (var > 10 || var < -10)
             var = 0; //So zero is more common
-        
-        if(var == 0) return; //if it's zero then there's no need to do anything
+
+        if (var == 0)
+            return; //if it's zero then there's no need to do anything
         int new_target = bot->target + var;
 
         if (new_target > 360)
@@ -633,20 +689,26 @@ void Bot_Wobble(Bot *bot){
     else if (final_rotation < 0)
         final_rotation += 360;
 
-    if (abs(final_rotation - bot->var_target) < 2) bot->wizard->rot = bot->var_target;
-    else bot->wizard->rot = final_rotation;
+    if (abs(final_rotation - bot->var_target) < 2)
+        bot->wizard->rot = bot->var_target;
+    else
+        bot->wizard->rot = final_rotation;
 }
 
-void Update_Bot_Rotation(Bot *bot){
-    if(bot->transitioning){
+void Update_Bot_Rotation(Bot *bot)
+{
+    if (bot->transitioning)
+    {
         Bot_Transition(bot);
     }
-    else{
+    else
+    {
         Bot_Wobble(bot);
     }
 }
 
-void Bot_Cast(Bot *bot){
+void Bot_Cast(Bot *bot)
+{
     enum Element_Type type;
     do
     {
@@ -909,8 +971,9 @@ bool openTextBox = false;
 void Update_Game_State()
 {
     ////CHECKING FOR ACTIONS////
-    for(unsigned int i = 0; i < BOTS_SIZE; i++){ //Update Bot Behaviour
-        Bot* bot = bots[i];
+    for (unsigned int i = 0; i < BOTS_SIZE; i++)
+    { //Update Bot Behaviour
+        Bot *bot = bots[i];
         if (bot != NULL && bot->wizard->health > 0)
         { //If he exists and is alive
             bot->attention_span--;
@@ -921,11 +984,13 @@ void Update_Game_State()
                 bot->wizard->frame_n = 0;
             }
 
-            if(bot->attention_span == 0){
+            if (bot->attention_span == 0)
+            {
                 Change_Target(bot);
             }
 
-            if(bot->time_to_fire == 0){
+            if (bot->time_to_fire == 0)
+            {
                 Bot_Cast(bot);
             }
 
@@ -1010,17 +1075,18 @@ void Update_Game_State()
     }
 
     DrawToolBox();
-    DrawTextBox();
     DrawTimers();
 
     if (openTextBox == true)
     {
         //para desenhar as letras, com a string q guarda a palavra, vai comparar
         // cada letra uma a uma e por cada letra vai dando display no ecra a letra respetiva uma a uma
-        DrawTextPointer();
+        DrawTextBox();
+        //DrawTextPointer();
         Draw_string();
     }
     DrawCursor(cursor);
+    DrawClock();
 }
 
 //timers
@@ -1028,65 +1094,65 @@ void Update_Game_State()
 void DrawFireTimer()
 {
     if (SpellsRdy.fire_timer == 0)
-        DrawBitmap(Fire_0, 400, 655);
+        DrawBitmap(Fire_0, 700, 655);
     if (SpellsRdy.fire_timer == 1)
-        DrawBitmap(Fire_1, 400, 655);
+        DrawBitmap(Fire_1, 700, 655);
     if (SpellsRdy.fire_timer == 2)
-        DrawBitmap(Fire_2, 400, 655);
+        DrawBitmap(Fire_2, 700, 655);
     if (SpellsRdy.fire_timer == 3)
-        DrawBitmap(Fire_3, 400, 655);
+        DrawBitmap(Fire_3, 700, 655);
     if (SpellsRdy.fire_timer == 4)
-        DrawBitmap(Fire_4, 400, 655);
+        DrawBitmap(Fire_4, 700, 655);
     if (SpellsRdy.fire_timer == 5)
-        DrawBitmap(Fire_5, 400, 655);
+        DrawBitmap(Fire_5, 700, 655);
 }
 
 void DrawWaterTimer()
 {
     if (SpellsRdy.water_timer == 0)
-        DrawBitmap(Water_0, 550, 655);
+        DrawBitmap(Water_0, 850, 655);
     if (SpellsRdy.water_timer == 1)
-        DrawBitmap(Water_1, 550, 655);
+        DrawBitmap(Water_1, 850, 655);
     if (SpellsRdy.water_timer == 2)
-        DrawBitmap(Water_2, 550, 655);
+        DrawBitmap(Water_2, 850, 655);
     if (SpellsRdy.water_timer == 3)
-        DrawBitmap(Water_3, 550, 655);
+        DrawBitmap(Water_3, 850, 655);
     if (SpellsRdy.water_timer == 4)
-        DrawBitmap(Water_4, 550, 655);
+        DrawBitmap(Water_4, 850, 655);
     if (SpellsRdy.water_timer == 5)
-        DrawBitmap(Water_5, 550, 655);
+        DrawBitmap(Water_5, 850, 655);
 }
 
 void DrawEarthTimer()
 {
     if (SpellsRdy.earth_timer == 0)
-        DrawBitmap(Earth_0, 550, 695);
+        DrawBitmap(Earth_0, 850, 695);
     if (SpellsRdy.earth_timer == 1)
-        DrawBitmap(Earth_1, 550, 695);
+        DrawBitmap(Earth_1, 850, 695);
     if (SpellsRdy.earth_timer == 2)
-        DrawBitmap(Earth_2, 550, 695);
+        DrawBitmap(Earth_2, 850, 695);
     if (SpellsRdy.earth_timer == 3)
-        DrawBitmap(Earth_3, 550, 695);
+        DrawBitmap(Earth_3, 850, 695);
     if (SpellsRdy.earth_timer == 4)
-        DrawBitmap(Earth_4, 550, 695);
+        DrawBitmap(Earth_4, 850, 695);
     if (SpellsRdy.earth_timer == 5)
-        DrawBitmap(Earth_5, 550, 695);
+        DrawBitmap(Earth_5, 850, 695);
 }
 
 void DrawWindTimer()
 {
     if (SpellsRdy.air_timer == 0)
-        DrawBitmap(Wind_0, 400, 695);
+        DrawBitmap(Wind_0, 700, 695);
     if (SpellsRdy.air_timer == 1)
-        DrawBitmap(Wind_1, 400, 695);
+        DrawBitmap(Wind_1, 700, 695);
     if (SpellsRdy.air_timer == 2)
-        DrawBitmap(Wind_2, 400, 695);
+        DrawBitmap(Wind_2, 700, 695);
     if (SpellsRdy.air_timer == 3)
-        DrawBitmap(Wind_3, 400, 695);
+        DrawBitmap(Wind_3, 700, 695);
     if (SpellsRdy.air_timer == 4)
-        DrawBitmap(Wind_4, 400, 695);
+        DrawBitmap(Wind_4, 700, 695);
     if (SpellsRdy.air_timer == 5)
-        DrawBitmap(Wind_5, 400, 695);
+        DrawBitmap(Wind_5, 700, 695);
 }
 
 void DrawTimers()

@@ -7,6 +7,7 @@
 #include "video_card.h"
 #include "keyboard.h"
 #include "timer.h"
+#include "RTC.h"
 #include <math.h>
 
 extern Bitmap *background;
@@ -22,8 +23,6 @@ extern uint8_t packets[3];
 extern uint16_t key;
 
 //globat temporary vars
-
-
 
 int main(int argc, char *argv[])
 {
@@ -71,7 +70,7 @@ int Arena()
   //unsigned int freq = 1; //frequency of updates(bcs there are 60 ticks/sec)
   //int frame_n = 0;
 
-  uint8_t bit_no, bit_no_t, bit_no_m;
+  uint8_t bit_no, bit_no_t, bit_no_m, bit_no_rtc;
 
   if (enable_stream() == 1)
   {
@@ -94,7 +93,15 @@ int Arena()
     return 1;
   }
 
-  uint32_t irq_kbd = BIT(bit_no), irq_timer0 = BIT(bit_no_t), irq_mouse = BIT(bit_no_m);
+  //subscribe RTC
+  if (subscribe_rtc(&bit_no_rtc) != 0)
+  {
+    return 1;
+  }
+
+  //....
+
+  uint32_t irq_kbd = BIT(bit_no), irq_timer0 = BIT(bit_no_t), irq_mouse = BIT(bit_no_m), irq_rtc = BIT(bit_no_rtc);
 
   while ((key != ESC_BREAK))
   {
@@ -136,6 +143,11 @@ int Arena()
             cursor->y -= mouse->delta_y; //it's - becuase y coordinates are counted downwards
           }
         }
+        //RTC
+        if (msg.m_notify.interrupts & irq_rtc){
+            rtc_ih(); 
+        }
+        
 
         break;
       default:
@@ -156,6 +168,10 @@ int Arena()
   if (unsubscribe_keyboard() != OK)
   {
     return 1;
+  }
+  //RTC
+  if( unsubscribe_rtc() != OK){
+    return 1; 
   }
 
   if (disable_stream() == 1)
@@ -179,7 +195,7 @@ int(proj_main_loop)()
   vg_init(0x144);
 
   time_t t;
-  srand((unsigned) time(&t));
+  srand((unsigned)time(&t));
 
   Arena();
 

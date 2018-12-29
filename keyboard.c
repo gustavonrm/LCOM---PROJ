@@ -4,13 +4,12 @@
 #include "game.h"
 
 extern bool openTextBox;
-extern SpellCast SpellsRdy; 
+extern SpellCast SpellsRdy;
 
 extern Bitmap *P_Cursor;
 
 int kbd_hook_id = 1;
-//char words[10] = {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'};
-char words[50] = "";
+char words[20] = "";
 unsigned int text_index = 0;
 //alphabet
 extern Bitmap *Letter_A;
@@ -210,7 +209,7 @@ void write_key(uint16_t key)
 }
 void Draw_string()
 {
-
+  printf( "Words: %s\n", words); 
   int x = 45, y = 680;
   for (size_t i = 0; i < text_index; i++)
   {
@@ -299,11 +298,8 @@ void Draw_string()
   }
 }
 
-
 void keyboard_utilities(uint16_t key)
 {
-
-  if(key == U) UpdateVideo();
 
   if (openTextBox == true)
   {
@@ -312,13 +308,18 @@ void keyboard_utilities(uint16_t key)
     if (getSpell() == true)
     {
       openTextBox = false;
+      return; 
     }
   }
-  if (key == TAB)
-  {
-    text_index = 0;
-    openTextBox = true;
-    Update_Game_State();
+  if (openTextBox == false)
+  { 
+    if (key == A || key == B || key == C || key == D || key == E || key == F || key == G || key == H || key == I || key == J || key == K || key == L || key == M || key == N || key == O || key == P || key == Q || key == R || key == S || key == T || key == U || key == V || key == W || key == X || key == Y || key == Z)
+    {
+      text_index = 0;
+      openTextBox = true;
+      write_key(key);
+      Update_Game_State();
+    }
   }
   if (key == ENTER)
   {
@@ -330,39 +331,33 @@ void keyboard_utilities(uint16_t key)
     strcpy(words, "");
     Update_Game_State();
   }
-  if (openTextBox == false)
-  {
-    Update_Game_State();
-  }
 }
 
 char fire[50] = "FIRE";
 char wind[50] = "WIND";
 char earth[50] = "EARTH";
 char water[50] = "WATER";
-/*
-extern unsigned fire_timer;
-extern unsigned water_timer;
-extern unsigned earth_timer;
-extern unsigned air_timer;
 
-bool Fire_Cast=false; 
-bool Water_Cast=false; 
-bool Earth_Cast=false; 
-bool Air_Cast=false; 
-*/
+
 bool getSpell()
 {
   //get the spell string and reset the respective timer
+
   if (SpellsRdy.fire_timer == 5)
   {
     if (strcmp(words, fire) == 0)
     {
       //condicao para fazer aparecer o bmp respetivos
       printf("Fire Spell Casted!\n ");
+      openTextBox = false;
+      text_index = 0;
       strcpy(words, "");
-      SpellsRdy.Fire_Cast = true; 
-      SpellsRdy.fire_timer =0; 
+      Update_Game_State();
+      SpellsRdy.Fire_Cast = true;
+      SpellsRdy.Water_Cast = false;
+      SpellsRdy.Earth_Cast = false;
+      SpellsRdy.Air_Cast = false;
+      SpellsRdy.fire_timer = 0;
       return true;
     }
   }
@@ -376,8 +371,13 @@ bool getSpell()
     {
       //condicao para fazer aparecer o bmp respetivos
       printf("Wind Spell Casted!\n ");
+      openTextBox = false;
+      text_index = 0;
       strcpy(words, "");
-       SpellsRdy.Air_Cast = true; 
+      SpellsRdy.Fire_Cast = false;
+      SpellsRdy.Water_Cast = false;
+      SpellsRdy.Earth_Cast = false;
+      SpellsRdy.Air_Cast = true;    
       SpellsRdy.air_timer = 0;
       return true;
     }
@@ -392,8 +392,13 @@ bool getSpell()
     {
       //condicao para fazer aparecer o bmp respetivos
       printf("Earth Spell cast\n ");
+       openTextBox = false;
+      text_index = 0;
       strcpy(words, "");
-      SpellsRdy.Earth_Cast = true; 
+      SpellsRdy.Fire_Cast = true;
+      SpellsRdy.Water_Cast = false;
+      SpellsRdy.Earth_Cast = true;
+      SpellsRdy.Air_Cast = false;
       SpellsRdy.earth_timer = 0;
       return true;
     }
@@ -408,8 +413,13 @@ bool getSpell()
     {
       //condicao para fazer aparecer o bmp respetivos
       printf("Water Spell Casted\n ");
+     openTextBox = false;
+      text_index = 0;
       strcpy(words, "");
-      SpellsRdy.Water_Cast = true; 
+       SpellsRdy.Fire_Cast = false;
+      SpellsRdy.Water_Cast = true;
+      SpellsRdy.Earth_Cast = false;
+      SpellsRdy.Air_Cast = false;
       SpellsRdy.water_timer = 0;
       return true;
     }
