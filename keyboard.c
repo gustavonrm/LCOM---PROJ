@@ -2,6 +2,9 @@
 #include <keyboard.h>
 #include "video_card.h"
 #include "game.h"
+#include "Menu.h"
+
+extern GameUtils GameMenus; 
 
 extern bool openTextBox;
 extern SpellCast SpellsRdy;
@@ -299,7 +302,17 @@ void Draw_string()
 }
 
 void keyboard_utilities(uint16_t key)
-{
+{ 
+   if(key == ESC_BREAK &&  GameMenus.pause == true){
+    GameMenus.pause = false; 
+    return;
+  }
+
+  if(key == ESC_BREAK &&  GameMenus.pause == false){
+    GameMenus.pause = true; 
+    return;
+  }
+  
 
   if (openTextBox == true)
   {

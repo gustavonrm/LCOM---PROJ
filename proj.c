@@ -8,6 +8,7 @@
 #include "keyboard.h"
 #include "timer.h"
 #include "RTC.h"
+#include "Menu.h"
 #include <math.h>
 
 extern Bitmap *background;
@@ -21,6 +22,7 @@ extern uint8_t pack;
 extern uint8_t packets[3];
 //keyboard
 extern uint16_t key;
+extern GameUtils GameMenus; 
 
 //globat temporary vars
 
@@ -103,7 +105,7 @@ int Arena()
 
   uint32_t irq_kbd = BIT(bit_no), irq_timer0 = BIT(bit_no_t), irq_mouse = BIT(bit_no_m), irq_rtc = BIT(bit_no_rtc);
 
-  while ((key != ESC_BREAK))
+  while (GameMenus.game_onoff == true)
   {
     if ((r = driver_receive(ANY, &msg, &ipc_status)) != 0)
     {
@@ -182,8 +184,13 @@ int Arena()
   return 0;
 }
 
+
 int(proj_main_loop)()
-{
+{ 
+  vg_init(0x144);
+  
+  DrawLoadingScreen(); 
+
   if (!LoadAssets())
   {
     vg_exit();
@@ -192,11 +199,8 @@ int(proj_main_loop)()
 
   //sleep(10);
 
-  vg_init(0x144);
-
   time_t t;
   srand((unsigned)time(&t));
-
   Arena();
 
   vg_exit();
