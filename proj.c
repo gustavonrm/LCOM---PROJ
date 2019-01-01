@@ -8,6 +8,7 @@
 #include "keyboard.h"
 #include "timer.h"
 #include "RTC.h"
+#include "serial.h"
 #include <math.h>
 
 extern Bitmap *background;
@@ -17,12 +18,14 @@ Bot *bot1;
 Bot *bot2;
 Bot *bot3;
  
-extern uint8_t pack;
-extern uint8_t packets[3];
 //keyboard
 extern uint16_t key;
 
 //globat temporary vars
+bool MP = false; //true if playing in multiplayer
+bool Host; //True if player is host, false if player is guest
+
+char* username = "ALEX";
 
 int main(int argc, char *argv[])
 {
@@ -52,13 +55,13 @@ int main(int argc, char *argv[])
 int Arena()
 {
   cursor = CreateCursor(512, 500);
-  player = CreateWizard(Green, 512, 600, 0, "ALEX");
+  player = CreateWizard(Green, 512, 600, 0, username);
   bot1 = CreateBot(Blue, 200, 384, "Blue Bobs");
   bot2 = CreateBot(Red, 900, 384, "Commy");
   bot3 = CreateBot(Yellow, 512, 100, "Bumbble Bee");
 
-  Update_Game_State();
-  UpdateVideo();
+  //Update_Game_State();
+  //UpdateVideo();
 
   int counter = 0;
   uint16_t key = 0;
@@ -70,7 +73,7 @@ int Arena()
   //unsigned int freq = 1; //frequency of updates(bcs there are 60 ticks/sec)
   //int frame_n = 0;
 
-  uint8_t bit_no, bit_no_t, bit_no_m, bit_no_rtc;
+  uint8_t bit_no, bit_no_t, bit_no_m, bit_no_rtc, bit_no_serial;
 
   if (enable_stream() == 1)
   {
@@ -99,9 +102,16 @@ int Arena()
     return 1;
   }
 
-  //....
+   if (subscribe_serial(&bit_no_serial) != 0)
+  {
+    return 1;
+  }
 
-  uint32_t irq_kbd = BIT(bit_no), irq_timer0 = BIT(bit_no_t), irq_mouse = BIT(bit_no_m), irq_rtc = BIT(bit_no_rtc);
+  sleep(3);
+
+  Send_Name(username);
+
+  uint32_t irq_kbd = BIT(bit_no), irq_timer0 = BIT(bit_no_t), irq_mouse = BIT(bit_no_m), irq_rtc = BIT(bit_no_rtc), irq_serial = BIT(bit_no_serial);
 
   while ((key != ESC_BREAK))
   {
@@ -122,8 +132,8 @@ int Arena()
           {
             spell_utilities();
           }
-          Update_Game_State();
-          UpdateVideo();
+          //Update_Game_State();
+          //UpdateVideo();
         }
 
         if (msg.m_notify.interrupts & irq_kbd)
@@ -145,7 +155,12 @@ int Arena()
         }
         //RTC
         if (msg.m_notify.interrupts & irq_rtc){
-            rtc_ih(); 
+          //rtc_ih(); 
+        }
+
+        if (msg.m_notify.interrupts & irq_serial)
+        { //If there's something to read
+          serial_ih();
         }
         
 
@@ -154,6 +169,11 @@ int Arena()
         break;
       }
     }
+  }
+
+  if( unsubscribe_serial() != 0)
+  {
+    return 1;
   }
 
   if (unsubscribe_mouse() != 0)
@@ -190,16 +210,14 @@ int(proj_main_loop)()
     return 1;
   }
 
-  //sleep(10);
-
-  vg_init(0x144);
+  //vg_init(0x144);
 
   time_t t;
   srand((unsigned)time(&t));
 
   Arena();
 
-  vg_exit();
+  //vg_exit();
   return 0;
 }
 

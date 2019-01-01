@@ -985,7 +985,7 @@ bool openTextBox = false;
 
 void Update_Game_State()
 {
-    ////CHECKING FOR ACTIONS////
+    ////BOT UPDATES//// (Only Host)
     for (unsigned int i = 0; i < BOTS_SIZE; i++)
     { //Update Bot Behaviour
         Bot *bot = bots[i];
@@ -1012,9 +1012,10 @@ void Update_Game_State()
             Update_Bot_Rotation(bot);
         }
     }
+    //////////////////////////
 
     ////Updating Player rotation////
-    int angle = atan2(player->center_y - cursor->y, cursor->x - player->center_x) * 180 / M_PI - 90;
+    int angle = round(atan2(player->center_y - cursor->y, cursor->x - player->center_x) * 180 / M_PI - 90);
     if (angle < 0)
         angle = 360 + angle;
     player->rot = angle;
@@ -1022,7 +1023,9 @@ void Update_Game_State()
 
     Player_Cast(player,cursor); //Checks if player has cast anything and if he is casting correctly
 
-    ////MOVE ELEMENTS AND CHECK FOR COLISIONS////
+    ////GUEST SENDS UPDATED INFORMATION (There may be a synchronization problem, maybe guest will be 1 frame behind but I hope not)
+
+    ////MOVE ELEMENTS AND CHECK FOR COLISIONS//// (Only Host)
     for (unsigned int i = 0; i < ELEMS_SIZE; i++)
     {
         if (elements[i] != NULL && elements[i]->active)
@@ -1058,7 +1061,10 @@ void Update_Game_State()
                 }
             }
         }
-    } 
+    }
+    /////////////////////////////////////
+
+    ////HOST SENDS UPDATED INFORMATION 
 
     ////DRAWING TO BUFFER////
     DrawBackground();
