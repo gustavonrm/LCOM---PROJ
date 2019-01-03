@@ -90,7 +90,6 @@ int activate_update_interrupts()
     }
     if (sys_inb(RTC_DATA_REG, &regB) != OK)
     {
-        printf("rtc_enable_interrupts::Error reading register B\n");
         return 1;
     }
 
@@ -208,9 +207,11 @@ void clock_display()
     Min = GameClock.minutes;
     Sec = GameClock.seconds;
 
-    printf("%d:", Hour);
-    printf("%d:", Min);
-    printf("%d\n", Sec);
+
+    //printf to debug 
+    //printf("%d:", Hour);
+    //printf("%d:", Min);
+    //printf("%d\n", Sec);
 
     //later with in game bmp
 }

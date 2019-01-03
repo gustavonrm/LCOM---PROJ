@@ -202,7 +202,6 @@ void DrawMainPage()
 }
 
 
-
 void DrawBitmap(Bitmap *bmp, int x, int y)
 {
   if (bmp == NULL)

@@ -8,7 +8,7 @@ typedef struct
 {
     bool main_page; //main page aberta 
     bool pause;  //jogo em pausa
-    bool game_run;  //jogo esta a correr 
+    int run; //if 0 nothing, if 1 single if 2 multi 
     bool game_onoff;
 
 } GameUtils;

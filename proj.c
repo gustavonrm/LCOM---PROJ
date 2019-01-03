@@ -22,6 +22,7 @@ extern uint8_t pack;
 extern uint8_t packets[3];
 //keyboard
 extern uint16_t key;
+//utils
 extern GameUtils GameMenus; 
 
 //globat temporary vars
@@ -105,7 +106,7 @@ int Arena()
 
   uint32_t irq_kbd = BIT(bit_no), irq_timer0 = BIT(bit_no_t), irq_mouse = BIT(bit_no_m), irq_rtc = BIT(bit_no_rtc);
 
-  while (GameMenus.game_onoff == true)
+   while (GameMenus.game_onoff == true)
   {
     if ((r = driver_receive(ANY, &msg, &ipc_status)) != 0)
     {
@@ -143,6 +144,8 @@ int Arena()
             cursor->rb = mouse->rb;
             cursor->x += mouse->delta_x;
             cursor->y -= mouse->delta_y; //it's - becuase y coordinates are counted downwards
+
+
           }
         }
         //RTC

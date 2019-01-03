@@ -212,7 +212,7 @@ void write_key(uint16_t key)
 }
 void Draw_string()
 {
-  printf( "Words: %s\n", words); 
+  //printf("Words: %s\n", words);
   int x = 45, y = 680;
   for (size_t i = 0; i < text_index; i++)
   {
@@ -302,30 +302,33 @@ void Draw_string()
 }
 
 void keyboard_utilities(uint16_t key)
-{ 
-   if(key == ESC_BREAK &&  GameMenus.pause == true){
-    GameMenus.pause = false; 
+{
+
+  if (key == ESC_BREAK && GameMenus.pause == true)
+  {
+    GameMenus.pause = false;
     return;
   }
 
-  if(key == ESC_BREAK &&  GameMenus.pause == false){
-    GameMenus.pause = true; 
+  if (key == ESC_BREAK && GameMenus.pause == false)
+  {
+    GameMenus.pause = true;
     return;
   }
-  
 
   if (openTextBox == true)
   {
+
     write_key(key);
     Update_Game_State();
     if (getSpell() == true)
     {
       openTextBox = false;
-      return; 
+      return;
     }
   }
   if (openTextBox == false)
-  { 
+  {
     if (key == A || key == B || key == C || key == D || key == E || key == F || key == G || key == H || key == I || key == J || key == K || key == L || key == M || key == N || key == O || key == P || key == Q || key == R || key == S || key == T || key == U || key == V || key == W || key == X || key == Y || key == Z)
     {
       text_index = 0;
@@ -350,7 +353,6 @@ char fire[50] = "FIRE";
 char wind[50] = "WIND";
 char earth[50] = "EARTH";
 char water[50] = "WATER";
-
 
 bool getSpell()
 {
@@ -390,7 +392,7 @@ bool getSpell()
       SpellsRdy.Fire_Cast = false;
       SpellsRdy.Water_Cast = false;
       SpellsRdy.Earth_Cast = false;
-      SpellsRdy.Air_Cast = true;    
+      SpellsRdy.Air_Cast = true;
       SpellsRdy.air_timer = 0;
       return true;
     }
@@ -405,7 +407,7 @@ bool getSpell()
     {
       //condicao para fazer aparecer o bmp respetivos
       printf("Earth Spell cast\n ");
-       openTextBox = false;
+      openTextBox = false;
       text_index = 0;
       strcpy(words, "");
       SpellsRdy.Fire_Cast = false;
@@ -426,10 +428,10 @@ bool getSpell()
     {
       //condicao para fazer aparecer o bmp respetivos
       printf("Water Spell Casted\n ");
-     openTextBox = false;
+      openTextBox = false;
       text_index = 0;
       strcpy(words, "");
-       SpellsRdy.Fire_Cast = false;
+      SpellsRdy.Fire_Cast = false;
       SpellsRdy.Water_Cast = true;
       SpellsRdy.Earth_Cast = false;
       SpellsRdy.Air_Cast = false;
