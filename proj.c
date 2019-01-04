@@ -25,13 +25,13 @@ uint16_t key;
 //utils
 extern GameUtils GameMenus;
 extern enum player_name name_status_single;
-extern enum player_name name_status_multi;
+//extern enum player_name name_status_multi;
 
 //globat temporary vars
 bool MP = false; //true if playing in multiplayer
-bool Host; //True if player is host, false if player is guest
-
-char* username = "ALEX";
+bool Host = false; //True if player is host, false if player is guest
+char username[20] = "";
+char* username_2 = NULL;
 
 int main(int argc, char *argv[])
 {
@@ -61,20 +61,6 @@ int main(int argc, char *argv[])
 int Arena()
 {
   cursor = CreateCursor(512, 500);
-
-  if(Host)
-  {
-    player = CreateWizard(Green, 512, 600, 0, username);
-    bot1 = CreateBot(Blue, 200, 384, "Blue Bobs");
-    bot2 = CreateBot(Red, 900, 384, "Commy");
-    player2 = CreateWizard(Yellow, 512, 100, 180, username);
-  }
-  else{
-    bot3 = CreateBot(Green, 512, 100, "Bumbble Bee");
-    bot1 = CreateBot(Blue, 900, 384, "Blue Bobs");
-    bot2 = CreateBot(Red, 200, 384, "Commy");
-    player = CreateWizard(Yellow, 512, 600, 0, username);
-  }
 
   int counter = 0;
   uint16_t key = 0;
@@ -115,14 +101,11 @@ int Arena()
 
   uint32_t irq_serial = 9999999;
 
-  if(MP)
+  if (subscribe_serial(&bit_no_serial) != 0)
   {
-    if (subscribe_serial(&bit_no_serial) != 0)
-    {
-      return 1;
-    }
-    irq_serial = BIT(bit_no_serial);
+    return 1;
   }
+  irq_serial = BIT(bit_no_serial);
 
   uint32_t irq_kbd = BIT(bit_no), irq_timer0 = BIT(bit_no_t), irq_mouse = BIT(bit_no_m), irq_rtc = BIT(bit_no_rtc);
 
@@ -155,7 +138,7 @@ int Arena()
         { //KEYBOARD
           key = kbd_ih();
           //get player name 
-          if (name_status_single == get || name_status_multi== get )
+          if (name_status_single == get)
           {
             GetPlayerName(key); 
           }
@@ -182,7 +165,7 @@ int Arena()
 
         if (msg.m_notify.interrupts & irq_serial)
         { //If there's something to read
-          if(MP) serial_ih();
+          serial_ih();
         }
         
 
@@ -228,7 +211,7 @@ int Arena()
   return 0;
 }
 
-int(proj_main_loop)(int argc, char *argv[])
+int(proj_main_loop)()
 {
   vg_init(0x144);
 

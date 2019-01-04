@@ -15,10 +15,11 @@ extern Wizard *player;
 
 int kbd_hook_id = 1;
 char words[20] = "";
+extern char username[];
 unsigned int text_index = 0;
 
 extern enum player_name name_status_single;
-extern enum player_name name_status_multi;
+//extern enum player_name name_status_multi;
 
 //alphabet
 extern Bitmap *Letter_A;
@@ -369,21 +370,18 @@ void GetPlayerName(uint16_t key)
   if (key == ENTER)
   {
     //set player name
-    strcpy(player->name, words);
+    printf("\n Setting name");
+    strcpy(username, words);
+    printf("\n Name set");
     //reset everything
     if (name_status_single == get)
     {
       name_status_single = done;
     }
 
-    if (name_status_multi== get)
-    {
-      name_status_multi = done;
-    }
-
     text_index = 0;
     strcpy(words, "");
-    printf("Player Name: %s\n", player->name);
+    printf("Player Name: %s\n", username);
     Update_Game_State();
   }
 }

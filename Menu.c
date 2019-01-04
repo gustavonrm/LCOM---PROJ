@@ -6,6 +6,7 @@
 #include "game.h"
 #include "mouse_ih.h"
 #include "keyboard.h"
+#include "serial.h"
 
 //bmps
 Bitmap *Loading_Screen;
@@ -16,23 +17,37 @@ extern Cursor *cursor;
 
 //utilities
 GameUtils GameMenus = {true, false, 0, true};
-char name[20] = "";
-enum player_name name_status_single = empty;
-enum player_name name_status_multi = empty;
+extern char username[20];
+extern char* username_2;
+extern bool Host;
+extern bool MP;
+extern Wizard* player;
+extern Wizard* player2;
+extern Bot* bot1;
+extern Bot* bot2;
+extern Bot* bot3;
+enum player_name name_status_single = get;
+//enum player_name name_status_multi = empty;
 bool Gamerules = false;
 
 void main_menu()
 {
+     if(GameMenus.main_page && Host && username_2 != NULL)
+     { //If Host and got Guest Name
+          MP = true;
+          GameMenus.main_page = false;
+          GameMenus.run = 1;
 
+          player = CreateWizard(Green, 512, 600, 0, username);
+          bot1 = CreateBot(Blue, 200, 384, "Blue Bobs");
+          bot2 = CreateBot(Red, 900, 384, "Commy");
+          player2 = CreateWizard(Yellow, 512, 100, 180, username);
+          
+          printf("multiplayer rdy\n");
+     }
      //condition for single player
      if (cursor->lb == true && cursor->x >= 210 && cursor->x <= 810 && cursor->y >= 240 && cursor->y <= 390)
      {
-          name_status_single = get;
-     }
-
-     if (name_status_single == done)
-     {
-          name_status_single = empty;
           GameMenus.main_page = false;
           GameMenus.run = 1;
      }
@@ -40,20 +55,32 @@ void main_menu()
      //condition for multi player
      if (cursor->lb == true && cursor->x >= 210 && cursor->x <= 810 && cursor->y >= 410 && cursor->y <= 560)
      {
-          name_status_multi = get;
-     }
+          if(username_2 == NULL && !Host)
+          { //If user is the first to send his name(a.k.a HOST)
+               Send_Name(username);
+               Host = true;
+               printf("\n USERNAME SENT AS HOST");
+          }
+          else if(username_2 != NULL && !Host)
+          { //If other player is Host
+               Send_Name(username);
+               GameMenus.main_page = false;
+               GameMenus.run = 1;
+               MP = true;
+              
+               bot3 = CreateBot(Green, 512, 100, "Bumbble Bee");
+               bot1 = CreateBot(Blue, 900, 384, "Blue Bobs");
+               bot2 = CreateBot(Red, 200, 384, "Commy");
+               player = CreateWizard(Yellow, 512, 600, 0, username);
 
-     if (name_status_multi == done)
-     {
-          name_status_multi = empty;
-          GameMenus.main_page = false;
-          GameMenus.run = 2;
-          printf("multiplayer rdy\n");
+               printf("multiplayer rdy as GUEST\n");
+          }
      }
 
      //conditon to leave game
      if (cursor->lb == true && cursor->x >= 210 && cursor->x <= 810 && cursor->y >= 580 && cursor->y <= 730)
      {
+          //Got Here
           GameMenus.main_page = false;
           GameMenus.game_onoff = false;
      }

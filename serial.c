@@ -51,6 +51,7 @@ bool send_char(unsigned char value){
     if(fail == 50) return false; //If it's stuck here
     sys_inb(COM1 + LSR, &st);
     fail++;
+    printf("\n TRYING TO SEND: %c", value);
   } while(!(st & UART_READY));
 
   sys_outb(COM1 + THR, value); //write to THR when ready
@@ -74,6 +75,7 @@ void read_char(uint8_t* values){
 }
 
 uint8_t serial_ih(){
+    printf("\n INTERRUPT GENERATED");
     uint32_t id = 0, data = 0;
 	
     sys_inb(COM1 + IIR, &id);
@@ -127,17 +129,20 @@ void Check_Recieve(){
 
 char recieved_name[15];
 bool first_letter = true;
-char* player2_username = NULL;
+extern char* username_2;
+int actual_it = 0; //So if we only read until mid of string we can come back to proper place
 uint8_t* Recieve_Name(uint8_t* data){
     if(*data == 'N' && first_letter) data++; //To skip N
-    for(int i = 0; i < 15 && data != NULL; i++){
+    for(int i = actual_it; i < 15 && *data != '\0'; i++){
         if((*data) == '/')
         {
             name = false;
             printf("\nRECIEVED NAME: %s", recieved_name);
             data++;
             first_letter = true;
-            player2_username = recieved_name;
+            username_2 = &recieved_name[0];
+            printf("\n USERNAME_2: %s", username_2);
+            actual_it = 0;
             return data;
         }
         else
@@ -147,6 +152,7 @@ uint8_t* Recieve_Name(uint8_t* data){
             data++;
             first_letter = false;
             //printf("\nRECIEVED NAME: %s", recieved_name);
+            actual_it++;
         }
     }
     printf("\nINCOMPLETE NAME: %s", recieved_name);
@@ -155,12 +161,14 @@ uint8_t* Recieve_Name(uint8_t* data){
 
 bool Send_Name(char* name){
     unsigned int size = strlen(name);
+    printf("\n GOING TO SEND: %s", name);
     send_char('N');
     for(unsigned int i = 0; i < size; i++){
         if(!send_char(*name)) return false;
         name++;
     }
     send_char('/');
+    printf("\n NAME SENT: %s", name);
     return true;
 }
 

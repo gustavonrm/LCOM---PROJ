@@ -483,9 +483,8 @@ void DrawCursor(Cursor *cursor)
     else
         DrawBitmap(cursor->released, cursor->x, cursor->y);
 
-    
-        printf( "mouse x:%d", cursor->x); 
-        printf( "mouse y:%d\n", cursor->y); 
+        //printf( "mouse x:%d", cursor->x); 
+        //printf( "mouse y:%d\n", cursor->y); 
 
 }
 
@@ -1074,120 +1073,138 @@ void Update_Game_State()
             DrawBitmap(Name_Box, 210, 240);
             Draw_string(250, 300);
         }
-        if (name_status_multi == get)
+        /*if (name_status_multi == get)
         {
             DrawBitmap(Name_Box, 210, 410);
             Draw_string(250, 470);
-        }
+        }*/
     }
 
     if (GameMenus.run == 1)
     {
-    ////Updating Player rotation////
-    int angle = round(atan2(player->center_y - cursor->y, cursor->x - player->center_x) * 180 / M_PI - 90);
-    if (angle < 0)
-        angle = 360 + angle;
-    player->rot = angle;
-    ////////////////////////////////
+        if((MP && Host) || !MP)
+        {
+            ////BOT UPDATES//// (Only Host or singleplayer)
+            for (unsigned int i = 0; i < BOTS_SIZE; i++)
+            { //Update Bot Behaviour
+                Bot *bot = bots[i];
+                if (bot != NULL && bot->wizard->health > 0)
+                { //If he exists and is alive
+                    bot->attention_span--;
+                    if(!bot->wizard->casting) bot->time_to_fire--;
+                    else if(bot->wizard->frame_n >= bot->wizard->cast_animation->n_frames){
+                        CreateElement(bot->wizard);
+                        bot->wizard->casting = false;
+                        bot->wizard->frame_n = 0;
+                    }
 
-        ////CHECKING FOR ACTIONS////
-        for (unsigned int i = 0; i < BOTS_SIZE; i++)
-        { //Update Bot Behaviour
-            Bot *bot = bots[i];
-            if (bot != NULL && bot->wizard->health > 0)
-            { //If he exists and is alive
-                bot->attention_span--;
-                if (!bot->wizard->casting)
-                    bot->time_to_fire--;
-                else if (bot->wizard->frame_n >= bot->wizard->cast_animation->n_frames)
+                    if (bot->attention_span == 0)
+                    {
+                        Change_Target(bot);
+                    }
+
+                    if (bot->time_to_fire == 0)
+                    {
+                        Bot_Cast(bot);
+                    }
+
+                    Update_Bot_Rotation(bot);
+                }
+            }
+            //////////////////////////
+        }
+
+        ////Updating Player rotation////
+        int angle = round(atan2(player->center_y - cursor->y, cursor->x - player->center_x) * 180 / M_PI - 90);
+        if (angle < 0)
+            angle = 360 + angle;
+        player->rot = angle;
+        ////////////////////////////////
+
+        Player_Cast(player,cursor); //Checks if player has cast anything and if he is casting correctly
+
+        ////GUEST SENDS UPDATED INFORMATION
+        if(MP && !Host){
+            //printf("\n SHOULD SEND GUEST WIZARD");
+            Send_Wizard(player, WIZARDS_SIZE-1);
+        }
+
+        if(!MP || (MP && Host))
+        {
+            ////MOVE ELEMENTS AND CHECK FOR COLISIONS//// (Only Host)
+            for (unsigned int i = 0; i < ELEMS_SIZE; i++)
+            {
+                if (elements[i] != NULL && elements[i]->active)
                 {
-                    CreateElement(bot->wizard);
-                    bot->wizard->casting = false;
-                    bot->wizard->frame_n = 0;
-                }
-
-    ////GUEST SENDS UPDATED INFORMATION
-    if(MP && !Host){
-        //printf("\n SHOULD SEND GUEST WIZARD");
-        Send_Wizard(player, WIZARDS_SIZE-1);
-    }
-
-    if(!MP || (MP && Host))
-    {
-        ////MOVE ELEMENTS AND CHECK FOR COLISIONS//// (Only Host)
-        for (unsigned int i = 0; i < ELEMS_SIZE; i++)
-        {
-            if (elements[i] != NULL && elements[i]->active)
-            {
-                if(Out_Of_Bounds(elements[i])) continue;
-                
-                Move_Element(elements[i]);
-                for (unsigned int x = 0; x < ELEMS_SIZE; x++)
-                { //Colisions between elements
-                    if (x != i && elements[x] != NULL && elements[x]->active)
-                    {
-                        int x_dis = abs(elements[i]->center_x - elements[x]->center_x);
-                        int y_dis = abs(elements[i]->center_y - elements[x]->center_y);
-                        int distance = sqrt(pow(x_dis, 2) + pow(y_dis, 2));
-                        if (distance <= BALL_HITBOX_RADIUS * 2)
-                        { //if there has been a colision
-                            Element_Colision(elements[i], elements[x]);
+                    if(Out_Of_Bounds(elements[i])) continue;
+                    
+                    Move_Element(elements[i]);
+                    for (unsigned int x = 0; x < ELEMS_SIZE; x++)
+                    { //Colisions between elements
+                        if (x != i && elements[x] != NULL && elements[x]->active)
+                        {
+                            int x_dis = abs(elements[i]->center_x - elements[x]->center_x);
+                            int y_dis = abs(elements[i]->center_y - elements[x]->center_y);
+                            int distance = sqrt(pow(x_dis, 2) + pow(y_dis, 2));
+                            if (distance <= BALL_HITBOX_RADIUS * 2)
+                            { //if there has been a colision
+                                Element_Colision(elements[i], elements[x]);
+                            }
                         }
                     }
-                }
 
-                for (unsigned int x = 0; x < WIZARDS_SIZE; x++)
-                { //Colisions between elements and wizards
-                    if (wizards[x] != NULL && wizards[x]->health > 0)
-                    {
-                        int x_dis = abs(elements[i]->center_x - wizards[x]->center_x);
-                        int y_dis = abs(elements[i]->center_y - wizards[x]->center_y);
-                        int distance = sqrt(pow(x_dis, 2) + pow(y_dis, 2));
-                        if (distance <= BALL_HITBOX_RADIUS + WIZARD_HITBOX_RADIUS)
-                        { //if there has been a colision
-                            Wizard_Colision(wizards[x], elements[i]);
+                    for (unsigned int x = 0; x < WIZARDS_SIZE; x++)
+                    { //Colisions between elements and wizards
+                        if (wizards[x] != NULL && wizards[x]->health > 0)
+                        {
+                            int x_dis = abs(elements[i]->center_x - wizards[x]->center_x);
+                            int y_dis = abs(elements[i]->center_y - wizards[x]->center_y);
+                            int distance = sqrt(pow(x_dis, 2) + pow(y_dis, 2));
+                            if (distance <= BALL_HITBOX_RADIUS + WIZARD_HITBOX_RADIUS)
+                            { //if there has been a colision
+                                Wizard_Colision(wizards[x], elements[i]);
+                            }
                         }
                     }
-                }
 
-                for (unsigned int x = 0; x < WIZARDS_SIZE; x++)
-                { //Colisions between elements and wizards
-                    if (wizards[x] != NULL && wizards[x]->health > 0)
-                    {
-                        int x_dis = abs(elements[i]->center_x - wizards[x]->center_x);
-                        int y_dis = abs(elements[i]->center_y - wizards[x]->center_y);
-                        int distance = sqrt(pow(x_dis, 2) + pow(y_dis, 2));
-                        if (distance <= BALL_HITBOX_RADIUS + WIZARD_HITBOX_RADIUS)
-                        { //if there has been a colision
-                            Wizard_Colision(wizards[x], elements[i]);
+                    for (unsigned int x = 0; x < WIZARDS_SIZE; x++)
+                    { //Colisions between elements and wizards
+                        if (wizards[x] != NULL && wizards[x]->health > 0)
+                        {
+                            int x_dis = abs(elements[i]->center_x - wizards[x]->center_x);
+                            int y_dis = abs(elements[i]->center_y - wizards[x]->center_y);
+                            int distance = sqrt(pow(x_dis, 2) + pow(y_dis, 2));
+                            if (distance <= BALL_HITBOX_RADIUS + WIZARD_HITBOX_RADIUS)
+                            { //if there has been a colision
+                                Wizard_Colision(wizards[x], elements[i]);
+                            }
                         }
                     }
                 }
             }
+            /////////////////////////////////////
         }
-        /////////////////////////////////////
-    }
 
-    ////HOST SENDS UPDATED INFORMATION
-    if(MP && Host){
-        //printf("\n SHOULD SEND HOST INFO");
-        Send_Game_Info();
-    }
+        ////HOST SENDS UPDATED INFORMATION
+        if(MP && Host){
+            //printf("\n SHOULD SEND HOST INFO");
+            Send_Game_Info();
+        }
 
-    ////GUEST MOVES ELEMENTS WITHOU CHECKING FOR COLISIONS
-    if(MP && !Host){
-        for(unsigned int i = 0; i < ELEMS_SIZE; i++)
-        {
-            if(elements[i] != NULL && elements[i]->active)
+        ////GUEST MOVES ELEMENTS WITHOU CHECKING FOR COLISIONS
+        if(MP && !Host){
+            for(unsigned int i = 0; i < ELEMS_SIZE; i++)
             {
-                Move_Element(elements[i]);
+                if(elements[i] != NULL && elements[i]->active)
+                {
+                    Move_Element(elements[i]);
+                }
             }
         }
-    }
-    /////////////
+        /////////////
 
-    ////DRAWING TO BUFFER////
-    DrawBackground();
+        ////DRAWING TO BUFFER////
+        DrawBackground();
 
         for (unsigned int i = 0; i < ELEMS_SIZE; i++)
         {
@@ -1248,7 +1265,6 @@ void Update_Game_State()
             }
         }
         DrawCursor(cursor);
-        DrawPlayerName();
     }
 }
 
