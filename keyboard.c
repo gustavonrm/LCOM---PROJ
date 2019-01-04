@@ -4,16 +4,22 @@
 #include "game.h"
 #include "Menu.h"
 
-extern GameUtils GameMenus; 
+extern GameUtils GameMenus;
 
 extern bool openTextBox;
 extern SpellCast SpellsRdy;
 
 extern Bitmap *P_Cursor;
+extern Bitmap *Name_Box;
+extern Wizard *player;
 
 int kbd_hook_id = 1;
 char words[20] = "";
 unsigned int text_index = 0;
+
+extern enum player_name name_status_single;
+extern enum player_name name_status_multi;
+
 //alphabet
 extern Bitmap *Letter_A;
 extern Bitmap *Letter_B;
@@ -27,6 +33,7 @@ extern Bitmap *Letter_I;
 extern Bitmap *Letter_J;
 extern Bitmap *Letter_K;
 extern Bitmap *Letter_L;
+
 extern Bitmap *Letter_M;
 extern Bitmap *Letter_N;
 extern Bitmap *Letter_O;
@@ -210,96 +217,6 @@ void write_key(uint16_t key)
     words[text_index] = '\0';
   }
 }
-void Draw_string()
-{
-  //printf("Words: %s\n", words);
-  int x = 45, y = 680;
-  for (size_t i = 0; i < text_index; i++)
-  {
-    x += 12;
-    switch (words[i])
-    {
-    case 'A':
-      DrawBitmap(Letter_A, x, y);
-      break;
-    case 'B':
-      DrawBitmap(Letter_B, x, y);
-      break;
-    case 'C':
-      DrawBitmap(Letter_C, x, y);
-      break;
-    case 'D':
-      DrawBitmap(Letter_D, x, y);
-      break;
-    case 'E':
-      DrawBitmap(Letter_E, x, y);
-      break;
-    case 'F':
-      DrawBitmap(Letter_F, x, y);
-      break;
-    case 'G':
-      DrawBitmap(Letter_G, x, y);
-      break;
-    case 'H':
-      DrawBitmap(Letter_H, x, y);
-      break;
-    case 'I':
-      DrawBitmap(Letter_I, x, y);
-      break;
-    case 'J':
-      DrawBitmap(Letter_J, x, y);
-      break;
-    case 'K':
-      DrawBitmap(Letter_K, x, y);
-      break;
-    case 'L':
-      DrawBitmap(Letter_L, x, y);
-      break;
-    case 'M':
-      DrawBitmap(Letter_M, x, y);
-      break;
-    case 'N':
-      DrawBitmap(Letter_N, x, y);
-      break;
-    case 'O':
-      DrawBitmap(Letter_O, x, y);
-      break;
-    case 'P':
-      DrawBitmap(Letter_P, x, y);
-      break;
-    case 'Q':
-      DrawBitmap(Letter_Q, x, y);
-      break;
-    case 'R':
-      DrawBitmap(Letter_R, x, y);
-      break;
-    case 'S':
-      DrawBitmap(Letter_S, x, y);
-      break;
-    case 'T':
-      DrawBitmap(Letter_T, x, y);
-      break;
-    case 'U':
-      DrawBitmap(Letter_U, x, y);
-      break;
-    case 'V':
-      DrawBitmap(Letter_V, x, y);
-      break;
-    case 'W':
-      DrawBitmap(Letter_W, x, y);
-      break;
-    case 'X':
-      DrawBitmap(Letter_X, x, y);
-      break;
-    case 'Y':
-      DrawBitmap(Letter_Y, x, y);
-      break;
-    case 'Z':
-      DrawBitmap(Letter_Z, x, y);
-      break;
-    }
-  }
-}
 
 void keyboard_utilities(uint16_t key)
 {
@@ -443,4 +360,213 @@ bool getSpell()
     (printf("Cant cast earth spell!\n"));
 
   return false;
+}
+
+void GetPlayerName(uint16_t key)
+{
+  write_key(key);
+
+  if (key == ENTER)
+  {
+    //set player name
+    strcpy(player->name, words);
+    //reset everything
+    if (name_status_single == get)
+    {
+      name_status_single = done;
+    }
+
+    if (name_status_multi== get)
+    {
+      name_status_multi = done;
+    }
+
+    text_index = 0;
+    strcpy(words, "");
+    printf("Player Name: %s\n", player->name);
+    Update_Game_State();
+  }
+}
+
+void Draw_string(int x, int y)
+{
+  //printf("Words: %s\n", words);
+  //int x = 45, y = 680;
+  for (size_t i = 0; i < text_index; i++)
+  {
+    x += 12;
+    switch (words[i])
+    {
+    case 'A':
+      DrawBitmap(Letter_A, x, y);
+      break;
+    case 'B':
+      DrawBitmap(Letter_B, x, y);
+      break;
+    case 'C':
+      DrawBitmap(Letter_C, x, y);
+      break;
+    case 'D':
+      DrawBitmap(Letter_D, x, y);
+      break;
+    case 'E':
+      DrawBitmap(Letter_E, x, y);
+      break;
+    case 'F':
+      DrawBitmap(Letter_F, x, y);
+      break;
+    case 'G':
+      DrawBitmap(Letter_G, x, y);
+      break;
+    case 'H':
+      DrawBitmap(Letter_H, x, y);
+      break;
+    case 'I':
+      DrawBitmap(Letter_I, x, y);
+      break;
+    case 'J':
+      DrawBitmap(Letter_J, x, y);
+      break;
+    case 'K':
+      DrawBitmap(Letter_K, x, y);
+      break;
+    case 'L':
+      DrawBitmap(Letter_L, x, y);
+      break;
+    case 'M':
+      DrawBitmap(Letter_M, x, y);
+      break;
+    case 'N':
+      DrawBitmap(Letter_N, x, y);
+      break;
+    case 'O':
+      DrawBitmap(Letter_O, x, y);
+      break;
+    case 'P':
+      DrawBitmap(Letter_P, x, y);
+      break;
+    case 'Q':
+      DrawBitmap(Letter_Q, x, y);
+      break;
+    case 'R':
+      DrawBitmap(Letter_R, x, y);
+      break;
+    case 'S':
+      DrawBitmap(Letter_S, x, y);
+      break;
+    case 'T':
+      DrawBitmap(Letter_T, x, y);
+      break;
+    case 'U':
+      DrawBitmap(Letter_U, x, y);
+      break;
+    case 'V':
+      DrawBitmap(Letter_V, x, y);
+      break;
+    case 'W':
+      DrawBitmap(Letter_W, x, y);
+      break;
+    case 'X':
+      DrawBitmap(Letter_X, x, y);
+      break;
+    case 'Y':
+      DrawBitmap(Letter_Y, x, y);
+      break;
+    case 'Z':
+      DrawBitmap(Letter_Z, x, y);
+      break;
+    }
+  }
+}
+
+void DrawPlayerName()
+{
+  //printf("Words: %s\n", words);
+  int x = 450, y = 680;
+
+  for (size_t i = 0; i < strlen(player->name); i++)
+  {
+    x += 12;
+    switch (player->name[i])
+    {
+    case 'A':
+      DrawBitmap(Letter_A, x, y);
+      break;
+    case 'B':
+      DrawBitmap(Letter_B, x, y);
+      break;
+    case 'C':
+      DrawBitmap(Letter_C, x, y);
+      break;
+    case 'D':
+      DrawBitmap(Letter_D, x, y);
+      break;
+    case 'E':
+      DrawBitmap(Letter_E, x, y);
+      break;
+    case 'F':
+      DrawBitmap(Letter_F, x, y);
+      break;
+    case 'G':
+      DrawBitmap(Letter_G, x, y);
+      break;
+    case 'H':
+      DrawBitmap(Letter_H, x, y);
+      break;
+    case 'I':
+      DrawBitmap(Letter_I, x, y);
+      break;
+    case 'J':
+      DrawBitmap(Letter_J, x, y);
+      break;
+    case 'K':
+      DrawBitmap(Letter_K, x, y);
+      break;
+    case 'L':
+      DrawBitmap(Letter_L, x, y);
+      break;
+    case 'M':
+      DrawBitmap(Letter_M, x, y);
+      break;
+    case 'N':
+      DrawBitmap(Letter_N, x, y);
+      break;
+    case 'O':
+      DrawBitmap(Letter_O, x, y);
+      break;
+    case 'P':
+      DrawBitmap(Letter_P, x, y);
+      break;
+    case 'Q':
+      DrawBitmap(Letter_Q, x, y);
+      break;
+    case 'R':
+      DrawBitmap(Letter_R, x, y);
+      break;
+    case 'S':
+      DrawBitmap(Letter_S, x, y);
+      break;
+    case 'T':
+      DrawBitmap(Letter_T, x, y);
+      break;
+    case 'U':
+      DrawBitmap(Letter_U, x, y);
+      break;
+    case 'V':
+      DrawBitmap(Letter_V, x, y);
+      break;
+    case 'W':
+      DrawBitmap(Letter_W, x, y);
+      break;
+    case 'X':
+      DrawBitmap(Letter_X, x, y);
+      break;
+    case 'Y':
+      DrawBitmap(Letter_Y, x, y);
+      break;
+    case 'Z':
+      DrawBitmap(Letter_Z, x, y);
+      break;
+    }
+  }
 }

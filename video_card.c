@@ -24,6 +24,7 @@ static uint8_t BlueFieldPosition;
 extern Cursor *cursor;
 extern Bitmap *background;
 extern Bitmap *Main_Page;
+extern Bitmap *Info_Box; 
 extern Wizard *player;
 
 uint16_t getXRes()
@@ -199,6 +200,11 @@ void DrawBackground()
 void DrawMainPage()
 {
   memcpy(video_buffer, Main_Page->bitmapData, Main_Page->bitmapInfoHeader.imageSize);
+}
+
+void DrawInfoBox()
+{
+  memcpy(video_buffer, Info_Box->bitmapData, Info_Box->bitmapInfoHeader.imageSize);
 }
 
 

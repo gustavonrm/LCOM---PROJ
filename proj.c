@@ -17,13 +17,15 @@ Wizard *player;
 Bot *bot1;
 Bot *bot2;
 Bot *bot3;
- 
+
 extern uint8_t pack;
 extern uint8_t packets[3];
 //keyboard
-extern uint16_t key;
+uint16_t key;
 //utils
-extern GameUtils GameMenus; 
+extern GameUtils GameMenus;
+extern enum player_name name_status_single;
+extern enum player_name name_status_multi;
 
 //globat temporary vars
 
@@ -106,7 +108,7 @@ int Arena()
 
   uint32_t irq_kbd = BIT(bit_no), irq_timer0 = BIT(bit_no_t), irq_mouse = BIT(bit_no_m), irq_rtc = BIT(bit_no_rtc);
 
-   while (GameMenus.game_onoff == true)
+  while (GameMenus.game_onoff == true)
   {
     if ((r = driver_receive(ANY, &msg, &ipc_status)) != 0)
     {
@@ -132,7 +134,13 @@ int Arena()
         if (msg.m_notify.interrupts & irq_kbd)
         { //KEYBOARD
           key = kbd_ih();
-          keyboard_utilities(key);
+          //get player name 
+          if (name_status_single == get || name_status_multi== get )
+          {
+            GetPlayerName(key); 
+          }
+          else
+            keyboard_utilities(key);
         }
 
         if (msg.m_notify.interrupts & irq_mouse)
@@ -144,15 +152,13 @@ int Arena()
             cursor->rb = mouse->rb;
             cursor->x += mouse->delta_x;
             cursor->y -= mouse->delta_y; //it's - becuase y coordinates are counted downwards
-
-
           }
         }
         //RTC
-        if (msg.m_notify.interrupts & irq_rtc){
-            rtc_ih(); 
+        if (msg.m_notify.interrupts & irq_rtc)
+        {
+          rtc_ih();
         }
-        
 
         break;
       default:
@@ -175,8 +181,9 @@ int Arena()
     return 1;
   }
   //RTC
-  if( unsubscribe_rtc() != OK){
-    return 1; 
+  if (unsubscribe_rtc() != OK)
+  {
+    return 1;
   }
 
   if (disable_stream() == 1)
@@ -187,12 +194,11 @@ int Arena()
   return 0;
 }
 
-
 int(proj_main_loop)()
-{ 
+{
   vg_init(0x144);
-  
-  DrawLoadingScreen(); 
+
+  DrawLoadingScreen();
 
   if (!LoadAssets())
   {
