@@ -7,6 +7,7 @@
 #include <math.h>
 #include <stdio.h>
 #include "RTC.h"
+#include "Menu.h"
 #include "serial.h"
 
 extern bool MP;
@@ -15,6 +16,11 @@ extern bool Host;
 //layout
 Bitmap *background;
 Bitmap *Tool_Box;
+Bitmap *Loading_Screen;
+Bitmap *Main_Page;
+Bitmap *Pause_Menu;
+Bitmap *Name_Box;
+Bitmap *Info_Box;
 
 //mouse manip
 Bitmap *P_Cursor;
@@ -109,10 +115,25 @@ Animation *Explosion;
 extern Cursor *cursor;
 extern SpellCast SpellsRdy;
 
+//menu
+extern GameUtils GameMenus;
+extern enum player_name name_status_single;
+extern enum player_name name_status_multi;
+extern bool Gamerules;
+
 //List of all Sprites
 
 bool LoadAssets()
 {
+    if ((Pause_Menu = loadBitmap("Pause_Menu.bmp")) == NULL)
+        return false;
+    if ((Main_Page = loadBitmap("Main_Page.bmp")) == NULL)
+        return false;
+    if ((Name_Box = loadBitmap("Name_Box.bmp")) == NULL)
+        return false;
+    if ((Info_Box = loadBitmap("Info_Box.bmp")) == NULL)
+        return false;
+
     if ((background = loadBitmap("Background.bmp")) == NULL)
         return false;
     if ((Tool_Box = loadBitmap("Tool_Box.bmp")) == NULL)
@@ -374,7 +395,7 @@ void Wizard_Colision(Wizard *wizard, Element *element)
     }
 }
 
-Element *CreateElement(Wizard* wizard)
+Element *CreateElement(Wizard *wizard)
 {
     Element *elem = (Element *)malloc(sizeof(Element));
     elem->elem_type = wizard->cast_type;
@@ -461,6 +482,11 @@ void DrawCursor(Cursor *cursor)
         DrawBitmap(cursor->pressed, cursor->x, cursor->y);
     else
         DrawBitmap(cursor->released, cursor->x, cursor->y);
+
+    
+        printf( "mouse x:%d", cursor->x); 
+        printf( "mouse y:%d\n", cursor->y); 
+
 }
 
 void DrawTextBox()
@@ -579,8 +605,9 @@ void Change_Target(Bot *bot)
         target_wizard = rand() % WIZARDS_SIZE;
         wiz = wizards[target_wizard];
         fail++;
-        if(fail == 20) return; //So there isn't an endless loop
-    } while(wiz == NULL || wiz->health <= 0 || wiz == bot->wizard);
+        if (fail == 20)
+            return; //So there isn't an endless loop
+    } while (wiz == NULL || wiz->health <= 0 || wiz == bot->wizard);
 
     int angle = atan2(bot->wizard->center_y - wiz->center_y, wiz->center_x - bot->wizard->center_x) * 180 / M_PI - 90;
     if (angle < 0)
@@ -796,25 +823,32 @@ extern SpellCast SpellsRdy;
 extern Cursor *cursor;
 extern Wizard *player;
 
-enum Spell_Type Get_Spell_Type(Cursor* cursor){
-    if(cursor->lb && !cursor->rb) return Launch;
-    else return None;
+enum Spell_Type Get_Spell_Type(Cursor *cursor)
+{
+    if (cursor->lb && !cursor->rb)
+        return Launch;
+    else
+        return None;
 }
 
-bool Check_Cursor(Cursor* cursor, enum Spell_Type spell_type){
-    switch(spell_type){
-        case Launch:
+bool Check_Cursor(Cursor *cursor, enum Spell_Type spell_type)
+{
+    switch (spell_type)
+    {
+    case Launch:
         return cursor->lb;
-        
-        case None:
+
+    case None:
         return false;
     }
 
     return false;
 }
 
-void Draw_Animation(Animation* animation, int center_x, int center_y, int frame_n, int *try_n, unsigned int rot){
-    if (frame_n >= animation->n_frames) return;
+void Draw_Animation(Animation *animation, int center_x, int center_y, int frame_n, int *try_n, unsigned int rot)
+{
+    if (frame_n >= animation->n_frames)
+        return;
     if (*try_n < animation->ticks_between_frames && frame_n != 0)
     {
         (*try_n)++;
@@ -823,40 +857,50 @@ void Draw_Animation(Animation* animation, int center_x, int center_y, int frame_
     {
         (*try_n) = 0;
     }
-    DrawSprite(animation->sprites[frame_n],center_x,center_y, rot,true);
+    DrawSprite(animation->sprites[frame_n], center_x, center_y, rot, true);
 }
 
-void Draw_Cast(Wizard* wizard){
-    if(wizard->cast_animation == NULL || wizard->frame_n > wizard->cast_animation->n_frames) return;
+void Draw_Cast(Wizard *wizard)
+{
+    if (wizard->cast_animation == NULL || wizard->frame_n > wizard->cast_animation->n_frames)
+        return;
 
     int x = wizard->center_x;
     int y = wizard->center_y;
     double rot = wizard->rot * M_PI / 180.0;
     x -= CAST_DISTANCE * sin(rot);
     y -= CAST_DISTANCE * cos(rot);
-    if(wizard->frame_n == wizard->cast_animation->n_frames) { //So it stops on last frame
+    if (wizard->frame_n == wizard->cast_animation->n_frames)
+    { //So it stops on last frame
         wizard->frame_n--;
         wizard->try_n = wizard->cast_animation->ticks_between_frames;
     }
 
     Draw_Animation(wizard->cast_animation, x, y, wizard->frame_n, &wizard->try_n, wizard->rot);
 
-    if(wizard->try_n == 0) wizard->frame_n++;
+    if (wizard->try_n == 0)
+        wizard->frame_n++;
 }
 
-void Get_Animation(Wizard* wizard){
-    switch(wizard->spell)
+void Get_Animation(Wizard *wizard)
+{
+    switch (wizard->spell)
     {
-        case None:
-            wizard->cast_animation = NULL;
+    case None:
+        wizard->cast_animation = NULL;
         break;
 
-        case Launch:
-            if(wizard->cast_type == Fire) wizard->cast_animation = Explosion; //INSERT CORRECT Animation here
-            else if(wizard->cast_type == Water) wizard->cast_animation = Explosion; //INSERT CORRECT Animation here
-            else if(wizard->cast_type == Air) wizard->cast_animation = Explosion; //INSERT CORRECT Animation here
-            else if(wizard->cast_type == Earth) wizard->cast_animation = Explosion; //INSERT CORRECT Animation here
-            else wizard->cast_animation = NULL;
+    case Launch:
+        if (wizard->cast_type == Fire)
+            wizard->cast_animation = Explosion; //INSERT CORRECT Animation here
+        else if (wizard->cast_type == Water)
+            wizard->cast_animation = Explosion; //INSERT CORRECT Animation here
+        else if (wizard->cast_type == Air)
+            wizard->cast_animation = Explosion; //INSERT CORRECT Animation here
+        else if (wizard->cast_type == Earth)
+            wizard->cast_animation = Explosion; //INSERT CORRECT Animation here
+        else
+            wizard->cast_animation = NULL;
         break;
     }
 
@@ -865,23 +909,27 @@ void Get_Animation(Wizard* wizard){
 
 unsigned int spell_timer = SPELL_TIMER; //30 ticks = 0.5 secs
 
-void Player_Cast(Wizard* player, Cursor* cursor){
+void Player_Cast(Wizard *player, Cursor *cursor)
+{
     enum Spell_Type type;
     if (player->casting)
-    {  //If there's already something being casted
-        if(player->frame_n >= player->cast_animation->n_frames){
+    { //If there's already something being casted
+        if (player->frame_n >= player->cast_animation->n_frames)
+        {
             spell_timer--;
-            if(!Check_Cursor(cursor,player->spell)){
+            if (!Check_Cursor(cursor, player->spell))
+            {
                 CreateElement(player);
                 spell_timer = 0;
-            } 
-            if(spell_timer == 0){
+            }
+            if (spell_timer == 0)
+            {
                 spell_timer = SPELL_TIMER;
                 player->casting = false;
             }
         }
 
-        if(!Check_Cursor(cursor, player->spell))
+        if (!Check_Cursor(cursor, player->spell))
         {
             player->casting = false;
             player->spell = None;
@@ -890,7 +938,7 @@ void Player_Cast(Wizard* player, Cursor* cursor){
         //While Spell is being casted Keyboard must also be disabled
     }
     else
-    {  //If nothing is being casted check if there's anything ready for casting
+    { //If nothing is being casted check if there's anything ready for casting
         if (SpellsRdy.Fire_Cast)
         {
             if ((type = Get_Spell_Type(cursor)) != None)
@@ -905,7 +953,7 @@ void Player_Cast(Wizard* player, Cursor* cursor){
             else
             {
                 spell_timer--;
-                if(spell_timer == 0)
+                if (spell_timer == 0)
                 {
                     spell_timer = SPELL_TIMER;
                     SpellsRdy.Fire_Cast = false;
@@ -926,7 +974,7 @@ void Player_Cast(Wizard* player, Cursor* cursor){
             else
             {
                 spell_timer--;
-                if(spell_timer == 0)
+                if (spell_timer == 0)
                 {
                     spell_timer = SPELL_TIMER;
                     SpellsRdy.Water_Cast = false;
@@ -947,7 +995,7 @@ void Player_Cast(Wizard* player, Cursor* cursor){
             else
             {
                 spell_timer--;
-                if(spell_timer == 0)
+                if (spell_timer == 0)
                 {
                     spell_timer = SPELL_TIMER;
                     SpellsRdy.Air_Cast = false;
@@ -968,7 +1016,7 @@ void Player_Cast(Wizard* player, Cursor* cursor){
             else
             {
                 spell_timer--;
-                if(spell_timer == 0)
+                if (spell_timer == 0)
                 {
                     spell_timer = SPELL_TIMER;
                     SpellsRdy.Earth_Cast = false;
@@ -978,21 +1026,25 @@ void Player_Cast(Wizard* player, Cursor* cursor){
     }
 }
 
-void Draw_Destruction(Element* element){
-    if(element->frame_n >= Explosion->n_frames)
+void Draw_Destruction(Element *element)
+{
+    if (element->frame_n >= Explosion->n_frames)
     {
         element->destroyed = true;
         return;
     }
     Draw_Animation(Explosion, element->center_x, element->center_y, element->frame_n, &element->try_n, element->rot);
-    if(element->try_n == 0) element->frame_n++;
+    if (element->try_n == 0)
+        element->frame_n++;
 }
 
-bool Out_Of_Bounds(Element* element){
-    int x = element->center_x + element->img->bitmap[element->rot]->bitmapInfoHeader.width/2;
-    int y = element->center_y + element->img->bitmap[element->rot]->bitmapInfoHeader.height/2;
+bool Out_Of_Bounds(Element *element)
+{
+    int x = element->center_x + element->img->bitmap[element->rot]->bitmapInfoHeader.width / 2;
+    int y = element->center_y + element->img->bitmap[element->rot]->bitmapInfoHeader.height / 2;
 
-    if((x < 0 || x > H_RES) && (y < 0 || y > V_RES)){
+    if ((x < 0 || x > H_RES) && (y < 0 || y > V_RES))
+    {
         element->destroyed = true;
         element->active = false;
         return true;
@@ -1006,38 +1058,31 @@ bool Out_Of_Bounds(Element* element){
 bool openTextBox = false;
 void Update_Game_State()
 {
-    if((MP && Host) || !MP)
+    if (GameMenus.main_page == true)
     {
-        ////BOT UPDATES//// (Only Host or singleplayer)
-        for (unsigned int i = 0; i < BOTS_SIZE; i++)
-        { //Update Bot Behaviour
-            Bot *bot = bots[i];
-            if (bot != NULL && bot->wizard->health > 0)
-            { //If he exists and is alive
-                bot->attention_span--;
-                if(!bot->wizard->casting) bot->time_to_fire--;
-                else if(bot->wizard->frame_n >= bot->wizard->cast_animation->n_frames){
-                    CreateElement(bot->wizard);
-                    bot->wizard->casting = false;
-                    bot->wizard->frame_n = 0;
-                }
+        DrawMainPage();
+        DrawCursor(cursor);
+        main_menu();
 
-                if (bot->attention_span == 0)
-                {
-                    Change_Target(bot);
-                }
-
-                if (bot->time_to_fire == 0)
-                {
-                    Bot_Cast(bot);
-                }
-
-                Update_Bot_Rotation(bot);
-            }
+        if( Gamerules == true){
+            DrawInfoBox(); 
+            DrawCursor(cursor);
         }
-        //////////////////////////
+
+        if (name_status_single == get)
+        {
+            DrawBitmap(Name_Box, 210, 240);
+            Draw_string(250, 300);
+        }
+        if (name_status_multi == get)
+        {
+            DrawBitmap(Name_Box, 210, 410);
+            Draw_string(250, 470);
+        }
     }
 
+    if (GameMenus.run == 1)
+    {
     ////Updating Player rotation////
     int angle = round(atan2(player->center_y - cursor->y, cursor->x - player->center_x) * 180 / M_PI - 90);
     if (angle < 0)
@@ -1045,7 +1090,21 @@ void Update_Game_State()
     player->rot = angle;
     ////////////////////////////////
 
-    Player_Cast(player,cursor); //Checks if player has cast anything and if he is casting correctly
+        ////CHECKING FOR ACTIONS////
+        for (unsigned int i = 0; i < BOTS_SIZE; i++)
+        { //Update Bot Behaviour
+            Bot *bot = bots[i];
+            if (bot != NULL && bot->wizard->health > 0)
+            { //If he exists and is alive
+                bot->attention_span--;
+                if (!bot->wizard->casting)
+                    bot->time_to_fire--;
+                else if (bot->wizard->frame_n >= bot->wizard->cast_animation->n_frames)
+                {
+                    CreateElement(bot->wizard);
+                    bot->wizard->casting = false;
+                    bot->wizard->frame_n = 0;
+                }
 
     ////GUEST SENDS UPDATED INFORMATION
     if(MP && !Host){
@@ -1090,6 +1149,20 @@ void Update_Game_State()
                         }
                     }
                 }
+
+                for (unsigned int x = 0; x < WIZARDS_SIZE; x++)
+                { //Colisions between elements and wizards
+                    if (wizards[x] != NULL && wizards[x]->health > 0)
+                    {
+                        int x_dis = abs(elements[i]->center_x - wizards[x]->center_x);
+                        int y_dis = abs(elements[i]->center_y - wizards[x]->center_y);
+                        int distance = sqrt(pow(x_dis, 2) + pow(y_dis, 2));
+                        if (distance <= BALL_HITBOX_RADIUS + WIZARD_HITBOX_RADIUS)
+                        { //if there has been a colision
+                            Wizard_Colision(wizards[x], elements[i]);
+                        }
+                    }
+                }
             }
         }
         /////////////////////////////////////
@@ -1116,45 +1189,67 @@ void Update_Game_State()
     ////DRAWING TO BUFFER////
     DrawBackground();
 
-    for (unsigned int i = 0; i < ELEMS_SIZE; i++)
-    {
-        if (elements[i] != NULL && elements[i]->active)
-        { //Drawing active elements
-            DrawElement(elements[i]);
-        }
-        else if (elements[i] != NULL && elements[i]->destroyed)
+        for (unsigned int i = 0; i < ELEMS_SIZE; i++)
         {
-            free(elements[i]);
-            elements[i] = NULL;
+            if (elements[i] != NULL && elements[i]->active)
+            { //Drawing active elements
+                DrawElement(elements[i]);
+            }
+            else if (elements[i] != NULL && elements[i]->destroyed)
+            {
+                free(elements[i]);
+                elements[i] = NULL;
+            }
+            else if (elements[i] != NULL && !elements[i]->active)
+            { //Drawing inactive elements
+                Draw_Destruction(elements[i]);
+            }
         }
-        else if(elements[i] != NULL && !elements[i]->active)
-        { //Drawing inactive elements
-            Draw_Destruction(elements[i]);
-        }
-    }
 
-    for (unsigned int i = 0; i < WIZARDS_SIZE; i++)
-    {
-        if (wizards[i] != NULL && wizards[i]->health > 0)
+        for (unsigned int i = 0; i < WIZARDS_SIZE; i++)
         {
-            DrawWizard(wizards[i]);
-            if(wizards[i]->casting) Draw_Cast(wizards[i]);
+            if (wizards[i] != NULL && wizards[i]->health > 0)
+            {
+                DrawWizard(wizards[i]);
+                if (wizards[i]->casting)
+                    Draw_Cast(wizards[i]);
+            }
         }
-    }
 
-    DrawToolBox();
-    DrawTimers();
+        // DrawToolBox();
+        DrawTimers();
 
-    if (openTextBox == true)
-    {
-        //para desenhar as letras, com a string q guarda a palavra, vai comparar
-        // cada letra uma a uma e por cada letra vai dando display no ecra a letra respetiva uma a uma
-        DrawTextBox();
-        //DrawTextPointer();
-        Draw_string();
+        if (openTextBox == true)
+        {
+            //para desenhar as letras, com a string q guarda a palavra, vai comparar
+            // cada letra uma a uma e por cada letra vai dando display no ecra a letra respetiva uma a uma
+            DrawTextBox();
+            //DrawTextPointer();
+            Draw_string(45, 680);
+        }
+
+        DrawClock();
+
+        if (GameMenus.pause == true)
+        {
+            DrawPauseMenu();
+            //cursor condition
+            //to check
+            if (cursor->lb == true && cursor->x >= 280 && cursor->x <= 760 && cursor->y >= 350 && cursor->y <= 430)
+            {
+                GameMenus.main_page = false;
+                GameMenus.run = 1;
+                GameMenus.pause = false;
+            }
+
+            if (cursor->lb == true && cursor->x >= 280 && cursor->x <= 760 && cursor->y >= 460 && cursor->y <= 540)
+            {
+                GameMenus.game_onoff = false;
+            }
+        }
+        DrawCursor(cursor);
+        DrawPlayerName();
     }
-    DrawCursor(cursor);
-    DrawClock();
 }
 
 void Send_Game_Info(){

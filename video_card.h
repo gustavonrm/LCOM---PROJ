@@ -23,6 +23,8 @@ int draw_pixel(uint16_t x, uint16_t y, uint32_t color);
 
 
 void DrawBackground();
+void DrawMainPage();
+void DrawInfoBox();
 void DrawBitmap(Bitmap* bitmap, int x, int y);
 void UpdateVideo();
 

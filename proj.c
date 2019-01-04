@@ -9,6 +9,7 @@
 #include "timer.h"
 #include "RTC.h"
 #include "serial.h"
+#include "Menu.h"
 #include <math.h>
 
 extern Bitmap *background;
@@ -20,7 +21,11 @@ Bot *bot2;
 Bot *bot3;
  
 //keyboard
-extern uint16_t key;
+uint16_t key;
+//utils
+extern GameUtils GameMenus;
+extern enum player_name name_status_single;
+extern enum player_name name_status_multi;
 
 //globat temporary vars
 bool MP = false; //true if playing in multiplayer
@@ -121,12 +126,7 @@ int Arena()
 
   uint32_t irq_kbd = BIT(bit_no), irq_timer0 = BIT(bit_no_t), irq_mouse = BIT(bit_no_m), irq_rtc = BIT(bit_no_rtc);
 
-  //Update_Game_State();
-  //UpdateVideo();
-
-  //printf("\n READY");
-
-  while ((key != ESC_BREAK))
+  while (GameMenus.game_onoff == true)
   {
     if ((r = driver_receive(ANY, &msg, &ipc_status)) != 0)
     {
@@ -154,7 +154,13 @@ int Arena()
         if (msg.m_notify.interrupts & irq_kbd)
         { //KEYBOARD
           key = kbd_ih();
-          keyboard_utilities(key);
+          //get player name 
+          if (name_status_single == get || name_status_multi== get )
+          {
+            GetPlayerName(key); 
+          }
+          else
+            keyboard_utilities(key);
         }
 
         if (msg.m_notify.interrupts & irq_mouse)
@@ -169,8 +175,9 @@ int Arena()
           }
         }
         //RTC
-        if (msg.m_notify.interrupts & irq_rtc){
-          rtc_ih(); 
+        if (msg.m_notify.interrupts & irq_rtc)
+        {
+          rtc_ih();
         }
 
         if (msg.m_notify.interrupts & irq_serial)
@@ -208,8 +215,9 @@ int Arena()
     return 1;
   }
   //RTC
-  if( unsubscribe_rtc() != OK){
-    return 1; 
+  if (unsubscribe_rtc() != OK)
+  {
+    return 1;
   }
 
   if (disable_stream() == 1)
@@ -222,18 +230,9 @@ int Arena()
 
 int(proj_main_loop)(int argc, char *argv[])
 {
-  if(argc == 1) Host = true;
-  else Host = false;
-  MP = true;
-  if(*argv[0] == 1) printf("\n UAU");
-  if(Host){
-    printf("\n HOST \n");
-  }
-  else{
-    printf("\n GUEST \n");
-  }
-
   vg_init(0x144);
+
+  DrawLoadingScreen();
 
   if (!LoadAssets())
   {
@@ -243,7 +242,6 @@ int(proj_main_loop)(int argc, char *argv[])
 
   time_t t;
   srand((unsigned)time(&t));
-
   Arena();
 
   vg_exit();

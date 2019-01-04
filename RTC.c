@@ -90,7 +90,6 @@ int activate_update_interrupts()
     }
     if (sys_inb(RTC_DATA_REG, &regB) != OK)
     {
-        printf("rtc_enable_interrupts::Error reading register B\n");
         return 1;
     }
 
@@ -208,9 +207,11 @@ void clock_display()
     Min = GameClock.minutes;
     Sec = GameClock.seconds;
 
-    printf("%d:", Hour);
-    printf("%d:", Min);
-    printf("%d\n", Sec);
+
+    //printf to debug 
+    //printf("%d:", Hour);
+    //printf("%d:", Min);
+    //printf("%d\n", Sec);
 
     //later with in game bmp
 }
@@ -273,598 +274,601 @@ void correct_hours()
         GameClock.hours = 24;
 }
 
+//                       h1     h2    dd1     m1    m2     dd2    s1       s2
+ClockPos UpperClock = {25,30, 40,30, 50,32, 60,30, 75,30, 85,32, 95,30, 110,30};
+
 void DrawClock()
 {
     //draw hour
 
     if (GameClock.hours / 10 == 0)
     {
-        DrawBitmap(Number_0, 10, 10);
+        DrawBitmap(Number_0, UpperClock.hour1_x, UpperClock.hour1_y);
         switch (GameClock.hours % 10)
         {
         case 0:
-            DrawBitmap(Number_0, 20, 10);
+            DrawBitmap(Number_0, UpperClock.hour2_x, UpperClock.hour2_y);
             break;
 
         case 1:
-            DrawBitmap(Number_1, 20, 10);
+            DrawBitmap(Number_1, UpperClock.hour2_x, UpperClock.hour2_y);
             break;
 
         case 2:
-            DrawBitmap(Number_2, 20, 10);
+            DrawBitmap(Number_2, UpperClock.hour2_x, UpperClock.hour2_y);
             break;
 
         case 3:
-            DrawBitmap(Number_3, 20, 10);
+            DrawBitmap(Number_3, UpperClock.hour2_x, UpperClock.hour2_y);
             break;
 
         case 4:
-            DrawBitmap(Number_4, 20, 10);
+            DrawBitmap(Number_4, UpperClock.hour2_x, UpperClock.hour2_y);
             break;
 
         case 5:
-            DrawBitmap(Number_5, 20, 10);
+            DrawBitmap(Number_5, UpperClock.hour2_x, UpperClock.hour2_y);
             break;
 
         case 6:
-            DrawBitmap(Number_6, 20, 10);
+            DrawBitmap(Number_6, UpperClock.hour2_x, UpperClock.hour2_y);
             break;
 
         case 7:
-            DrawBitmap(Number_7, 20, 10);
+            DrawBitmap(Number_7, UpperClock.hour2_x, UpperClock.hour2_y);
             break;
 
         case 8:
-            DrawBitmap(Number_8, 20, 10);
+            DrawBitmap(Number_8, UpperClock.hour2_x, UpperClock.hour2_y);
             break;
 
         case 9:
-            DrawBitmap(Number_9, 20, 10);
+            DrawBitmap(Number_9, UpperClock.hour2_x, UpperClock.hour2_y);
             break;
         }
     }
 
     if (GameClock.hours / 10 == 1)
     {
-        DrawBitmap(Number_1, 10, 10);
+        DrawBitmap(Number_1, UpperClock.hour1_x, UpperClock.hour1_y);
         switch (GameClock.hours % 10)
         {
         case 0:
-            DrawBitmap(Number_0, 20, 10);
+            DrawBitmap(Number_0, UpperClock.hour2_x, UpperClock.hour2_y);
             break;
 
         case 1:
-            DrawBitmap(Number_1, 20, 10);
+            DrawBitmap(Number_1,UpperClock.hour2_x, UpperClock.hour2_y);
             break;
 
         case 2:
-            DrawBitmap(Number_2, 20, 10);
+            DrawBitmap(Number_2, UpperClock.hour2_x, UpperClock.hour2_y);
             break;
 
         case 3:
-            DrawBitmap(Number_3, 20, 10);
+            DrawBitmap(Number_3,UpperClock.hour2_x, UpperClock.hour2_y);
             break;
 
         case 4:
-            DrawBitmap(Number_4, 20, 10);
+            DrawBitmap(Number_4, UpperClock.hour2_x, UpperClock.hour2_y);
             break;
 
         case 5:
-            DrawBitmap(Number_5, 20, 10);
+            DrawBitmap(Number_5,UpperClock.hour2_x, UpperClock.hour2_y);
             break;
 
         case 6:
-            DrawBitmap(Number_6, 20, 10);
+            DrawBitmap(Number_6, UpperClock.hour2_x, UpperClock.hour2_y);
             break;
 
         case 7:
-            DrawBitmap(Number_7, 20, 10);
+            DrawBitmap(Number_7,UpperClock.hour2_x, UpperClock.hour2_y);
             break;
 
         case 8:
-            DrawBitmap(Number_8, 20, 10);
+            DrawBitmap(Number_8, UpperClock.hour2_x, UpperClock.hour2_y);
             break;
 
         case 9:
-            DrawBitmap(Number_9, 20, 10);
+            DrawBitmap(Number_9, UpperClock.hour2_x, UpperClock.hour2_y);
             break;
         }
     }
 
     if (GameClock.hours / 10 == 2)
     {
-        DrawBitmap(Number_2, 10, 10);
+        DrawBitmap(Number_2,UpperClock.hour1_x, UpperClock.hour1_y);
         switch (GameClock.hours % 10)
         {
         case 0:
-            DrawBitmap(Number_0, 20, 10);
+            DrawBitmap(Number_0, UpperClock.hour2_x, UpperClock.hour2_y);
             break;
 
         case 1:
-            DrawBitmap(Number_1, 20, 10);
+            DrawBitmap(Number_1, UpperClock.hour2_x, UpperClock.hour2_y);
             break;
 
         case 2:
-            DrawBitmap(Number_2, 20, 10);
+            DrawBitmap(Number_2, UpperClock.hour2_x, UpperClock.hour2_y);
             break;
 
         case 3:
-            DrawBitmap(Number_3, 20, 10);
+            DrawBitmap(Number_3,UpperClock.hour2_x, UpperClock.hour2_y);
             break;
 
         case 4:
-            DrawBitmap(Number_4, 20, 10);
+            DrawBitmap(Number_4,UpperClock.hour2_x, UpperClock.hour2_y);
             break;
 
         }
     }
 
-    DrawBitmap(Double_Dots, 30, 12);
+    DrawBitmap(Double_Dots,  UpperClock.dd1_x, UpperClock.dd1_y);
 
     //draw min
     if (GameClock.minutes / 10 == 0)
     {
-        DrawBitmap(Number_0, 35, 10);
+        DrawBitmap(Number_0,  UpperClock.minute1_x, UpperClock.minute1_y);
         switch (GameClock.minutes % 10)
         {
         case 0:
-            DrawBitmap(Number_0, 45, 10);
+            DrawBitmap(Number_0, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 1:
-            DrawBitmap(Number_1, 45, 10);
+            DrawBitmap(Number_1, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 2:
-            DrawBitmap(Number_2, 45, 10);
+            DrawBitmap(Number_2, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 3:
-            DrawBitmap(Number_3, 45, 10);
+            DrawBitmap(Number_3, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 4:
-            DrawBitmap(Number_4, 45, 10);
+            DrawBitmap(Number_4, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 5:
-            DrawBitmap(Number_5, 45, 10);
+            DrawBitmap(Number_5, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 6:
-            DrawBitmap(Number_6, 45, 10);
+            DrawBitmap(Number_6, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 7:
-            DrawBitmap(Number_7, 45, 10);
+            DrawBitmap(Number_7, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 8:
-            DrawBitmap(Number_8, 45, 10);
+            DrawBitmap(Number_8, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 9:
-            DrawBitmap(Number_9, 45, 10);
+            DrawBitmap(Number_9, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         }
     }
 
     if (GameClock.minutes / 10 == 1)
     {
-        DrawBitmap(Number_1, 35, 10);
+        DrawBitmap(Number_1,  UpperClock.minute1_x, UpperClock.minute1_y);
         switch (GameClock.minutes % 10)
         {
         case 0:
-            DrawBitmap(Number_0, 45, 10);
+            DrawBitmap(Number_0, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 1:
-            DrawBitmap(Number_1, 45, 10);
+            DrawBitmap(Number_1, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 2:
-            DrawBitmap(Number_2, 45, 10);
+            DrawBitmap(Number_2, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 3:
-            DrawBitmap(Number_3, 45, 10);
+            DrawBitmap(Number_3, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 4:
-            DrawBitmap(Number_4, 45, 10);
+            DrawBitmap(Number_4, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 5:
-            DrawBitmap(Number_5, 45, 10);
+            DrawBitmap(Number_5, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 6:
-            DrawBitmap(Number_6, 45, 10);
+            DrawBitmap(Number_6, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 7:
-            DrawBitmap(Number_7, 45, 10);
+            DrawBitmap(Number_7, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 8:
-            DrawBitmap(Number_8, 45, 10);
+            DrawBitmap(Number_8, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 9:
-            DrawBitmap(Number_9, 45, 10);
+            DrawBitmap(Number_9, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         }
     }
 
     if (GameClock.minutes / 10 == 2)
     {
-        DrawBitmap(Number_2, 35, 10);
+        DrawBitmap(Number_2,  UpperClock.minute1_x, UpperClock.minute1_y);
         switch (GameClock.minutes % 10)
         {
         case 0:
-            DrawBitmap(Number_0, 45, 10);
+            DrawBitmap(Number_0, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 1:
-            DrawBitmap(Number_1, 45, 10);
+            DrawBitmap(Number_1, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 2:
-            DrawBitmap(Number_2, 45, 10);
+            DrawBitmap(Number_2, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 3:
-            DrawBitmap(Number_3, 45, 10);
+            DrawBitmap(Number_3, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 4:
-            DrawBitmap(Number_4, 45, 10);
+            DrawBitmap(Number_4, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 5:
-            DrawBitmap(Number_5, 45, 10);
+            DrawBitmap(Number_5, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 6:
-            DrawBitmap(Number_6, 45, 10);
+            DrawBitmap(Number_6, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 7:
-            DrawBitmap(Number_7, 45, 10);
+            DrawBitmap(Number_7, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 8:
-            DrawBitmap(Number_8, 45, 10);
+            DrawBitmap(Number_8, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 9:
-            DrawBitmap(Number_9, 45, 10);
+            DrawBitmap(Number_9, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         }
     }
 
     if (GameClock.minutes / 10 == 3)
     {
-        DrawBitmap(Number_3, 35, 10);
+        DrawBitmap(Number_3, UpperClock.minute1_x, UpperClock.minute1_y);
         switch (GameClock.minutes % 10)
         {
         case 0:
-            DrawBitmap(Number_0, 45, 10);
+            DrawBitmap(Number_0, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 1:
-            DrawBitmap(Number_1, 45, 10);
+            DrawBitmap(Number_1, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 2:
-            DrawBitmap(Number_2, 45, 10);
+            DrawBitmap(Number_2, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 3:
-            DrawBitmap(Number_3, 45, 10);
+            DrawBitmap(Number_3, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 4:
-            DrawBitmap(Number_4, 45, 10);
+            DrawBitmap(Number_4, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 5:
-            DrawBitmap(Number_5, 45, 10);
+            DrawBitmap(Number_5, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 6:
-            DrawBitmap(Number_6, 45, 10);
+            DrawBitmap(Number_6, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 7:
-            DrawBitmap(Number_7, 45, 10);
+            DrawBitmap(Number_7, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 8:
-            DrawBitmap(Number_8, 45, 10);
+            DrawBitmap(Number_8, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 9:
-            DrawBitmap(Number_9, 45, 10);
+            DrawBitmap(Number_9, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         }
     }
 
     if (GameClock.minutes / 10 == 4)
     {
-        DrawBitmap(Number_4, 35, 10);
+        DrawBitmap(Number_4, UpperClock.minute1_x, UpperClock.minute1_y);
         switch (GameClock.minutes % 10)
         {
         case 0:
-            DrawBitmap(Number_0, 45, 10);
+            DrawBitmap(Number_0, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 1:
-            DrawBitmap(Number_1, 45, 10);
+            DrawBitmap(Number_1, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 2:
-            DrawBitmap(Number_2, 45, 10);
+            DrawBitmap(Number_2, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 3:
-            DrawBitmap(Number_3, 45, 10);
+            DrawBitmap(Number_3, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 4:
-            DrawBitmap(Number_4, 45, 10);
+            DrawBitmap(Number_4, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 5:
-            DrawBitmap(Number_5, 45, 10);
+            DrawBitmap(Number_5, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 6:
-            DrawBitmap(Number_6, 45, 10);
+            DrawBitmap(Number_6, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 7:
-            DrawBitmap(Number_7, 45, 10);
+            DrawBitmap(Number_7, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 8:
-            DrawBitmap(Number_8, 45, 10);
+            DrawBitmap(Number_8, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 9:
-            DrawBitmap(Number_9, 45, 10);
+            DrawBitmap(Number_9, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         }
     }
 
     if (GameClock.minutes / 10 == 5)
     {
-        DrawBitmap(Number_5, 35, 10);
+        DrawBitmap(Number_5,  UpperClock.minute1_x, UpperClock.minute1_y);
         switch (GameClock.minutes % 10)
         {
         case 0:
-            DrawBitmap(Number_0, 45, 10);
+            DrawBitmap(Number_0, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 1:
-            DrawBitmap(Number_1, 45, 10);
+            DrawBitmap(Number_1, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 2:
-            DrawBitmap(Number_2, 45, 10);
+            DrawBitmap(Number_2, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 3:
-            DrawBitmap(Number_3, 45, 10);
+            DrawBitmap(Number_3, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 4:
-            DrawBitmap(Number_4, 45, 10);
+            DrawBitmap(Number_4, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 5:
-            DrawBitmap(Number_5, 45, 10);
+            DrawBitmap(Number_5, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 6:
-            DrawBitmap(Number_6, 45, 10);
+            DrawBitmap(Number_6, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 7:
-            DrawBitmap(Number_7, 45, 10);
+            DrawBitmap(Number_7, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 8:
-            DrawBitmap(Number_8, 45, 10);
+            DrawBitmap(Number_8, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         case 9:
-            DrawBitmap(Number_9, 45, 10);
+            DrawBitmap(Number_9, UpperClock.minute2_x, UpperClock.minute2_y);
             break;
         }
     }
 
     if (GameClock.minutes == 60)
     {
-        DrawBitmap(Number_6, 35, 10);
-        DrawBitmap(Number_0, 45, 10);
+        DrawBitmap(Number_6,  UpperClock.minute1_x, UpperClock.minute1_y);
+        DrawBitmap(Number_0,  UpperClock.minute2_x, UpperClock.minute2_y);
     }
 
-    DrawBitmap(Double_Dots, 55, 12);
+    DrawBitmap(Double_Dots, UpperClock.dd2_x, UpperClock.dd2_y);
 
     //draw sec
 
     if ((GameClock.seconds / 10) == 0)
     {
-        DrawBitmap(Number_0, 60, 10);
+        DrawBitmap(Number_0,UpperClock.second1_x, UpperClock.second1_y);
         switch (GameClock.seconds % 10)
         {
         case 0:
-            DrawBitmap(Number_0, 70, 10);
+            DrawBitmap(Number_0, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 1:
-            DrawBitmap(Number_1, 70, 10);
+            DrawBitmap(Number_1, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 2:
-            DrawBitmap(Number_2, 70, 10);
+            DrawBitmap(Number_2, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 3:
-            DrawBitmap(Number_3, 70, 10);
+            DrawBitmap(Number_3, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 4:
-            DrawBitmap(Number_4, 70, 10);
+            DrawBitmap(Number_4, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 5:
-            DrawBitmap(Number_5, 70, 10);
+            DrawBitmap(Number_5, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 6:
-            DrawBitmap(Number_6, 70, 10);
+            DrawBitmap(Number_6, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 7:
-            DrawBitmap(Number_7, 70, 10);
+            DrawBitmap(Number_7, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 8:
-            DrawBitmap(Number_8, 70, 10);
+            DrawBitmap(Number_8, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 9:
-            DrawBitmap(Number_9, 70, 10);
+            DrawBitmap(Number_9, UpperClock.second2_x, UpperClock.second2_y);
             break;
         }
     }
     if ((GameClock.seconds / 10) == 1)
     {
-        DrawBitmap(Number_1, 60, 10);
+        DrawBitmap(Number_1, UpperClock.second1_x, UpperClock.second1_y);
         switch (GameClock.seconds % 10)
         {
         case 0:
-            DrawBitmap(Number_0, 70, 10);
+            DrawBitmap(Number_0, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 1:
-            DrawBitmap(Number_1, 70, 10);
+            DrawBitmap(Number_1, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 2:
-            DrawBitmap(Number_2, 70, 10);
+            DrawBitmap(Number_2, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 3:
-            DrawBitmap(Number_3, 70, 10);
+            DrawBitmap(Number_3, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 4:
-            DrawBitmap(Number_4, 70, 10);
+            DrawBitmap(Number_4, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 5:
-            DrawBitmap(Number_5, 70, 10);
+            DrawBitmap(Number_5, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 6:
-            DrawBitmap(Number_6, 70, 10);
+            DrawBitmap(Number_6, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 7:
-            DrawBitmap(Number_7, 70, 10);
+            DrawBitmap(Number_7, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 8:
-            DrawBitmap(Number_8, 70, 10);
+            DrawBitmap(Number_8, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 9:
-            DrawBitmap(Number_9, 70, 10);
+            DrawBitmap(Number_9, UpperClock.second2_x, UpperClock.second2_y);
             break;
         }
     }
     if ((GameClock.seconds / 10) == 2)
     {
-        DrawBitmap(Number_2, 60, 10);
+        DrawBitmap(Number_2, UpperClock.second1_x, UpperClock.second1_y);
         switch (GameClock.seconds % 10)
         {
         case 0:
-            DrawBitmap(Number_0, 70, 10);
+            DrawBitmap(Number_0, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 1:
-            DrawBitmap(Number_1, 70, 10);
+            DrawBitmap(Number_1, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 2:
-            DrawBitmap(Number_2, 70, 10);
+            DrawBitmap(Number_2, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 3:
-            DrawBitmap(Number_3, 70, 10);
+            DrawBitmap(Number_3, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 4:
-            DrawBitmap(Number_4, 70, 10);
+            DrawBitmap(Number_4, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 5:
-            DrawBitmap(Number_5, 70, 10);
+            DrawBitmap(Number_5, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 6:
-            DrawBitmap(Number_6, 70, 10);
+            DrawBitmap(Number_6, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 7:
-            DrawBitmap(Number_7, 70, 10);
+            DrawBitmap(Number_7, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 8:
-            DrawBitmap(Number_8, 70, 10);
+            DrawBitmap(Number_8, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 9:
-            DrawBitmap(Number_9, 70, 10);
+            DrawBitmap(Number_9, UpperClock.second2_x, UpperClock.second2_y);
             break;
         }
     }
     if ((GameClock.seconds / 10) == 3)
     {
-        DrawBitmap(Number_3, 60, 10);
+        DrawBitmap(Number_3, UpperClock.second1_x, UpperClock.second1_y);
         switch (GameClock.seconds % 10)
         {
         case 0:
-            DrawBitmap(Number_0, 70, 10);
+            DrawBitmap(Number_0, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 1:
-            DrawBitmap(Number_1, 70, 10);
+            DrawBitmap(Number_1, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 2:
-            DrawBitmap(Number_2, 70, 10);
+            DrawBitmap(Number_2, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 3:
-            DrawBitmap(Number_3, 70, 10);
+            DrawBitmap(Number_3, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 4:
-            DrawBitmap(Number_4, 70, 10);
+            DrawBitmap(Number_4, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 5:
-            DrawBitmap(Number_5, 70, 10);
+            DrawBitmap(Number_5, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 6:
-            DrawBitmap(Number_6, 70, 10);
+            DrawBitmap(Number_6, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 7:
-            DrawBitmap(Number_7, 70, 10);
+            DrawBitmap(Number_7, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 8:
-            DrawBitmap(Number_8, 70, 10);
+            DrawBitmap(Number_8, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 9:
-            DrawBitmap(Number_9, 70, 10);
+            DrawBitmap(Number_9, UpperClock.second2_x, UpperClock.second2_y);
             break;
         }
     }
     if ((GameClock.seconds / 10) == 4)
     {
-        DrawBitmap(Number_4, 60, 10);
+        DrawBitmap(Number_4, UpperClock.second1_x, UpperClock.second1_y);
         switch (GameClock.seconds % 10)
         {
         case 0:
-            DrawBitmap(Number_0, 70, 10);
+            DrawBitmap(Number_0, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 1:
-            DrawBitmap(Number_1, 70, 10);
+            DrawBitmap(Number_1, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 2:
-            DrawBitmap(Number_2, 70, 10);
+            DrawBitmap(Number_2, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 3:
-            DrawBitmap(Number_3, 70, 10);
+            DrawBitmap(Number_3, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 4:
-            DrawBitmap(Number_4, 70, 10);
+            DrawBitmap(Number_4, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 5:
-            DrawBitmap(Number_5, 70, 10);
+            DrawBitmap(Number_5, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 6:
-            DrawBitmap(Number_6, 70, 10);
+            DrawBitmap(Number_6, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 7:
-            DrawBitmap(Number_7, 70, 10);
+            DrawBitmap(Number_7, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 8:
-            DrawBitmap(Number_8, 70, 10);
+            DrawBitmap(Number_8, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 9:
-            DrawBitmap(Number_9, 70, 10);
+            DrawBitmap(Number_9, UpperClock.second2_x, UpperClock.second2_y);
             break;
         }
     }
     if ((GameClock.seconds / 10) == 5)
     {
-        DrawBitmap(Number_5, 60, 10);
+        DrawBitmap(Number_5, UpperClock.second1_x, UpperClock.second1_y);
         switch (GameClock.seconds % 10)
         {
         case 0:
-            DrawBitmap(Number_0, 70, 10);
+            DrawBitmap(Number_0, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 1:
-            DrawBitmap(Number_1, 70, 10);
+            DrawBitmap(Number_1, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 2:
-            DrawBitmap(Number_2, 70, 10);
+            DrawBitmap(Number_2, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 3:
-            DrawBitmap(Number_3, 70, 10);
+            DrawBitmap(Number_3, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 4:
-            DrawBitmap(Number_4, 70, 10);
+            DrawBitmap(Number_4, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 5:
-            DrawBitmap(Number_5, 70, 10);
+            DrawBitmap(Number_5, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 6:
-            DrawBitmap(Number_6, 70, 10);
+            DrawBitmap(Number_6, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 7:
-            DrawBitmap(Number_7, 70, 10);
+            DrawBitmap(Number_7, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 8:
-            DrawBitmap(Number_8, 70, 10);
+            DrawBitmap(Number_8, UpperClock.second2_x, UpperClock.second2_y);
             break;
         case 9:
-            DrawBitmap(Number_9, 70, 10);
+            DrawBitmap(Number_9, UpperClock.second2_x, UpperClock.second2_y);
             break;
         }
         if (GameClock.seconds == 60)
         {
-            DrawBitmap(Number_6, 60, 10);
-            DrawBitmap(Number_0, 70, 10);
+            DrawBitmap(Number_6, UpperClock.second1_x, UpperClock.second1_y);
+            DrawBitmap(Number_0, UpperClock.second2_x, UpperClock.second2_y);
         }
     }
 }
