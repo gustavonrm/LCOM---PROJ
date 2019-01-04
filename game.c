@@ -15,6 +15,8 @@ Bitmap *Tool_Box;
 Bitmap *Loading_Screen;
 Bitmap *Main_Page;
 Bitmap *Pause_Menu;
+Bitmap *Name_Box;
+Bitmap *Info_Box;
 
 //mouse manip
 Bitmap *P_Cursor;
@@ -108,7 +110,12 @@ Animation *Explosion;
 
 extern Cursor *cursor;
 extern SpellCast SpellsRdy;
+
+//menu
 extern GameUtils GameMenus;
+extern enum player_name name_status_single;
+extern enum player_name name_status_multi;
+extern bool Gamerules;
 
 //List of all Sprites
 
@@ -117,6 +124,10 @@ bool LoadAssets()
     if ((Pause_Menu = loadBitmap("Pause_Menu.bmp")) == NULL)
         return false;
     if ((Main_Page = loadBitmap("Main_Page.bmp")) == NULL)
+        return false;
+    if ((Name_Box = loadBitmap("Name_Box.bmp")) == NULL)
+        return false;
+    if ((Info_Box = loadBitmap("Info_Box.bmp")) == NULL)
         return false;
 
     if ((background = loadBitmap("Background.bmp")) == NULL)
@@ -464,6 +475,9 @@ void DrawCursor(Cursor *cursor)
     else
         DrawBitmap(cursor->released, cursor->x, cursor->y);
 
+    
+        printf( "mouse x:%d", cursor->x); 
+        printf( "mouse y:%d\n", cursor->y); 
 
 }
 
@@ -1028,6 +1042,22 @@ void Update_Game_State()
         DrawMainPage();
         DrawCursor(cursor);
         main_menu();
+
+        if( Gamerules == true){
+            DrawInfoBox(); 
+            DrawCursor(cursor);
+        }
+
+        if (name_status_single == get)
+        {
+            DrawBitmap(Name_Box, 210, 240);
+            Draw_string(250, 300);
+        }
+        if (name_status_multi == get)
+        {
+            DrawBitmap(Name_Box, 210, 410);
+            Draw_string(250, 470);
+        }
     }
 
     if (GameMenus.run == 1)
@@ -1141,7 +1171,7 @@ void Update_Game_State()
             }
         }
 
-       // DrawToolBox();
+        // DrawToolBox();
         DrawTimers();
 
         if (openTextBox == true)
@@ -1150,7 +1180,7 @@ void Update_Game_State()
             // cada letra uma a uma e por cada letra vai dando display no ecra a letra respetiva uma a uma
             DrawTextBox();
             //DrawTextPointer();
-            Draw_string();
+            Draw_string(45, 680);
         }
 
         DrawClock();
@@ -1173,6 +1203,7 @@ void Update_Game_State()
             }
         }
         DrawCursor(cursor);
+        DrawPlayerName();
     }
 }
 

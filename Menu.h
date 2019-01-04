@@ -13,6 +13,13 @@ typedef struct
 
 } GameUtils;
 
+enum player_name
+{
+    empty,
+    get, 
+    done 
+};
+
 
 void main_menu(); 
 

@@ -40,6 +40,7 @@ enum Element_Type
     Fire = 3,
     Null = 0
 };
+
 enum Wizard_color
 {
     Red,
@@ -136,6 +137,7 @@ void Draw_Animation(Animation* animation, int center_x, int center_y, int frame_
 void Player_Cast(Wizard* player, Cursor* cursor); //Handles spell casting for players
 enum Spell_Type Get_Spell_Type(Cursor* cursor); //Gets what type of spell to cast depending on the cursor attributes
 bool Check_Cursor(Cursor* cursor, enum Spell_Type spell_type);
+
 
 Wizard* CreateWizard(enum Wizard_color color, int center_x, int center_y, unsigned int rot, char* name) ;
 void DrawWizard(Wizard *wizard);
