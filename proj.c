@@ -14,6 +14,7 @@
 extern Bitmap *background;
 Cursor *cursor;
 Wizard *player;
+Wizard *player2;
 Bot *bot1;
 Bot *bot2;
 Bot *bot3;
@@ -55,13 +56,20 @@ int main(int argc, char *argv[])
 int Arena()
 {
   cursor = CreateCursor(512, 500);
-  player = CreateWizard(Green, 512, 600, 0, username);
-  bot1 = CreateBot(Blue, 200, 384, "Blue Bobs");
-  bot2 = CreateBot(Red, 900, 384, "Commy");
-  bot3 = CreateBot(Yellow, 512, 100, "Bumbble Bee");
 
-  //Update_Game_State();
-  //UpdateVideo();
+  if(Host)
+  {
+    player = CreateWizard(Green, 512, 600, 0, username);
+    bot1 = CreateBot(Blue, 200, 384, "Blue Bobs");
+    bot2 = CreateBot(Red, 900, 384, "Commy");
+    player2 = CreateWizard(Yellow, 512, 100, 180, username);
+  }
+  else{
+    bot3 = CreateBot(Green, 512, 100, "Bumbble Bee");
+    bot1 = CreateBot(Blue, 900, 384, "Blue Bobs");
+    bot2 = CreateBot(Red, 200, 384, "Commy");
+    player = CreateWizard(Yellow, 512, 600, 0, username);
+  }
 
   int counter = 0;
   uint16_t key = 0;
@@ -70,8 +78,6 @@ int Arena()
   int r;
   message msg;
   int ipc_status;
-  //unsigned int freq = 1; //frequency of updates(bcs there are 60 ticks/sec)
-  //int frame_n = 0;
 
   uint8_t bit_no, bit_no_t, bit_no_m, bit_no_rtc, bit_no_serial;
 
@@ -102,16 +108,23 @@ int Arena()
     return 1;
   }
 
-   if (subscribe_serial(&bit_no_serial) != 0)
+  uint32_t irq_serial = 9999999;
+
+  if(MP)
   {
-    return 1;
+    if (subscribe_serial(&bit_no_serial) != 0)
+    {
+      return 1;
+    }
+    irq_serial = BIT(bit_no_serial);
   }
 
-  sleep(3);
+  uint32_t irq_kbd = BIT(bit_no), irq_timer0 = BIT(bit_no_t), irq_mouse = BIT(bit_no_m), irq_rtc = BIT(bit_no_rtc);
 
-  Send_Name(username);
+  //Update_Game_State();
+  //UpdateVideo();
 
-  uint32_t irq_kbd = BIT(bit_no), irq_timer0 = BIT(bit_no_t), irq_mouse = BIT(bit_no_m), irq_rtc = BIT(bit_no_rtc), irq_serial = BIT(bit_no_serial);
+  //printf("\n READY");
 
   while ((key != ESC_BREAK))
   {
@@ -132,8 +145,10 @@ int Arena()
           {
             spell_utilities();
           }
-          //Update_Game_State();
-          //UpdateVideo();
+          Update_Game_State();
+          UpdateVideo();
+          //if(Host) Send_Game_Info();
+          //else Send_Wizard(player,3);
         }
 
         if (msg.m_notify.interrupts & irq_kbd)
@@ -155,12 +170,12 @@ int Arena()
         }
         //RTC
         if (msg.m_notify.interrupts & irq_rtc){
-          //rtc_ih(); 
+          rtc_ih(); 
         }
 
         if (msg.m_notify.interrupts & irq_serial)
         { //If there's something to read
-          serial_ih();
+          if(MP) serial_ih();
         }
         
 
@@ -171,9 +186,12 @@ int Arena()
     }
   }
 
-  if( unsubscribe_serial() != 0)
+  if(MP)
   {
-    return 1;
+    if( unsubscribe_serial() != 0)
+    {
+      return 1;
+    }
   }
 
   if (unsubscribe_mouse() != 0)
@@ -202,22 +220,33 @@ int Arena()
   return 0;
 }
 
-int(proj_main_loop)()
+int(proj_main_loop)(int argc, char *argv[])
 {
+  if(argc == 1) Host = true;
+  else Host = false;
+  MP = true;
+  if(*argv[0] == 1) printf("\n UAU");
+  if(Host){
+    printf("\n HOST \n");
+  }
+  else{
+    printf("\n GUEST \n");
+  }
+
+  vg_init(0x144);
+
   if (!LoadAssets())
   {
     vg_exit();
     return 1;
   }
 
-  //vg_init(0x144);
-
   time_t t;
   srand((unsigned)time(&t));
 
   Arena();
 
-  //vg_exit();
+  vg_exit();
   return 0;
 }
 

@@ -1,6 +1,8 @@
 #ifndef __SERIAL_H
 #define __SERIAL_H
 
+#include "game.h"
+
 #define BIT(n) (0x01<<(n))
 
 #define COM1        0x3F8
@@ -53,7 +55,16 @@ void read_char(uint8_t* values);
 uint8_t serial_ih();
 
 void Check_Recieve();
-void Recieve_Name(uint8_t* data);
+
+uint8_t* Recieve_Name(uint8_t* data);
 bool Send_Name(char* name);
+
+bool Send_Wizard(Wizard* wizard, int array_pos);
+uint8_t* Recieve_Wizard(uint8_t* data);
+
+bool Send_Element(Element* element, int array_pos);
+uint8_t* Recieve_Element(uint8_t* data);
+
+void Clear_UART();
 
 #endif

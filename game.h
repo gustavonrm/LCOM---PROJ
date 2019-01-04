@@ -50,11 +50,11 @@ enum Wizard_color
 
 enum Spell_Type
 {
-    Launch,
+    Launch = 1,
     //Control,
     //Circle,
     //Aura,
-    None
+    None = 0
 };
 
 typedef struct
@@ -100,6 +100,8 @@ typedef struct {
 
     bool destroyed;
 
+    int array_position;
+
 } Element;
 
 typedef struct
@@ -128,6 +130,7 @@ typedef struct
 bool LoadAssets(); //Loads all of the bitmaps and saves them in sprites, bmps or animations
 void DrawToolBox();
 
+//animation
 Animation* CreateAnimation(char animation_name[], int n_frames, int ticks_per_frame); //Used to load animations
 void Get_Animation(Wizard* wizard); //Get correct casting animation for a wizard
 void Draw_Animation(Animation* animation, int center_x, int center_y, int frame_n, int *try_n, unsigned int rot);
@@ -175,5 +178,9 @@ void DrawTimers();
 
 //video
 void Update_Game_State();
+
+//Multiplayer
+void Send_Game_Info();
+Element* Create_Guest_Element(int array_pos, int8_t elem_type, uint8_t spell_type);
 
 #endif
