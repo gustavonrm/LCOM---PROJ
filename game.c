@@ -387,11 +387,12 @@ Wizard *CreateWizard(enum Wizard_color color, int center_x, int center_y, unsign
 
 void Wizard_Colision(Wizard *wizard, Element *element)
 {
-    if (element->elem_type != Null)
+    if (element->elem_type != Null && element->active)
     {
         element->active = false;
         wizard->health--;
-        Send_Element(element,element->array_position);
+        printf("\n %s :  %d HEALTH", wizard->name, wizard->health);
+        if(MP) Send_Element(element,element->array_position);
     }
 }
 
@@ -438,7 +439,7 @@ Element *CreateElement(Wizard *wizard)
         {
             elements[i] = elem;
             elem->array_position = i;
-            Send_Element(elem,i);
+            if(MP) Send_Element(elem,i);
             break;
         }
     }
@@ -529,8 +530,8 @@ void Element_Colision(Element *element1, Element *element2)
     { //Destroy both for elements of opposing types
         element1->active = false;
         element2->active = false;
-        Send_Element(element1, element1->array_position);
-        Send_Element(element2, element2->array_position);
+        if(MP) Send_Element(element1, element1->array_position);
+        if(MP) Send_Element(element2, element2->array_position);
     }
     else
     { //If they're consecutive elements decie which to destroy
@@ -540,24 +541,24 @@ void Element_Colision(Element *element1, Element *element2)
             if (element1->elem_type == Air)
             {
                 element1->active = false;
-                Send_Element(element1, element1->array_position);
+                if(MP) Send_Element(element1, element1->array_position);
             }
             else
             {
                 element2->active = false;
-                Send_Element(element2, element2->array_position);
+                if(MP) Send_Element(element2, element2->array_position);
             }
             return;
         }
         if (abs(e1) > abs(e2))
         {
             element1->active = false; //Highest element gets destroyed
-            Send_Element(element1, element1->array_position);
+            if(MP) Send_Element(element1, element1->array_position);
         }
         else
         {
             element2->active = false;
-            Send_Element(element2, element2->array_position);
+            if(MP) Send_Element(element2, element2->array_position);
         }
     }
 }
@@ -1082,7 +1083,6 @@ void Update_Game_State()
 
     if (GameMenus.run == 1)
     {
-        printf("\n Running game");
         if((MP && Host) || !MP)
         {
             ////BOT UPDATES//// (Only Host or singleplayer)
