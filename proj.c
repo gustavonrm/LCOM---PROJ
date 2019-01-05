@@ -108,7 +108,7 @@ int Arena()
 
   uint32_t irq_kbd = BIT(bit_no), irq_timer0 = BIT(bit_no_t), irq_mouse = BIT(bit_no_m), irq_rtc = BIT(bit_no_rtc);
 
-  printf("\n EVERYTHING SUBSCRBIED"); //debug
+  printf("\n EVERYTHING SUBSCRBIED");
 
   while (GameMenus.game_onoff == true)
   {
@@ -124,13 +124,17 @@ int Arena()
       case HARDWARE:
         if (msg.m_notify.interrupts & irq_timer0)
         { //TIMER
+        if(GameMenus.pause==false){
           counter = timer_ih();
           if (counter == 60)
           {
             spell_utilities();
           }
+        }
           Update_Game_State();
           UpdateVideo();
+          //if(Host) Send_Game_Info();
+          //else Send_Wizard(player,3);
         }
 
         if (msg.m_notify.interrupts & irq_kbd)
