@@ -93,13 +93,12 @@ int Arena()
     return 1;
   }
 
-  //subscribe RTC
   if (subscribe_rtc(&bit_no_rtc) != 0)
   {
     return 1;
   }
 
-  uint32_t irq_serial = 9999999;
+  uint32_t irq_serial = 9999999; //just so it is initialized
 
   if (subscribe_serial(&bit_no_serial) != 0)
   {
@@ -108,6 +107,8 @@ int Arena()
   irq_serial = BIT(bit_no_serial);
 
   uint32_t irq_kbd = BIT(bit_no), irq_timer0 = BIT(bit_no_t), irq_mouse = BIT(bit_no_m), irq_rtc = BIT(bit_no_rtc);
+
+  printf("\n EVERYTHING SUBSCRBIED");
 
   while (GameMenus.game_onoff == true)
   {
@@ -176,13 +177,11 @@ int Arena()
     }
   }
 
-  if(MP)
+  if( unsubscribe_serial() != 0)
   {
-    if( unsubscribe_serial() != 0)
-    {
-      return 1;
-    }
+    return 1;
   }
+
 
   if (unsubscribe_mouse() != 0)
   {

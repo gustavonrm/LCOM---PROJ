@@ -1082,6 +1082,7 @@ void Update_Game_State()
 
     if (GameMenus.run == 1)
     {
+        printf("\n Running game");
         if((MP && Host) || !MP)
         {
             ////BOT UPDATES//// (Only Host or singleplayer)

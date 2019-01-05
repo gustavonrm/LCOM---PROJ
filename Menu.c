@@ -34,7 +34,6 @@ void main_menu()
 {
      if(GameMenus.main_page && Host && username_2 != NULL)
      { //If Host and got Guest Name
-          MP = true;
           GameMenus.main_page = false;
           GameMenus.run = 1;
 
@@ -50,6 +49,12 @@ void main_menu()
      {
           GameMenus.main_page = false;
           GameMenus.run = 1;
+          MP = false;
+
+          player = CreateWizard(Green, 512, 600, 0, username);
+          bot1 = CreateBot(Blue, 200, 384, "Bot: Bob");
+          bot2 = CreateBot(Red, 900, 384, "Bot: Commy");
+          bot3 = CreateBot(Yellow, 512, 100, "Bot: Pie");
      }
 
      //condition for multi player
@@ -66,7 +71,6 @@ void main_menu()
                Send_Name(username);
                GameMenus.main_page = false;
                GameMenus.run = 1;
-               MP = true;
               
                bot3 = CreateBot(Green, 512, 100, "Bumbble Bee");
                bot1 = CreateBot(Blue, 900, 384, "Blue Bobs");
@@ -75,6 +79,7 @@ void main_menu()
 
                printf("multiplayer rdy as GUEST\n");
           }
+          MP = true;
      }
 
      //conditon to leave game
