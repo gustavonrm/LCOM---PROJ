@@ -40,9 +40,9 @@ void main_menu()
           player = CreateWizard(Green, 512, 600, 0, username);
           bot1 = CreateBot(Blue, 200, 384, "Blue Bobs");
           bot2 = CreateBot(Red, 900, 384, "Commy");
-          player2 = CreateWizard(Yellow, 512, 100, 180, username);
+          player2 = CreateWizard(Yellow, 512, 100, 180, username_2);
           
-          printf("multiplayer rdy\n");
+          printf("\n multiplayer rdy\n");
      }
      //condition for single player
      if (cursor->lb == true && cursor->x >= 210 && cursor->x <= 810 && cursor->y >= 240 && cursor->y <= 390)
@@ -72,10 +72,12 @@ void main_menu()
                GameMenus.main_page = false;
                GameMenus.run = 1;
               
-               bot3 = CreateBot(Green, 512, 100, "Bumbble Bee");
+               bot3 = CreateBot(Green, 512, 100, username_2);
                bot1 = CreateBot(Blue, 900, 384, "Blue Bobs");
                bot2 = CreateBot(Red, 200, 384, "Commy");
                player = CreateWizard(Yellow, 512, 600, 0, username);
+
+               tickdelay(micros_to_ticks(100));
 
                printf("multiplayer rdy as GUEST\n");
           }
