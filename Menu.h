@@ -20,11 +20,8 @@ enum player_name
     done 
 };
 
-
 void main_menu(); 
-
 void DrawLoadingScreen();
 void DrawPauseMenu(); 
-
 
 #endif

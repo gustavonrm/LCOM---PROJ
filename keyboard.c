@@ -367,7 +367,7 @@ void GetPlayerName(uint16_t key)
 {
   write_key(key);
 
-  if (key == ENTER)
+  if (key == ENTER && strlen(words)!= 0)
   {
     //set player name
     printf("\n Setting name");
