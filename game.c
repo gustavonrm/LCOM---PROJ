@@ -391,7 +391,7 @@ void Wizard_Colision(Wizard *wizard, Element *element)
     {
         element->active = false;
         wizard->health--;
-        printf("\n %s :  %d HEALTH", wizard->name, wizard->health);
+        //printf("\n %s :  %d HEALTH", wizard->name, wizard->health); //debug
         if(MP) Send_Element(element,element->array_position);
     }
 }

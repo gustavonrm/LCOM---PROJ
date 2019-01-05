@@ -51,7 +51,7 @@ bool send_char(unsigned char value){
     if(fail == 50) return false; //If it's stuck here
     sys_inb(COM1 + LSR, &st);
     fail++;
-    printf("\n TRYING TO SEND: %c", value);
+    //printf("\n TRYING TO SEND: %c", value); //debug
   } while(!(st & UART_READY));
 
   sys_outb(COM1 + THR, value); //write to THR when ready
@@ -75,7 +75,7 @@ void read_char(uint8_t* values){
 }
 
 uint8_t serial_ih(){
-    printf("\n INTERRUPT GENERATED");
+    //printf("\n INTERRUPT GENERATED"); //debug
     uint32_t id = 0, data = 0;
 	
     sys_inb(COM1 + IIR, &id);
@@ -97,7 +97,7 @@ bool name = false, wizard = false, element = false;
 void Check_Recieve(){
     uint8_t* data = (uint8_t*) malloc(351); //enough for a lot of BYTES
     read_char(data);
-    printf("\n DATA: %c", *data);
+    //printf("\n DATA: %c", *data); //debug
     while(1){
         if(data == NULL) break;
         if(!name && !wizard && !element)
@@ -137,11 +137,11 @@ uint8_t* Recieve_Name(uint8_t* data){
         if((*data) == '/')
         {
             name = false;
-            printf("\nRECIEVED NAME: %s", recieved_name);
+            //printf("\nRECIEVED NAME: %s", recieved_name); //debug
             data++;
             first_letter = true;
             username_2 = &recieved_name[0];
-            printf("\n USERNAME_2: %s", username_2);
+            //printf("\n USERNAME_2: %s", username_2); //debug
             actual_it = 0;
             return data;
         }
@@ -155,20 +155,20 @@ uint8_t* Recieve_Name(uint8_t* data){
             actual_it++;
         }
     }
-    printf("\nINCOMPLETE NAME: %s", recieved_name);
+    //printf("\nINCOMPLETE NAME: %s", recieved_name); //debug
     return NULL;
 }
 
 bool Send_Name(char* name){
     unsigned int size = strlen(name);
-    printf("\n GOING TO SEND: %s", name);
+    //printf("\n GOING TO SEND: %s", name); //debug
     send_char('N');
     for(unsigned int i = 0; i < size; i++){
         if(!send_char(*name)) return false;
         name++;
     }
     send_char('/');
-    printf("\n NAME SENT: %s", name);
+    //printf("\n NAME SENT: %s", name); //debug
     return true;
 }
 
@@ -233,7 +233,7 @@ bool Send_Wizard(Wizard* wizard, int array_pos){ //Sending 9 Bytes per wizard
 unsigned int wiz_it = 0;
 bool wiz_first = true;
 uint8_t* Recieve_Wizard(uint8_t* data){
-    printf("\n Recieving Wizard");
+    //printf("\n Recieving Wizard"); //debug
     if(*data == 'W' && wiz_first) data++; wiz_it++; //To skip W header
     wiz_first = false;
 
@@ -315,7 +315,7 @@ uint8_t* Recieve_Wizard(uint8_t* data){
 
     if((*data) == '/') wizard = false;
     else{
-        printf("\nDIDN'T RECIEVE / \n");
+        //printf("\nDIDN'T RECIEVE / \n"); //debug
         data++;
         wiz_it = 0;
         wiz_first = true;
@@ -347,7 +347,7 @@ uint8_t* Recieve_Wizard(uint8_t* data){
     wizard->frame_n = (int) frame_n;
     wizard->try_n = (int) try_n;
 
-    printf("\n RECEIEVED WIZARD \n");
+    //printf("\n RECEIEVED WIZARD \n"); //debug
     /*printf("\n RECEIEVED: \n");
 
     printf("\nX_POS: %d", x_pos);
@@ -383,7 +383,7 @@ bool Send_Element(Element* element, int array_pos){ //Using 10B
     uint8_t frame_n = element->frame_n;
     uint8_t try_n = element->try_n;
 
-    printf("\nSEND ELEMENT");
+    //printf("\nSEND ELEMENT"); //debug
 
     if(!send_char('E')) return false;
 
@@ -423,7 +423,7 @@ bool elem_first;
 uint8_t* Recieve_Element(uint8_t* data){
     if(elem_first)data++;//To skip E header
 
-    printf("\n RECIEVING ELEMENT");
+    //printf("\n RECIEVING ELEMENT"); //debug
 
     int16_t x_pos;
     int16_t y_pos;
@@ -465,7 +465,6 @@ uint8_t* Recieve_Element(uint8_t* data){
     destroyed = ((*data) & 0x40) >> 6;
     spell_type = (*data) & 0x07;
     data++; 
-    printf("\n ACTIVE: %d", active); 
 
     elem_type = (*data);
     data++;  
@@ -477,7 +476,7 @@ uint8_t* Recieve_Element(uint8_t* data){
     data++;  
 
     if(*data != '/'){
-        printf("\n Didn't Recieve /");
+        //printf("\n Didn't Recieve /"); //debug
         data++;
         elem_first = true;
         element = false;
@@ -510,8 +509,8 @@ uint8_t* Recieve_Element(uint8_t* data){
     element->frame_n = (int) frame_n;
     element->try_n = (int) try_n;
 
-    printf("\n RECEIEVED ELEMENT: \n");
-/*
+    //printf("\n RECEIEVED ELEMENT: \n"); //debug
+    /*
     printf("\nX_POS: %d", x_pos);
     printf("\nY_POS: %d", y_pos);
 
@@ -534,7 +533,7 @@ void Clear_UART(){
     sys_inb(COM1 + LSR, &st);
     while (st & DATA_RECIEVED){ //Only read if there's anything there
 		sys_inb(COM1 + RBR, &data);
-        //printf("\nGOT SOMETHING: %c", data);
+        //printf("\nGOT SOMETHING: %c", data); //debug
         sys_inb(COM1 + LSR, &st);
 	}
 }
