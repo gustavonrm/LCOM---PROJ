@@ -20,8 +20,16 @@ enum player_name
     done 
 };
 
+enum game_result
+{
+    clean,
+    victory,
+    defeat
+};
+
 void main_menu(); 
 void DrawLoadingScreen();
-void DrawPauseMenu(); 
+void gameCondition(); 
+
 
 #endif
