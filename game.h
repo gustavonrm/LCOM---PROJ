@@ -121,10 +121,14 @@ typedef struct
     bool Water_Cast;
     bool Earth_Cast;
     bool Air_Cast;
+    bool Leap_Cast; 
+
     unsigned fire_timer;
     unsigned water_timer;
     unsigned earth_timer;
     unsigned air_timer;
+    unsigned leap_timer; 
+
 }SpellCast;
 
 //main layout
@@ -176,6 +180,7 @@ void DrawFireTimer();
 void DrawWaterTimer();
 void DrawEarthTimer();
 void DrawWindTimer();
+void DrawLeapTimer(); 
 void DrawTimers();
 
 //video

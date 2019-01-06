@@ -290,6 +290,7 @@ bool getSpell()
       SpellsRdy.Water_Cast = false;
       SpellsRdy.Earth_Cast = false;
       SpellsRdy.Air_Cast = false;
+      SpellsRdy.Leap_Cast = false;
       SpellsRdy.fire_timer = 0;
       return true;
     }
@@ -311,6 +312,7 @@ bool getSpell()
       SpellsRdy.Water_Cast = false;
       SpellsRdy.Earth_Cast = false;
       SpellsRdy.Air_Cast = true;
+      SpellsRdy.Leap_Cast = false;
       SpellsRdy.air_timer = 0;
       return true;
     }
@@ -332,6 +334,7 @@ bool getSpell()
       SpellsRdy.Water_Cast = false;
       SpellsRdy.Earth_Cast = true;
       SpellsRdy.Air_Cast = false;
+      SpellsRdy.Leap_Cast = false;
       SpellsRdy.earth_timer = 0;
       return true;
     }
@@ -353,6 +356,7 @@ bool getSpell()
       SpellsRdy.Water_Cast = true;
       SpellsRdy.Earth_Cast = false;
       SpellsRdy.Air_Cast = false;
+      SpellsRdy.Leap_Cast = false;
       SpellsRdy.water_timer = 0;
       return true;
     }
