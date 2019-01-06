@@ -9,7 +9,7 @@
 unsigned int ticks = 0;
 int timer_hook_id = 0; //used for timer
 
-SpellCast SpellsRdy = {0, 0, 0, 0, 0, 0, 0, 0}; 
+SpellCast SpellsRdy = {0, 0, 0, 0, 0, 5, 5, 5, 5, 3}; 
 
 extern unsigned int ticks;
 
@@ -70,11 +70,21 @@ void wind_ih()
   }
 }
 
+void leap_ih()
+{
+  if (SpellsRdy.leap_timer < 3)
+  {
+    SpellsRdy.leap_timer++;
+  }
+}
+
 void spell_utilities()
 {
   fire_ih();
   water_ih();
   earth_ih();
   wind_ih();
+
+  leap_ih(); 
 }
 

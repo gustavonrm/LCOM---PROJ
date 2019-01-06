@@ -7,23 +7,31 @@
 #include "video_card.h"
 #include "keyboard.h"
 #include "timer.h"
+#include "RTC.h"
+#include "serial.h"
+#include "Menu.h"
 #include <math.h>
 
 extern Bitmap *background;
 Cursor *cursor;
 Wizard *player;
+Wizard *player2;
 Bot *bot1;
 Bot *bot2;
 Bot *bot3;
-extern SpellCast SpellsRdy; 
-extern uint8_t pack;
-extern uint8_t packets[3];
+ 
 //keyboard
-extern uint16_t key;
+uint16_t key;
+//utils
+extern GameUtils GameMenus;
+extern enum player_name name_status_single;
+//extern enum player_name name_status_multi;
 
 //globat temporary vars
-
-
+bool MP = false; //true if playing in multiplayer
+bool Host = false; //True if player is host, false if player is guest
+char username[20] = "";
+char* username_2 = NULL;
 
 int main(int argc, char *argv[])
 {
@@ -32,11 +40,11 @@ int main(int argc, char *argv[])
 
   // enables to log function invocations that are being "wrapped" by LCF
   // [comment this out if you don't want/need it]
-  lcf_trace_calls("/home/lcom/labs/proj/trace.txt");
+  //lcf_trace_calls("/home/lcom/labs/proj/trace.txt");
 
   // enables to save the output of printf function calls on a file
   // [comment this out if you don't want/need it]
-  lcf_log_output("/home/lcom/labs/proj/output.txt");
+  //lcf_log_output("/home/lcom/labs/proj/output.txt");
 
   // handles control over to LCF
   // [LCF handles command line arguments and invokes the right function]
@@ -53,13 +61,6 @@ int main(int argc, char *argv[])
 int Arena()
 {
   cursor = CreateCursor(512, 500);
-  player = CreateWizard(Green, 512, 600, 0, "ALEX");
-  bot1 = CreateBot(Blue, 200, 384, "Blue Bobs");
-  bot2 = CreateBot(Red, 900, 384, "Commy");
-  bot3 = CreateBot(Yellow, 512, 100, "Bumbble Bee");
-
-  Update_Game_State();
-  UpdateVideo();
 
   int counter = 0;
   uint16_t key = 0;
@@ -68,10 +69,8 @@ int Arena()
   int r;
   message msg;
   int ipc_status;
-  //unsigned int freq = 1; //frequency of updates(bcs there are 60 ticks/sec)
-  //int frame_n = 0;
 
-  uint8_t bit_no, bit_no_t, bit_no_m;
+  uint8_t bit_no, bit_no_t, bit_no_m, bit_no_rtc, bit_no_serial;
 
   if (enable_stream() == 1)
   {
@@ -94,9 +93,24 @@ int Arena()
     return 1;
   }
 
-  uint32_t irq_kbd = BIT(bit_no), irq_timer0 = BIT(bit_no_t), irq_mouse = BIT(bit_no_m);
+  if (subscribe_rtc(&bit_no_rtc) != 0)
+  {
+    return 1;
+  }
 
-  while ((key != ESC_BREAK))
+  uint32_t irq_serial = 9999999; //just so it is initialized
+
+  if (subscribe_serial(&bit_no_serial) != 0)
+  {
+    return 1;
+  }
+  irq_serial = BIT(bit_no_serial);
+
+  uint32_t irq_kbd = BIT(bit_no), irq_timer0 = BIT(bit_no_t), irq_mouse = BIT(bit_no_m), irq_rtc = BIT(bit_no_rtc);
+
+  printf("\n EVERYTHING SUBSCRBIED");
+
+  while (GameMenus.game_onoff == true)
   {
     if ((r = driver_receive(ANY, &msg, &ipc_status)) != 0)
     {
@@ -108,73 +122,55 @@ int Arena()
       switch (_ENDPOINT_P(msg.m_source))
       {
       case HARDWARE:
-        if (msg.m_notify.interrupts & irq_timer0) //TIMER
-        {
+        if (msg.m_notify.interrupts & irq_timer0)
+        { //TIMER
+        if(GameMenus.pause==false){
           counter = timer_ih();
           if (counter == 60)
           {
             spell_utilities();
           }
+        }
           Update_Game_State();
           UpdateVideo();
+          //if(Host) Send_Game_Info();
+          //else Send_Wizard(player,3);
         }
 
-        if (msg.m_notify.interrupts & irq_kbd) //KEYBOARD
-        {
+        if (msg.m_notify.interrupts & irq_kbd)
+        { //KEYBOARD
           key = kbd_ih();
-          keyboard_utilities(key);
+          //get player name 
+          if (name_status_single == get)
+          {
+            GetPlayerName(key); 
+          }
+          else
+            keyboard_utilities(key);
         }
 
-        if (msg.m_notify.interrupts & irq_mouse) //MOUSE
-        {
+        if (msg.m_notify.interrupts & irq_mouse)
+        { //MOUSE
           mouse = mouse_int_h();
           if (mouse != NULL)
           { //if mouse recieved something useful
-            cursor->press = mouse->lb;
+            cursor->lb = mouse->lb;
+            cursor->rb = mouse->rb;
             cursor->x += mouse->delta_x;
             cursor->y -= mouse->delta_y; //it's - becuase y coordinates are counted downwards
-            int angle = atan2(player->center_y - cursor->y, cursor->x - player->center_x) * 180 / M_PI - 90;
-            if (angle < 0)
-              angle = 360 + angle;
-
-            //check line 136 in the future if problems
-            player->rot = angle;
-
-            if (!player->casting && SpellsRdy.Fire_Cast == true)
-            {
-              player->rot = angle;
-              player->casting = cursor->press; //THIS IS ONLY TEMPORARY(So user casts when LB is pressed)
-              if (player->casting)
-               SpellsRdy.Fire_Cast = false;
-              player->cast_type = Fire; //TEMPORARY
-            }
-
-            if (!player->casting &&  SpellsRdy. Water_Cast == true)
-            {
-              player->rot = angle;
-              player->casting = cursor->press; //THIS IS ONLY TEMPORARY(So user casts when LB is pressed)
-              if (player->casting)
-                 SpellsRdy.Water_Cast = false;
-                player->cast_type = Water; //TEMPORARY
-            }
-            if (!player->casting &&  SpellsRdy. Air_Cast == true)
-            {
-              player->rot = angle;
-              player->casting = cursor->press; //THIS IS ONLY TEMPORARY(So user casts when LB is pressed)
-              if (player->casting)
-                 SpellsRdy.Air_Cast = false;
-                player->cast_type = Air; //TEMPORARY
-            }
-            if (!player->casting &&  SpellsRdy. Earth_Cast == true)
-            {
-              player->rot = angle;
-              player->casting = cursor->press; //THIS IS ONLY TEMPORARY(So user casts when LB is pressed)
-              if (player->casting)
-                 SpellsRdy.Earth_Cast = false;
-                player->cast_type = Earth; //TEMPORARY
-            }
           }
         }
+        //RTC
+        if (msg.m_notify.interrupts & irq_rtc)
+        {
+          rtc_ih();
+        }
+
+        if (msg.m_notify.interrupts & irq_serial)
+        { //If there's something to read
+          serial_ih();
+        }
+        
 
         break;
       default:
@@ -182,6 +178,12 @@ int Arena()
       }
     }
   }
+
+  if( unsubscribe_serial() != 0)
+  {
+    return 1;
+  }
+
 
   if (unsubscribe_mouse() != 0)
   {
@@ -196,6 +198,11 @@ int Arena()
   {
     return 1;
   }
+  //RTC
+  if (unsubscribe_rtc() != OK)
+  {
+    return 1;
+  }
 
   if (disable_stream() == 1)
   { //if it returns 1 then we should try again
@@ -207,19 +214,18 @@ int Arena()
 
 int(proj_main_loop)()
 {
+  vg_init(0x144);
+
+  DrawLoadingScreen();
+
   if (!LoadAssets())
   {
     vg_exit();
     return 1;
   }
 
-  //sleep(10);
-
-  vg_init(0x144);
-
   time_t t;
-  srand((unsigned) time(&t));
-
+  srand((unsigned)time(&t));
   Arena();
 
   vg_exit();
