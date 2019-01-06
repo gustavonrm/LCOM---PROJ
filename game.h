@@ -30,6 +30,8 @@ typedef struct {
     Sprite* sprites[30];  //Up to 30 frames for each animation
     int n_frames;
     int ticks_between_frames;
+    bool rotates;
+    Bitmap* bitmaps[30]; //In case the Animation doesn't rotate
 } Animation;
 
 enum Element_Type
@@ -136,7 +138,7 @@ bool LoadAssets(); //Loads all of the bitmaps and saves them in sprites, bmps or
 void DrawToolBox();
 
 //animation
-Animation* CreateAnimation(char animation_name[], int n_frames, int ticks_per_frame); //Used to load animations
+Animation* CreateAnimation(char animation_name[], int n_frames, int ticks_per_frame, bool rotates); //Used to load animations
 void Get_Animation(Wizard* wizard); //Get correct casting animation for a wizard
 void Draw_Animation(Animation* animation, int center_x, int center_y, int frame_n, int *try_n, unsigned int rot);
 

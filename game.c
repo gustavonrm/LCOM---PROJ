@@ -161,13 +161,13 @@ bool LoadAssets()
         return false;
     if ((RedWizard = CreateSprite("Red_Hat.bmp")) == NULL)
         return false;
-    if ((Explosion = CreateAnimation("Explosion", 9, 2)) == NULL)
+    if ((Explosion = CreateAnimation("Explosion", 9, 2, true)) == NULL)
         return false;
-    if ((Fire_Cast = CreateAnimation("Fire_Cast", 8, 2)) == NULL)
+    if ((Fire_Cast = CreateAnimation("Fire_Cast", 8, 2, false)) == NULL)
         return false;
-    if ((Wind_Cast = CreateAnimation("Wind_Cast", 8, 2)) == NULL)
+    if ((Wind_Cast = CreateAnimation("Wind_Cast", 8, 2, false)) == NULL)
         return false;
-    if ((Earth_Cast = CreateAnimation("Earth_Cast", 8, 2)) == NULL)
+    if ((Earth_Cast = CreateAnimation("Earth_Cast", 8, 2, false)) == NULL)
         return false;
 
     //mouse
@@ -332,7 +332,7 @@ bool LoadAssets()
     return true;
 }
 
-Animation *CreateAnimation(char animation_name[], int n_frames, int ticks_per_frame)
+Animation *CreateAnimation(char animation_name[], int n_frames, int ticks_per_frame, bool rotates)
 {
     Animation *animation = (Animation *)malloc(sizeof(Animation));
     char name[100] = "/";
@@ -353,18 +353,33 @@ Animation *CreateAnimation(char animation_name[], int n_frames, int ticks_per_fr
 
         strcat(final, ".bmp");
 
-        Sprite *anim = CreateSprite(final);
-        if (anim != NULL)
-            animation->sprites[i] = anim;
+        if(rotates)
+        {
+            Sprite *anim = CreateSprite(final);
+            if (anim != NULL)
+                animation->sprites[i] = anim;
+            else
+            {
+                printf("\nInvalid animation path: %s", final);
+                return NULL;
+            }
+        }
         else
         {
-            printf("\nInvalid animation path: %s", final);
-            return NULL;
+            Bitmap *anim = loadBitmap(final);
+            if (anim != NULL)
+                animation->bitmaps[i] = anim;
+            else
+            {
+                printf("\nInvalid animation path: %s", final);
+                return NULL;
+            }
         }
     }
 
     animation->n_frames = n_frames;
     animation->ticks_between_frames = ticks_per_frame;
+    animation->rotates = rotates;
 
     return animation;
 }
@@ -894,7 +909,12 @@ void Draw_Animation(Animation *animation, int center_x, int center_y, int frame_
     {
         (*try_n) = 0;
     }
-    DrawSprite(animation->sprites[frame_n], center_x, center_y, rot, true);
+    if(animation->rotates) DrawSprite(animation->sprites[frame_n], center_x, center_y, rot, true);
+    else{
+        int x = center_x - animation->bitmaps[frame_n]->bitmapInfoHeader.width/2;
+        int y = center_y - animation->bitmaps[frame_n]->bitmapInfoHeader.height/2;
+        DrawBitmap(animation->bitmaps[frame_n],x,y);
+    }
 }
 
 void Draw_Cast(Wizard *wizard)
