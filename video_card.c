@@ -24,7 +24,11 @@ static uint8_t BlueFieldPosition;
 extern Cursor *cursor;
 extern Bitmap *background;
 extern Bitmap *Main_Page;
-extern Bitmap *Info_Box; 
+extern Bitmap *Info_Box;
+extern Bitmap *Victory_Menu; 
+extern Bitmap *Defeat_Menu;  
+
+extern Bitmap *Pause_Menu;
 extern Wizard *player;
 
 uint16_t getXRes()
@@ -191,7 +195,7 @@ void UpdateVideo()
 
 
 ///////////////////////////////////
-
+//full bmp's
 void DrawBackground()
 {
   memcpy(video_buffer, background->bitmapData, background->bitmapInfoHeader.imageSize);
@@ -205,6 +209,18 @@ void DrawMainPage()
 void DrawInfoBox()
 {
   memcpy(video_buffer, Info_Box->bitmapData, Info_Box->bitmapInfoHeader.imageSize);
+}
+
+void DrawPauseMenu(){
+  memcpy(video_buffer, Pause_Menu->bitmapData, Info_Box->bitmapInfoHeader.imageSize);
+}
+
+void DrawVictory(){
+  memcpy(video_buffer, Victory_Menu->bitmapData, Info_Box->bitmapInfoHeader.imageSize);
+}
+
+void DrawDefeat(){
+  memcpy(video_buffer, Defeat_Menu->bitmapData, Info_Box->bitmapInfoHeader.imageSize);
 }
 
 
