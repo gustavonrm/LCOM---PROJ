@@ -5,6 +5,7 @@
 int serial_hook_id = 3;
 extern Element* elements[ELEMS_SIZE];
 extern Wizard* wizards[WIZARDS_SIZE];
+extern bool MP;
 
 int subscribe_serial(uint8_t *bit_no){
   *bit_no = serial_hook_id;
@@ -75,7 +76,7 @@ void read_char(uint8_t* values){
 }
 
 uint8_t serial_ih(){
-    //printf("\n INTERRUPT GENERATED"); //debug
+    printf("\n INTERRUPT GENERATED"); //debug
     uint32_t id = 0, data = 0;
 	
     sys_inb(COM1 + IIR, &id);
@@ -95,8 +96,10 @@ uint8_t serial_ih(){
 
 extern char* username_2;
 bool name = false, wizard = false, element = false;
+uint8_t* data_end = NULL;
 void Check_Recieve(){
-    uint8_t* data = (uint8_t*) malloc(351); //enough for a lot of BYTES
+    uint8_t* data = (uint8_t*) malloc(352); //enough for a lot of BYTES
+    data_end = data + 352;
     read_char(data);
     //printf("\n DATA: %c", *data); //debug
     while(*data != '\0' && data != NULL){
@@ -113,9 +116,21 @@ void Check_Recieve(){
                     name = true;
                     break;
                 case 'W':
+                    if(!MP)
+                    {
+                        Clear_UART();
+                        free(data);
+                        return;
+                    }
                     wizard = true;
                     break;
                 case 'E':
+                    if(!MP)
+                    {
+                        Clear_UART();
+                        free(data);
+                        return;
+                    }
                     element = true;
                     break;
                 default:
@@ -136,6 +151,7 @@ char recieved_name[15];
 bool first_letter = true;
 int actual_it = 0; //So if we only read until mid of string we can come back to proper place
 uint8_t* Recieve_Name(uint8_t* data){
+    printf("\n GOT NAME"); //debug
     if(*data == 'N' && first_letter) data++; //To skip N
     for(int i = actual_it; i < 15 && *data != '\0'; i++){
         if((*data) == '/')
@@ -233,12 +249,31 @@ bool Send_Wizard(Wizard* wizard, int array_pos){ //Sending 9 Bytes per wizard
     return true;
 }
 
-unsigned int wiz_it = 0;
+uint8_t data[15];
+size_t data_it = 0;
 bool wiz_first = true;
-uint8_t* Recieve_Wizard(uint8_t* data){
+uint8_t* Recieve_Wizard(uint8_t* values){
     //printf("\n Recieving Wizard"); //debug
-    if(*data == 'W' && wiz_first) data++; wiz_it++; //To skip W header
+    if(wiz_first) values++; //To skip W header
     wiz_first = false;
+    //printf("\n Start Wizard Recieve Procedure");
+    while(*values != '/')
+    {
+        //printf("\n VALUES: %c", *values);
+        if(values == data_end){
+            //printf("\n BROKE HERE: %d", *values);
+            return NULL;
+        }
+        //printf("\n DATA BEFORE: %c", data[data_it]);
+        data[data_it] = (*values);
+        //printf("\n DATA: %c", data[data_it]);
+        data_it++;
+        values++;
+    }
+    //printf("\n VALUES AFTER BREAKING WHILE: %c", *values);
+    data[data_it] = (*values);
+    //printf("\n DATA AFTER WHILE: %c", data[data_it]);
+    data_it = 0;
 
     int16_t x_pos;
     int16_t y_pos;
@@ -254,77 +289,44 @@ uint8_t* Recieve_Wizard(uint8_t* data){
     uint8_t try_n;
     uint8_t pos;
 
-    if(wiz_it == 1)
-    {
-        if(data == NULL) return NULL;
-        x_pos = (*data) << 8;
-        data++; wiz_it++;
-    }
-    if(wiz_it == 2)
-    {
-        if(data == NULL) return NULL;
-        x_pos |= *data;
-        data++; wiz_it++;
-    }
+    x_pos = (data[data_it]) << 8;
+    data_it++;
+    x_pos |= data[data_it];
+    data_it++;
 
-    if(wiz_it == 3)
-    {
-        if(data == NULL) return NULL;
-        y_pos = (*data) << 8;
-        data++; wiz_it++;
-    }
-    if(wiz_it == 4)
-    {
-        if(data == NULL) return NULL;
-        y_pos |= *data;
-        data++; wiz_it++;
-    }
+    y_pos = (data[data_it]) << 8;
+    data_it++;
 
-    if(wiz_it == 5)
-    {
-        if(data == NULL) return NULL;
-        health = ((*data) & 0xC0) >> 6 ;
-        casting = ((*data) & 0x20) >> 5;
-        spell_type = ((*data) & 0x1C) >> 2;
-        rot = ((*data) & 0x01) << 8;
-        data++; wiz_it++;
-    }
-    if(wiz_it == 6)
-    {
-        if(data == NULL) return NULL;
-        rot |= (*data);
-        data++; wiz_it++;
-    }
+    y_pos |= data[data_it];
+    data_it++;
 
-    if(wiz_it == 7)
-    {
-        if(data == NULL) return NULL;
-        cast_type = (*data);
-        data++; wiz_it++;
-    }
-    if(wiz_it == 8)
-    {
-        if(data == NULL) return NULL;
-        frame_n = (*data);
-        data++; wiz_it++;
-    }
-    if(wiz_it == 9)
-    {
-        if(data == NULL) return NULL;
-        try_n = (*data) & 0x0F;
-        pos = ((*data) & 0xC0) >> 6;
-        data++; wiz_it++;
-    }
+    health = ((data[data_it]) & 0xC0) >> 6;
+    casting = ((data[data_it]) & 0x20) >> 5;
+    spell_type = ((data[data_it]) & 0x1C) >> 2;
+    rot = ((data[data_it]) & 0x01) << 8;
+    data_it++;
 
-    if((*data) == '/') wizard = false;
+    rot |= (data[data_it]);
+    data_it++;
+
+    cast_type = (data[data_it]);
+    data_it++;
+
+    frame_n = (data[data_it]);
+    data_it++;
+
+    try_n = (data[data_it]) & 0x0F;
+    pos = ((data[data_it]) & 0xC0) >> 6;
+    data_it++;
+
+    if((data[data_it]) == '/') wizard = false;
     else{
         printf("\nDIDN'T RECIEVE / \n"); //debug
         wiz_first = true;
         wizard = false;
-        Check_Recieve();
-        return data;
+        data_it = 0;
+        return NULL;
     }
-    data++; wiz_it = 0; //To Skip / last char
     wiz_first = true;
     
     //Needs to transfor positions into correct ones
@@ -366,7 +368,7 @@ uint8_t* Recieve_Wizard(uint8_t* data){
 
     printf("\nARRAY POS: %d", pos);*/
 
-    return data;
+    return values;
 }
 
 bool Send_Element(Element* element, int array_pos){ //Using 10B
@@ -413,7 +415,6 @@ bool Send_Element(Element* element, int array_pos){ //Using 10B
     if(!send_char(elem_type) || !send_char(frame_n) || !send_char(try_n)) return false;
 
     if(!send_char('/')) return false;
-    printf("\n ELEM ACTIVE: %d", active);
 
     //printf("\nSENT");
     data_it = 0;
@@ -453,49 +454,43 @@ uint8_t* Recieve_Element(uint8_t* values){
     uint8_t frame_n;
     uint8_t try_n;
 
-    x_pos = (*data) << 8;
-    data++;
+    x_pos = (data[data_it]) << 8;
+    data_it++;
+    x_pos |= data[data_it];
+    data_it++;  
 
-    
-    x_pos |= *data;
-    data++;  
+    y_pos = (data[data_it]) << 8;
+    data_it++;
+    y_pos |= data[data_it];
+    data_it++;
 
+    array_p = ((data[data_it]) & 0xF8) >> 3;
+    rot = ((data[data_it]) & 0x01) << 8;
+    data_it++;  
 
-    y_pos = (*data) << 8;
-    data++;
+    rot |= (data[data_it]);
+    data_it++;  
 
+    active = ((data[data_it]) & 0x80) >> 7;
+    destroyed = ((data[data_it]) & 0x40) >> 6;
+    spell_type = (data[data_it]) & 0x07;
+    data_it++; 
 
-    y_pos |= *data;
-    data++;
+    elem_type = (data[data_it]);
+    data_it++;  
 
-    array_p = ((*data) & 0xF8) >> 3;
-    rot = ((*data) & 0x01) << 8;
-    data++;  
+    frame_n = data[data_it];
+    data_it++;  
 
-    rot |= (*data);
-    data++;  
+    try_n = data[data_it];
+    data_it++;  
 
-    active = ((*data) & 0x80) >> 7;
-    destroyed = ((*data) & 0x40) >> 6;
-    spell_type = (*data) & 0x07;
-    data++; 
-
-    elem_type = (*data);
-    data++;  
-
-    frame_n = *data;
-    data++;  
-
-    try_n = *data;
-    data++;  
-
-    if(*data != '/'){
-        //printf("\n Didn't Recieve /"); //debug
-        data++;
+    if(data[data_it] != '/'){
+        printf("\n Didn't Recieve /"); //debug
         elem_first = true;
         element = false;
-        Check_Recieve();
-        return data;
+        data_it = 0;
+        return NULL;
     }
     element = false;
     elem_first = true;
@@ -538,7 +533,8 @@ uint8_t* Recieve_Element(uint8_t* values){
     printf("\nFRAME_N: %d", frame_n);
     printf("\nTRY_N: %d", try_n);*/
 
-    return data;
+    data_it = 0;
+    return values;
 }
 
 void Clear_UART(){
