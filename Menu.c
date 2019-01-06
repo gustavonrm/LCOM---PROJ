@@ -85,8 +85,8 @@ void main_menu()
                printf("multiplayer rdy as GUEST\n");
           }
      }
-}
-//always do this 
+     }
+     //always do this 
 
      //conditon to leave game
      if (cursor->lb == true && cursor->x >= 210 && cursor->x <= 810 && cursor->y >= 580 && cursor->y <= 730)

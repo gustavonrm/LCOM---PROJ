@@ -1270,6 +1270,10 @@ void Update_Game_State()
                 GameMenus.main_page = true;
                 GameMenus.run =0;
                 GameMenus.pause = false;
+                for(unsigned int i = 0; i < WIZARDS_SIZE; i++){
+                    free(wizards[i]);
+                    wizards[i] = NULL;
+                }
             }
         }
     }
