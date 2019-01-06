@@ -1062,8 +1062,8 @@ void Update_Game_State()
     {
         DrawMainPage();
         DrawCursor(cursor);
-        main_menu();
-
+        main_menu();  
+    
         if( Gamerules == true){
             DrawInfoBox(); 
             DrawCursor(cursor);
@@ -1083,6 +1083,8 @@ void Update_Game_State()
 
     if (GameMenus.run == 1)
     {
+        if(GameMenus.pause == false)
+        {
         if((MP && Host) || !MP)
         {
             ////BOT UPDATES//// (Only Host or singleplayer)
@@ -1245,12 +1247,15 @@ void Update_Game_State()
             //DrawTextPointer();
             Draw_string(45, 680);
         }
-
+          DrawCursor(cursor);
+        }
         DrawClock();
 
         if (GameMenus.pause == true)
         {
             DrawPauseMenu();
+            DrawCursor(cursor);
+            
             //cursor condition
             //to check
             if (cursor->lb == true && cursor->x >= 280 && cursor->x <= 760 && cursor->y >= 350 && cursor->y <= 430)
@@ -1262,10 +1267,11 @@ void Update_Game_State()
 
             if (cursor->lb == true && cursor->x >= 280 && cursor->x <= 760 && cursor->y >= 460 && cursor->y <= 540)
             {
-                GameMenus.game_onoff = false;
+                GameMenus.main_page = true;
+                GameMenus.run =0;
+                GameMenus.pause = false;
             }
         }
-        DrawCursor(cursor);
     }
 }
 

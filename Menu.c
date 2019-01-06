@@ -32,6 +32,7 @@ bool Gamerules = false;
 
 void main_menu()
 {
+     if(name_status_single == done){
      if(GameMenus.main_page && Host && username_2 != NULL)
      { //If Host and got Guest Name
           GameMenus.main_page = false;
@@ -43,7 +44,7 @@ void main_menu()
           player2 = CreateWizard(Yellow, 512, 100, 180, username_2);
           MP = true;
           
-          printf("\n multiplayer rdy\n");
+          printf("multiplayer rdy\n");
      }
      //condition for single player
      if (cursor->lb == true && cursor->x >= 210 && cursor->x <= 810 && cursor->y >= 240 && cursor->y <= 390)
@@ -73,7 +74,7 @@ void main_menu()
                GameMenus.main_page = false;
                GameMenus.run = 1;
               
-               bot3 = CreateBot(Green, 512, 100, username_2);
+               bot3 = CreateBot(Green, 512, 100, "Bumbble Bee");
                bot1 = CreateBot(Blue, 900, 384, "Blue Bobs");
                bot2 = CreateBot(Red, 200, 384, "Commy");
                player = CreateWizard(Yellow, 512, 600, 0, username);
@@ -84,6 +85,8 @@ void main_menu()
                printf("multiplayer rdy as GUEST\n");
           }
      }
+}
+//always do this 
 
      //conditon to leave game
      if (cursor->lb == true && cursor->x >= 210 && cursor->x <= 810 && cursor->y >= 580 && cursor->y <= 730)
