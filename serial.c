@@ -151,13 +151,13 @@ char recieved_name[15];
 bool first_letter = true;
 int actual_it = 0; //So if we only read until mid of string we can come back to proper place
 uint8_t* Recieve_Name(uint8_t* data){
-    printf("\n GOT NAME"); //debug
+    //printf("\n GOT NAME"); //debug
     if(*data == 'N' && first_letter) data++; //To skip N
     for(int i = actual_it; i < 15 && *data != '\0'; i++){
         if((*data) == '/')
         {
             name = false;
-            //printf("\nRECIEVED NAME: %s", recieved_name); //debug
+            printf("\nRECIEVED NAME: %s", recieved_name); //debug
             data++;
             first_letter = true;
             username_2 = &recieved_name[0];
@@ -175,7 +175,8 @@ uint8_t* Recieve_Name(uint8_t* data){
             actual_it++;
         }
     }
-    //printf("\nINCOMPLETE NAME: %s", recieved_name); //debug
+    printf("\nINCOMPLETE NAME: %s", recieved_name); //debug
+    Check_Recieve();
     return NULL;
 }
 
