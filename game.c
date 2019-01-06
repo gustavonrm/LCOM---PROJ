@@ -118,9 +118,6 @@ Sprite *AirBall;
 
 //animations
 Animation *Explosion;
-Animation *Fire_Cast;
-Animation *Wind_Cast;
-Animation *Earth_Cast;
 
 extern Cursor *cursor;
 extern SpellCast SpellsRdy;
@@ -162,12 +159,6 @@ bool LoadAssets()
     if ((RedWizard = CreateSprite("Red_Hat.bmp")) == NULL)
         return false;
     if ((Explosion = CreateAnimation("Explosion", 9, 2)) == NULL)
-        return false;
-    if ((Fire_Cast = CreateAnimation("Fire_Cast", 8, 2)) == NULL)
-        return false;
-    if ((Wind_Cast = CreateAnimation("Wind_Cast", 8, 2)) == NULL)
-        return false;
-    if ((Earth_Cast = CreateAnimation("Earth_Cast", 8, 2)) == NULL)
         return false;
 
     //mouse
@@ -335,7 +326,8 @@ bool LoadAssets()
 Animation *CreateAnimation(char animation_name[], int n_frames, int ticks_per_frame)
 {
     Animation *animation = (Animation *)malloc(sizeof(Animation));
-    char name[100] = "/";
+
+    char *name = "/";
     strcat(name, animation_name);
 
     char path[100] = "\0";
@@ -929,13 +921,13 @@ void Get_Animation(Wizard *wizard)
 
     case Launch:
         if (wizard->cast_type == Fire)
-            wizard->cast_animation = Fire_Cast; //INSERT CORRECT Animation here
+            wizard->cast_animation = Explosion; //INSERT CORRECT Animation here
         else if (wizard->cast_type == Water)
             wizard->cast_animation = Explosion; //INSERT CORRECT Animation here
         else if (wizard->cast_type == Air)
-            wizard->cast_animation = Wind_Cast; //INSERT CORRECT Animation here
+            wizard->cast_animation = Explosion; //INSERT CORRECT Animation here
         else if (wizard->cast_type == Earth)
-            wizard->cast_animation = Earth_Cast; //INSERT CORRECT Animation here
+            wizard->cast_animation = Explosion; //INSERT CORRECT Animation here
         else
             wizard->cast_animation = NULL;
         break;
@@ -1278,7 +1270,12 @@ void Update_Game_State()
 
             for (unsigned int i = 0; i < WIZARDS_SIZE; i++)
             {
-                    Draw_Cast(wizards[i]);
+                if (wizards[i] != NULL && wizards[i]->health > 0)
+                {
+                    DrawWizard(wizards[i]);
+                    if (wizards[i]->casting)
+                        Draw_Cast(wizards[i]);
+                }
             }
 
             // DrawToolBox();
