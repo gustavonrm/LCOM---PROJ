@@ -1273,7 +1273,7 @@ void Send_Game_Info(){
     for (unsigned int i = 0; i < WIZARDS_SIZE; i++)
     {
         if (wizards[i] != NULL) Send_Wizard(wizards[i],i);
-        printf("\n TRIED TO SEND: %s", wizards[i]->name);
+        //printf("\n TRIED TO SEND: %s", wizards[i]->name); //debug
     }
 }
 

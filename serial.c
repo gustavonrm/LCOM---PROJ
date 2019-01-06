@@ -94,19 +94,25 @@ uint8_t serial_ih(){
     return data;
 }
 
+extern char* username_2;
 bool name = false, wizard = false, element = false;
 uint8_t* data_end = NULL;
 void Check_Recieve(){
     uint8_t* data = (uint8_t*) malloc(352); //enough for a lot of BYTES
     data_end = data + 352;
     read_char(data);
-    printf("\n DATA: %c", *data); //debug
+    //printf("\n DATA: %c", *data); //debug
     while(*data != '\0' && data != NULL){
         if(!name && !wizard && !element)
         {
             switch(*data)
             {
                 case 'N':
+                    if(MP)
+                    {
+                        free(data);
+                        return;
+                    }
                     name = true;
                     break;
                 case 'W':
@@ -143,7 +149,6 @@ void Check_Recieve(){
 
 char recieved_name[15];
 bool first_letter = true;
-extern char* username_2;
 int actual_it = 0; //So if we only read until mid of string we can come back to proper place
 uint8_t* Recieve_Name(uint8_t* data){
     printf("\n GOT NAME"); //debug
@@ -156,7 +161,7 @@ uint8_t* Recieve_Name(uint8_t* data){
             data++;
             first_letter = true;
             username_2 = &recieved_name[0];
-            printf("\n USERNAME_2: %s", username_2); //debug
+            //printf("\n USERNAME_2: %s", username_2); //debug
             actual_it = 0;
             return data;
         }
@@ -170,7 +175,7 @@ uint8_t* Recieve_Name(uint8_t* data){
             actual_it++;
         }
     }
-    printf("\nINCOMPLETE NAME: %s", recieved_name); //debug
+    //printf("\nINCOMPLETE NAME: %s", recieved_name); //debug
     return NULL;
 }
 
@@ -241,7 +246,6 @@ bool Send_Wizard(Wizard* wizard, int array_pos){ //Sending 9 Bytes per wizard
     printf("\nTRY_N: %d", try_n);*/
 
     //printf("\n\n SENT WIZARD");
-
     return true;
 }
 
@@ -317,14 +321,14 @@ uint8_t* Recieve_Wizard(uint8_t* values){
 
     if((data[data_it]) == '/') wizard = false;
     else{
-        //printf("\nDIDN'T RECIEVE / \n"); //debug
+        printf("\nDIDN'T RECIEVE / \n"); //debug
         wiz_first = true;
         wizard = false;
         data_it = 0;
         return NULL;
     }
     wiz_first = true;
-
+    
     //Needs to transfor positions into correct ones
     x_pos = x_pos - (x_pos - H_RES/2)*2;
     y_pos = y_pos - (y_pos - V_RES/2)*2;
@@ -382,7 +386,7 @@ bool Send_Element(Element* element, int array_pos){ //Using 10B
     uint8_t frame_n = element->frame_n;
     uint8_t try_n = element->try_n;
 
-    printf("\nSEND ELEMENT"); //debug
+    //printf("\nSEND ELEMENT"); //debug
 
     if(!send_char('E')) return false;
 
@@ -412,7 +416,7 @@ bool Send_Element(Element* element, int array_pos){ //Using 10B
 
     if(!send_char('/')) return false;
 
-    printf("\nSENT");
+    //printf("\nSENT");
     data_it = 0;
     return true;
 }
@@ -421,13 +425,17 @@ bool elem_first;
 uint8_t* Recieve_Element(uint8_t* values){
     if(elem_first)values++;//To skip E header
     while(*values != '/')
-    {
+    {   
+        printf("\n VALUES: %c", *values);
+        printf("\n DATAI_IT: %d", data_it);
         if(values == data_end) return NULL;
         data[data_it] = *values;
         data_it++;
         values++;
     }
     data[data_it] = *values;
+    printf("\n VALUES: %c", *values);
+    printf("\n DATAI_IT: %d", data_it);
     data_it = 0;
 
     //printf("\n RECIEVING ELEMENT"); //debug
@@ -484,8 +492,7 @@ uint8_t* Recieve_Element(uint8_t* values){
         data_it = 0;
         return NULL;
     }
-    else element = false;
-    data_it++;
+    element = false;
     elem_first = true;
 
     Element* element = NULL;

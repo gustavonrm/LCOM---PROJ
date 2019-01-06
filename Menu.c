@@ -41,6 +41,7 @@ void main_menu()
           bot1 = CreateBot(Blue, 200, 384, "Blue Bobs");
           bot2 = CreateBot(Red, 900, 384, "Commy");
           player2 = CreateWizard(Yellow, 512, 100, 180, username_2);
+          MP = true;
           
           printf("\n multiplayer rdy\n");
      }
@@ -76,12 +77,12 @@ void main_menu()
                bot1 = CreateBot(Blue, 900, 384, "Blue Bobs");
                bot2 = CreateBot(Red, 200, 384, "Commy");
                player = CreateWizard(Yellow, 512, 600, 0, username);
+               MP = true;
 
-               tickdelay(micros_to_ticks(100));
+               tickdelay(micros_to_ticks(1000));
 
                printf("multiplayer rdy as GUEST\n");
           }
-          MP = true;
      }
 
      //conditon to leave game
