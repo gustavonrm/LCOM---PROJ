@@ -26,10 +26,22 @@
 
 #define TOTAL_BITMAPS           10000
 
+/**
+ * @brief A Sprite is a strcut that contains 360 bitmaps (one for each angle degree)
+ * @param bitmap[360] array of bitmaps
+ */
 typedef struct {
     Bitmap* bitmap[360];  //list of all 360 possible rotations
 } Sprite;
 
+/**
+ * @brief An animation is a struct that may have up to 30 frames (bitmaps or sprites) and also stores the information needed for timing the animation
+ * @param sprites[30] Array of up to 30 frames of sprites
+ * @param ticks_between_frames Used to time the animation
+ * @param n_frames total number of frames the animation has
+ * @param bitmaps[30] Array of up to 30 frames of bitmaps
+ * @param rotates boolean that indicates whether this animation has rotation or not
+ */
 typedef struct {
     Sprite* sprites[30];  //Up to 30 frames for each animation
     int n_frames;
@@ -38,6 +50,9 @@ typedef struct {
     Bitmap* bitmaps[30]; //In case the Animation doesn't rotate
 } Animation;
 
+/**
+ * @brief enum that indicates the type of each element(used for collisions, animations and casting)
+ */
 enum Element_Type
 {
     Air = 1,
@@ -47,6 +62,9 @@ enum Element_Type
     Null = 0
 };
 
+/**
+ * @brief enum that indicates the color of a wizard (used for Finding the right sprite)
+ */
 enum Wizard_color
 {
     Red,
@@ -55,12 +73,13 @@ enum Wizard_color
     Yellow
 };
 
+/**
+ * @brief enum that indicates what type of spell the wizard is casting
+ */
 enum Spell_Type
 {
     Launch = 1,
     Leap = 2,
-    //Circle,
-    //Aura,
     None = 0
 };
 
