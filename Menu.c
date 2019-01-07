@@ -147,6 +147,8 @@ void gameCondition()
                GameMenus.run = 0;
                GameMenus.pause = false;
                gameStatus = clean;
+               cursor->x = 50;
+               cursor->y = 50;
           }
 
           if (cursor->lb == true && cursor->x >= 210 && cursor->x <= 810 && cursor->y >= 505 && cursor->y <= 650)
@@ -172,6 +174,8 @@ void gameCondition()
                GameMenus.run = 0;
                GameMenus.pause = false;
                gameStatus = clean;
+               cursor->x = 50;
+               cursor->y = 50;
           }
 
            if (cursor->lb == true && cursor->x >= 210 && cursor->x <= 810 && cursor->y >= 505 && cursor->y <= 650)

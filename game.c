@@ -12,6 +12,7 @@
 
 extern bool MP;
 extern bool Host;
+extern char* username_2;
 
 Bitmap* bitmaps_to_destroy[TOTAL_BITMAPS];
 
