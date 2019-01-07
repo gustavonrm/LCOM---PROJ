@@ -64,15 +64,14 @@ void main_menu()
           //condition for multi player
           if (cursor->lb == true && cursor->x >= 210 && cursor->x <= 810 && cursor->y >= 410 && cursor->y <= 560)
           {
+               Send_Name(username);
                if (username_2 == NULL && !Host)
                { //If user is the first to send his name(a.k.a HOST)
-                    Send_Name(username);
                     Host = true;
-                    printf("\n USERNAME SENT AS HOST");
+                    //printf("\n USERNAME SENT AS HOST"); //deubg
                }
                else if (username_2 != NULL && !Host)
                { //If other player is Host
-                    Send_Name(username);
                     GameMenus.main_page = false;
                     GameMenus.run = 1;
 
@@ -82,9 +81,7 @@ void main_menu()
                     player = CreateWizard(Yellow, 512, 600, 0, username);
                     MP = true;
 
-                    tickdelay(micros_to_ticks(1000));
-
-                    printf("multiplayer rdy as GUEST\n");
+                    //printf("multiplayer rdy as GUEST\n"); //deubg
                }
           }
      }

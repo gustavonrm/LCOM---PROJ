@@ -101,7 +101,7 @@ void Check_Recieve(){
     uint8_t* data = (uint8_t*) malloc(352); //enough for a lot of BYTES
     data_end = data + 352;
     read_char(data);
-    //printf("\n DATA: %c", *data); //debug
+    printf("\n DATA: %c", *data); //debug
     while(*data != '\0' && data != NULL){
         if(!name && !wizard && !element)
         {
@@ -160,7 +160,7 @@ uint8_t* Recieve_Name(uint8_t* data){
             printf("\nRECIEVED NAME: %s", recieved_name); //debug
             data++;
             first_letter = true;
-            username_2 = &recieved_name[0];
+            if(username_2 == NULL) username_2 = &recieved_name[0];
             //printf("\n USERNAME_2: %s", username_2); //debug
             actual_it = 0;
             return data;
@@ -190,6 +190,8 @@ bool Send_Name(char* name){
     }
     send_char('/');
     //printf("\n NAME SENT: %s", name); //debug
+
+    tickdelay(micros_to_ticks(100));
     return true;
 }
 
