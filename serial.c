@@ -6,6 +6,7 @@ int serial_hook_id = 3;
 extern Element* elements[ELEMS_SIZE];
 extern Wizard* wizards[WIZARDS_SIZE];
 extern bool MP;
+extern bool Host;
 
 int subscribe_serial(uint8_t *bit_no){
   *bit_no = serial_hook_id;
@@ -60,23 +61,26 @@ bool send_char(unsigned char value){
   return true;
 }
 
+unsigned int bytes_read = 0;
 void read_char(uint8_t* values){
+    bytes_read = 0;
     uint32_t st, data;
 	sys_inb(COM1 + LSR, &st);	
     unsigned int i = 0;
-	while (st & DATA_RECIEVED && i < 351){ //Only read if there's anything there
+	while (st & DATA_RECIEVED && i < 252){ //Only read if there's anything there
 		sys_inb(COM1 + RBR, &data);
         
         *values = (uint8_t) data;
         values++;
         i++;
+        bytes_read++;
         //printf("\n READ THIS: %c", data);
         sys_inb(COM1 + LSR, &st);
 	}
 }
 
 uint8_t serial_ih(){
-    printf("\n INTERRUPT GENERATED"); //debug
+    //printf("\n INTERRUPT GENERATED"); //debug
     uint32_t id = 0, data = 0;
 	
     sys_inb(COM1 + IIR, &id);
@@ -98,11 +102,11 @@ extern char* username_2;
 bool name = false, wizard = false, element = false;
 uint8_t* data_end = NULL;
 void Check_Recieve(){
-    uint8_t* data = (uint8_t*) malloc(352); //enough for a lot of BYTES
-    data_end = data + 352;
+    uint8_t* data = (uint8_t*) malloc(253);
+    data_end = data + 33;
     read_char(data);
-    printf("\n DATA: %c", *data); //debug
-    while(*data != '\0' && data != NULL){
+    //printf("\n DATA: %c", *data); //debug
+    while(data != data_end && data != NULL){
         if(!name && !wizard && !element)
         {
             switch(*data)
@@ -134,8 +138,8 @@ void Check_Recieve(){
                     element = true;
                     break;
                 default:
-                    free(data);
-                    return;
+                    data++;
+                    break;
             }
         }
 
@@ -257,25 +261,26 @@ size_t data_it = 0;
 bool wiz_first = true;
 uint8_t* Recieve_Wizard(uint8_t* values){
     //printf("\n Recieving Wizard"); //debug
-    if(wiz_first) values++; //To skip W header
+    if(wiz_first){
+        values++; //To skip W header
+        bytes_read--;
+    }
     wiz_first = false;
     //printf("\n Start Wizard Recieve Procedure");
-    while(*values != '/')
+    while(data_it < 10)
     {
         //printf("\n VALUES: %c", *values);
-        if(values == data_end){
+        if(values == data_end || bytes_read == 0){
             //printf("\n BROKE HERE: %d", *values);
             return NULL;
         }
         //printf("\n DATA BEFORE: %c", data[data_it]);
         data[data_it] = (*values);
+        bytes_read--;
         //printf("\n DATA: %c", data[data_it]);
         data_it++;
         values++;
     }
-    //printf("\n VALUES AFTER BREAKING WHILE: %c", *values);
-    data[data_it] = (*values);
-    //printf("\n DATA AFTER WHILE: %c", data[data_it]);
     data_it = 0;
 
     int16_t x_pos;
@@ -339,11 +344,20 @@ uint8_t* Recieve_Wizard(uint8_t* values){
     int new_rot = (int) (rot - 180);
     if(new_rot < 0) new_rot+= 360;
 
+    //printf("\n POS: %d", pos);
+
     Wizard* wizard = wizards[pos];
+
+    if(!Host) wizard->health = (int) health;
+    if(pos == 1 && !Host)
+    {
+        data_it = 0;
+        return values;
+    }
+
     wizard->center_x = (int) x_pos;
     wizard->center_y = (int) y_pos;
 
-    wizard->health = (int) health;
     wizard->casting = (bool) casting;
     wizard->spell = spell_type;
 
@@ -370,7 +384,7 @@ uint8_t* Recieve_Wizard(uint8_t* values){
     printf("\nTRY_N: %d", try_n);
 
     printf("\nARRAY POS: %d", pos);*/
-
+    data_it = 0;
     return values;
 }
 
@@ -427,18 +441,18 @@ bool Send_Element(Element* element, int array_pos){ //Using 10B
 bool elem_first;
 uint8_t* Recieve_Element(uint8_t* values){
     if(elem_first)values++;//To skip E header
-    while(*values != '/')
+    while(data_it < 11)
     {   
-        printf("\n VALUES: %c", *values);
-        printf("\n DATAI_IT: %d", data_it);
-        if(values == data_end) return NULL;
+        //printf("\n VALUES: %c", *values); //debug
+        //printf("\n DATAI_IT: %d", data_it); //debug
+        if(values == data_end || bytes_read == 0) return NULL;
         data[data_it] = *values;
+        bytes_read--;
         data_it++;
         values++;
     }
-    data[data_it] = *values;
-    printf("\n VALUES: %c", *values);
-    printf("\n DATAI_IT: %d", data_it);
+    //printf("\n VALUES: %c", *values); //debug
+    //printf("\n DATAI_IT: %d", data_it); //debug
     data_it = 0;
 
     //printf("\n RECIEVING ELEMENT"); //debug
@@ -546,6 +560,7 @@ void Clear_UART(){
     while (st & DATA_RECIEVED){ //Only read if there's anything there
 		sys_inb(COM1 + RBR, &data);
         //printf("\nGOT SOMETHING: %c", data); //debug
+        //tickdelay(1);
         sys_inb(COM1 + LSR, &st);
 	}
 }

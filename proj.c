@@ -19,6 +19,23 @@ Wizard *player2;
 Bot *bot1;
 Bot *bot2;
 Bot *bot3;
+
+extern Sprite *GreenWizard;
+extern Sprite *BlueWizard;
+extern Sprite *RedWizard;
+extern Sprite *YellowWizard;
+
+extern Sprite *FireBall;
+extern Sprite *WaterBall;
+extern Sprite *EarthBall;
+extern Sprite *AirBall;
+
+extern Animation *Explosion;
+extern Animation *Fire_Cast;
+extern Animation *Wind_Cast;
+extern Animation *Earth_Cast;
+extern Animation *Water_Cast;
+
  
 //keyboard
 uint16_t key;
@@ -229,6 +246,23 @@ int(proj_main_loop)()
   Arena();
 
   vg_exit();
+
+  Destroy_Bitmaps();
+  free(GreenWizard);
+  free(BlueWizard);
+  free(RedWizard);
+  free(YellowWizard);
+
+  free(FireBall);
+  free(EarthBall);
+  free(WaterBall);
+  free(AirBall);
+
+  free(Explosion);
+  free(Water_Cast);
+  free(Fire_Cast);
+  free(Wind_Cast);
+  free(Earth_Cast);
   return 0;
 }
 

@@ -24,6 +24,8 @@
 #define LEAP_DISTANCE           70
 #define LEAP_SPEED              8 //distance per frame
 
+#define TOTAL_BITMAPS           10000
+
 typedef struct {
     Bitmap* bitmap[360];  //list of all 360 possible rotations
 } Sprite;
@@ -195,5 +197,7 @@ void Update_Game_State();
 //Multiplayer
 void Send_Game_Info();
 Element* Create_Guest_Element(int array_pos, int8_t elem_type, uint8_t spell_type);
+
+void Destroy_Bitmaps();
 
 #endif

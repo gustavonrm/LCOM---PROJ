@@ -7,6 +7,8 @@
 #include "keyboard.h"
 #include <math.h>
 
+extern Bitmap* bitmaps_to_destroy[TOTAL_BITMAPS];
+
 static uint16_t X_Res;
 static uint16_t Y_Res;
 static uint8_t B_per_pixel;
@@ -258,6 +260,14 @@ Sprite *CreateSprite(char img_name[])
   {
     Bitmap *rotated = RotateImage(bmp, i);
     sprite->bitmap[i] = rotated;
+    for(unsigned int i = 0; i < TOTAL_BITMAPS; i++)
+    {
+      if(bitmaps_to_destroy[i] == NULL)
+      {
+        bitmaps_to_destroy[i] = rotated;
+        break;
+      }
+    }
   }
 
   sprite->bitmap[0] = bmp;

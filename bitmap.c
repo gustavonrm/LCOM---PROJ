@@ -1,7 +1,9 @@
 #include <lcom/lcf.h>
 #include "bitmap.h"
-
+#include "game.h"
 #include "stdio.h"
+
+extern Bitmap* bitmaps_to_destroy[TOTAL_BITMAPS];
 
 Bitmap* loadBitmap(char* filename) {
     // allocating necessary size
@@ -85,6 +87,15 @@ Bitmap* loadBitmap(char* filename) {
 
     bmp->bitmapData = bitmapImage;
     bmp->bitmapInfoHeader = bitmapInfoHeader;
+
+    for(unsigned int i = 0; i < TOTAL_BITMAPS; i++)
+    {
+        if(bitmaps_to_destroy[i] == NULL)
+        {
+            bitmaps_to_destroy[i] = bmp;
+            break;
+        }
+    }
 
     return bmp;
 }

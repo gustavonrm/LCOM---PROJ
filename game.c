@@ -13,6 +13,8 @@
 extern bool MP;
 extern bool Host;
 
+Bitmap* bitmaps_to_destroy[TOTAL_BITMAPS];
+
 //layout
 Bitmap *background;
 Bitmap *Tool_Box;
@@ -333,6 +335,18 @@ bool LoadAssets()
         return false;
 
     return true;
+}
+
+void Destroy_Bitmaps()
+{
+    unsigned int total = 0;
+    for(unsigned int i = 0; i < TOTAL_BITMAPS; i++)
+    {
+        if(bitmaps_to_destroy[i] == NULL) break;
+        free(bitmaps_to_destroy[i]);
+        total++;
+    }
+    printf("\n DESTROYED %d BITMAPS", total);
 }
 
 Animation *CreateAnimation(char animation_name[], int n_frames, int ticks_per_frame, bool rotates)
@@ -1243,7 +1257,7 @@ void Update_Game_State()
             if (MP && !Host)
             {
                 //printf("\n SHOULD SEND GUEST WIZARD");
-                Send_Wizard(player, WIZARDS_SIZE - 1);
+                Send_Wizard(player, 1);
             }
 
             if (!MP || (MP && Host))
@@ -1357,6 +1371,8 @@ void Update_Game_State()
             }
             if(alive <= 1)
             {
+                tickdelay(1);
+                if(Host) Send_Game_Info();
                 for (unsigned int i = 0; i < WIZARDS_SIZE; i++)
                 {
                     free(wizards[i]);
@@ -1373,6 +1389,12 @@ void Update_Game_State()
                 }
                 else gameStatus = defeat;
                 cursor->lb = false;
+                cursor->x = 50;
+                cursor->y = 50;
+                MP = false;
+                Host = false;
+                username_2 = NULL;
+                Clear_UART();
             }
 
             DrawTimers();
@@ -1419,6 +1441,12 @@ void Update_Game_State()
                     elements[i] = NULL;
                 }
                 cursor->lb = false;
+                cursor->x = 50;
+                cursor->y = 50;
+                MP = false;
+                Host = false;
+                username_2 = NULL;
+                Clear_UART();
             }
         }
     }

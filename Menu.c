@@ -41,8 +41,8 @@ void main_menu()
                GameMenus.run = 1;
 
                player = CreateWizard(Green, 512, 600, 0, username);
-               bot1 = CreateBot(Blue, 200, 384, "Blue Bobs");
-               bot2 = CreateBot(Red, 900, 384, "Commy");
+               //bot1 = CreateBot(Blue, 200, 384, "Blue Bobs");
+               //bot2 = CreateBot(Red, 900, 384, "Commy");
                player2 = CreateWizard(Yellow, 512, 100, 180, username_2);
                MP = true;
 
@@ -75,9 +75,9 @@ void main_menu()
                     GameMenus.main_page = false;
                     GameMenus.run = 1;
 
-                    bot3 = CreateBot(Green, 512, 100, "Bumbble Bee");
-                    bot1 = CreateBot(Blue, 900, 384, "Blue Bobs");
-                    bot2 = CreateBot(Red, 200, 384, "Commy");
+                    player2 = CreateWizard(Green, 512, 100, 180, username_2);
+                    //bot1 = CreateBot(Blue, 900, 384, "Blue Bobs");
+                    //bot2 = CreateBot(Red, 200, 384, "Commy");
                     player = CreateWizard(Yellow, 512, 600, 0, username);
                     MP = true;
 
