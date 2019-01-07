@@ -21,6 +21,8 @@
 #define MAX_WOOBLE_VAR          270 //10 degrees of variation to either side
 
 #define SPELL_TIMER             60
+#define LEAP_DISTANCE           70
+#define LEAP_SPEED              8 //distance per frame
 
 typedef struct {
     Bitmap* bitmap[360];  //list of all 360 possible rotations
@@ -54,7 +56,7 @@ enum Wizard_color
 enum Spell_Type
 {
     Launch = 1,
-    //Control,
+    Leap = 2,
     //Circle,
     //Aura,
     None = 0
@@ -76,6 +78,7 @@ typedef struct
     
     enum Wizard_color color;
     char* name;
+    int leap_xf, leap_yf;
 } Wizard;
 
 typedef struct {
@@ -152,6 +155,7 @@ Wizard* CreateWizard(enum Wizard_color color, int center_x, int center_y, unsign
 void DrawWizard(Wizard *wizard);
 void Wizard_Colision(Wizard *wizard, Element *element);
 void Draw_Cast(Wizard* wizard);
+void Wizard_Leap(Wizard* wizard);
 
 //bots
 Bot* CreateBot(enum Wizard_color color, int center_x, int center_y, char* name);

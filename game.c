@@ -892,6 +892,8 @@ bool Check_Cursor(Cursor *cursor, enum Spell_Type spell_type)
 
     case None:
         return false;
+    case Leap:
+        return false;
     }
 
     return false;
@@ -943,25 +945,45 @@ void Get_Animation(Wizard *wizard)
 {
     switch (wizard->spell)
     {
+    case Leap:
     case None:
         wizard->cast_animation = NULL;
         break;
 
     case Launch:
         if (wizard->cast_type == Fire)
-            wizard->cast_animation = Fire_Cast; //INSERT CORRECT Animation here
+            wizard->cast_animation = Fire_Cast;
         else if (wizard->cast_type == Water)
             wizard->cast_animation = Explosion; //INSERT CORRECT Animation here
         else if (wizard->cast_type == Air)
-            wizard->cast_animation = Wind_Cast; //INSERT CORRECT Animation here
+            wizard->cast_animation = Wind_Cast;
         else if (wizard->cast_type == Earth)
-            wizard->cast_animation = Earth_Cast; //INSERT CORRECT Animation here
+            wizard->cast_animation = Earth_Cast;
         else
             wizard->cast_animation = NULL;
         break;
     }
 
     wizard->frame_n = 0;
+}
+
+void Wizard_Leap(Wizard* wizard){
+    int x_dist = player->leap_xf - player->center_x;
+    int y_dist = player->leap_yf - player->center_y;
+    int dist = round(sqrt(pow(x_dist,2) + pow(y_dist,2)));
+    //printf("\n DIST: %d", dist); //debug
+    if(dist <= 4)
+    {
+        wizard->center_x = wizard->leap_xf;
+        wizard->center_y = wizard->leap_yf;
+        wizard->spell = None;
+        wizard->casting = false;
+        return;
+    }
+    int x_des = round(LEAP_SPEED*x_dist/dist);
+    int y_des = round(LEAP_SPEED*y_dist/dist);
+    wizard->center_x += x_des;
+    wizard->center_y += y_des;
 }
 
 unsigned int spell_timer = SPELL_TIMER; //30 ticks = 0.5 secs
@@ -971,6 +993,11 @@ void Player_Cast(Wizard *player, Cursor *cursor)
     enum Spell_Type type;
     if (player->casting)
     { //If there's already something being casted
+        if(player->spell == Leap)
+        {
+            Wizard_Leap(player);
+            return;
+        }
         if (player->frame_n >= player->cast_animation->n_frames)
         {
             spell_timer--;
@@ -992,7 +1019,6 @@ void Player_Cast(Wizard *player, Cursor *cursor)
             player->spell = None;
             player->cast_type = Null;
         }
-        //While Spell is being casted Keyboard must also be disabled
     }
     else
     { //If nothing is being casted check if there's anything ready for casting
@@ -1080,7 +1106,25 @@ void Player_Cast(Wizard *player, Cursor *cursor)
                 }
             }
         }
-        //TODO: leap maybe?
+        else if (SpellsRdy.leap_timer == 3 && cursor->rb)
+        {
+            SpellsRdy.leap_timer = 0;
+            player->spell = Leap;
+            double rad_rot = player->rot * M_PI /180;
+            int x_dis = round(sin(rad_rot)*LEAP_DISTANCE);
+            int y_dis = round(cos(rad_rot)*LEAP_DISTANCE);
+
+            player->leap_xf = player->center_x - x_dis;
+            player->leap_yf = player->center_y - y_dis;
+
+            if(player->leap_xf > H_RES - WIZARD_HITBOX_RADIUS) player->leap_xf = H_RES - WIZARD_HITBOX_RADIUS;
+            else if(player->leap_xf < WIZARD_HITBOX_RADIUS) player->leap_xf = WIZARD_HITBOX_RADIUS;
+
+            if(player->leap_yf > V_RES - WIZARD_HITBOX_RADIUS) player->leap_yf = V_RES - WIZARD_HITBOX_RADIUS;
+            else if(player->leap_yf < WIZARD_HITBOX_RADIUS) player->leap_yf = WIZARD_HITBOX_RADIUS;
+            player->casting = true;
+            player->cast_animation = NULL;
+        }
     }
 }
 
@@ -1296,11 +1340,25 @@ void Update_Game_State()
                 }
             }
 
+            unsigned int alive = 0;
+            Wizard* wizard_alive = NULL;
             for (unsigned int i = 0; i < WIZARDS_SIZE; i++)
             {
-                if (wizards[i]->casting)
-                    Draw_Cast(wizards[i]);
-                DrawWizard(wizards[i]);
+                if (wizards[i] != NULL && wizards[i]->health > 0)
+                {
+                    if(wizards[i]->casting) Draw_Cast(wizards[i]);
+                    DrawWizard(wizards[i]);
+                    alive++;
+                    wizard_alive = wizards[i];
+                }
+            }
+            if(alive <= 1)
+            {
+                if(wizard_alive != NULL && wizard_alive == player)
+                {
+                    gameStatus = victory;
+                }
+                else gameStatus = defeat;
             }
 
             // DrawToolBox();

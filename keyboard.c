@@ -285,7 +285,7 @@ bool getSpell()
       openTextBox = false;
       text_index = 0;
       strcpy(words, "");
-      Update_Game_State();
+      //Update_Game_State();
       SpellsRdy.Fire_Cast = true;
       SpellsRdy.Water_Cast = false;
       SpellsRdy.Earth_Cast = false;
