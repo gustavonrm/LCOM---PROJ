@@ -1354,14 +1354,19 @@ void Update_Game_State()
             }
             if(alive <= 1)
             {
+                for (unsigned int i = 0; i < WIZARDS_SIZE; i++)
+                {
+                    free(wizards[i]);
+                    wizards[i] = NULL;
+                }
                 if(wizard_alive != NULL && wizard_alive == player)
                 {
                     gameStatus = victory;
                 }
                 else gameStatus = defeat;
+                cursor->lb = false;
             }
 
-            // DrawToolBox();
             DrawTimers();
 
             if (openTextBox == true)
@@ -1400,6 +1405,7 @@ void Update_Game_State()
                     free(wizards[i]);
                     wizards[i] = NULL;
                 }
+                cursor->lb = false;
             }
         }
     }

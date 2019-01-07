@@ -154,7 +154,7 @@ void gameCondition()
 
           if (cursor->lb == true && cursor->x >= 210 && cursor->x <= 810 && cursor->y >= 505 && cursor->y <= 650)
           {
-                GameMenus.main_page = false;
+               GameMenus.main_page = true;
                GameMenus.game_onoff = false;
           }
      }
@@ -174,12 +174,12 @@ void gameCondition()
                GameMenus.main_page = true;
                GameMenus.run = 0;
                GameMenus.pause = false;
-              gameStatus = clean;
+               gameStatus = clean;
           }
 
            if (cursor->lb == true && cursor->x >= 210 && cursor->x <= 810 && cursor->y >= 505 && cursor->y <= 650)
           {
-                GameMenus.main_page = false;
+               GameMenus.main_page = true;
                GameMenus.game_onoff = false;
           }
      }
