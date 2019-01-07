@@ -55,10 +55,10 @@ void main_menu()
                GameMenus.run = 1;
                MP = false;
 
-               player = CreateWizard(Green, 512, 600, 0, username);
-               bot1 = CreateBot(Blue, 200, 384, "Bot: Bob");
-               bot2 = CreateBot(Red, 900, 384, "Bot: Commy");
-               bot3 = CreateBot(Yellow, 512, 100, "Bot: Pie");
+               player = CreateWizard(Green, 512, 700, 0, username);
+               bot1 = CreateBot(Blue, 100, 384, "Bot: Bob");
+               bot2 = CreateBot(Red, 950, 384, "Bot: Commy");
+               bot3 = CreateBot(Yellow, 512, 80, "Bot: Pie");
           }
 
           //condition for multi player

@@ -121,6 +121,7 @@ Animation *Explosion;
 Animation *Fire_Cast;
 Animation *Wind_Cast;
 Animation *Earth_Cast;
+Animation *Water_Cast;
 
 extern Cursor *cursor;
 extern SpellCast SpellsRdy;
@@ -168,6 +169,8 @@ bool LoadAssets()
     if ((Wind_Cast = CreateAnimation("Wind_Cast", 8, 2, false)) == NULL)
         return false;
     if ((Earth_Cast = CreateAnimation("Earth_Cast", 8, 2, false)) == NULL)
+        return false;
+    if ((Water_Cast = CreateAnimation("Water_Cast", 8, 2, false)) == NULL)
         return false;
 
     //mouse
@@ -954,7 +957,7 @@ void Get_Animation(Wizard *wizard)
         if (wizard->cast_type == Fire)
             wizard->cast_animation = Fire_Cast;
         else if (wizard->cast_type == Water)
-            wizard->cast_animation = Explosion; //INSERT CORRECT Animation here
+            wizard->cast_animation = Water_Cast;
         else if (wizard->cast_type == Air)
             wizard->cast_animation = Wind_Cast;
         else if (wizard->cast_type == Earth)
@@ -1359,6 +1362,11 @@ void Update_Game_State()
                     free(wizards[i]);
                     wizards[i] = NULL;
                 }
+                for (unsigned int i = 0; i < ELEMS_SIZE; i++)
+                {
+                    free(elements[i]);
+                    elements[i] = NULL;
+                }
                 if(wizard_alive != NULL && wizard_alive == player)
                 {
                     gameStatus = victory;
@@ -1404,6 +1412,11 @@ void Update_Game_State()
                 {
                     free(wizards[i]);
                     wizards[i] = NULL;
+                }
+                for (unsigned int i = 0; i < ELEMS_SIZE; i++)
+                {
+                    free(elements[i]);
+                    elements[i] = NULL;
                 }
                 cursor->lb = false;
             }
