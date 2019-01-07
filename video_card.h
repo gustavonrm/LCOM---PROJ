@@ -21,23 +21,71 @@ int draw_rectangle(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint
 int vg_draw_line( uint16_t x, uint16_t y,uint16_t len,uint32_t color );
 int draw_pixel(uint16_t x, uint16_t y, uint32_t color);
 
-
+/**
+ * @brief Draws the Background BMP
+ */
 void DrawBackground();
+/**
+ * @brief Draws the Main page bmp
+ */
 void DrawMainPage();
+/**
+ * @brief Draws the information box
+ */
 void DrawInfoBox();
-void DrawPauseMenu(); 
-void DrawVictory(); 
+/**
+ * @brief Draws the Pause menu
+ */
+void DrawPauseMenu();
+/**
+ * @Draws the Victory BMP
+ */
+void DrawVictory();
+/**
+ * @brief Draws the Defeat BMP
+ */
 void DrawDefeat();
+/**
+ * @brief Draws the bitmap to the buffer
+ * @param bitmap bitmap to draw
+ * @param x top left x coordinate
+ * @param y top left y coordinate
+ */
 void DrawBitmap(Bitmap* bitmap, int x, int y);
+/**
+ * @brief Copies buffer to video memory
+ */
 void UpdateVideo();
 
 
 
 ////SPRITE////
-
+/**
+ * @brief Creates a Sprite with the given name
+ * @param img_name name of the sprite
+ * @return Pointer to Sprite
+ */
 Sprite* CreateSprite(char img_name[]);
+/**
+ * @brief Rotates the Image given by the specified number of angles
+ * @param image bitmap to rotate
+ * @param angle number of angles to rotate
+ * @return returns the new bmp pointer
+ */
 Bitmap* RotateImage(Bitmap* image, float angle);
+/**
+ * @brief frees sprites
+ * @param sp sprite to be freed
+ */
 void destroy_sprite(Sprite *sp);
+/**
+ * @brief Draws the sprite to the buffer
+ * @param sp sprite to draw
+ * @param center_x x center of sprite
+ * @param center_y y center of sprite
+ * @param rot rotatio nof sprite
+ * @param centered true if teh x and y are the center, false if they are the top left corners
+ */
 void DrawSprite(Sprite *sp, int center_x, int center_y, unsigned int rot, bool centered);
 
 int new_vbe_get_mode_info(uint16_t mode,vbe_mode_info_t * vmi_p );	

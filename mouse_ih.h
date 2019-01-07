@@ -4,11 +4,37 @@
 #include <lcom/lcf.h>
 #include "i8042.h"
 
+/**
+ * @brief subscribes mouse interrupts
+ * @param bit_no Used to know if the interrupt belongs to the mouse
+ * @return returns 0 if OK
+ */
 int subscribe_mouse(uint8_t *bit_no);
+/**
+ * @brief Unsubscribes mouse interrupts
+ * @return 0 if OK
+ */
 int unsubscribe_mouse();
+/**
+ * @brief Enables the Mouse Stream
+ * @return 0 if OK
+ */
 int enable_stream();
+/**
+ * @brief Disables mouse stream
+ * @return 0 if OK
+ */
 int disable_stream();
+/**
+ * @brief Returns mouse info in an organized package
+ * @return organized package
+ */
 struct packet* mouse_int_h();
+/**
+ * @brief Divides the info into an organized package
+ * @param pp packet to be altered
+ * @param packets info from mouse
+ */
 void parse_packet(struct packet *pp, uint8_t packets[3]);
 
 int (disable_mouse_IH)();
